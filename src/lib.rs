@@ -1,6 +1,7 @@
 extern crate num;
 
 pub mod vec;
+mod vec_test;
 
 pub mod mat;
-mod vec_test;
+mod mat_test;

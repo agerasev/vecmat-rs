@@ -1,5 +1,6 @@
-use num::{Num, Zero, Signed};
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+use num::{Num, Zero, Signed};
+
 
 macro_rules! vn_struct {
 	($V:ident, $N:expr) => (
@@ -28,11 +29,30 @@ macro_rules! vn_index {
 	)
 }
 
+macro_rules! vn_zero {
+	($V:ident, $N:expr) => (
+		impl<T> Zero for $V<T> where T: Copy + Num + Zero {
+			fn zero() -> Self {
+				$V::<T> { d: [T::zero(); $N] }
+			}
+
+			fn is_zero(&self) -> bool {
+				for i in 0..$N {
+					if !self.d[i].is_zero() {
+						return false;
+					}
+				}
+				true
+			}
+		}
+	)
+}
+
 macro_rules! vn_new {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Zero {
+		impl<T> $V<T> where T: Copy + Num + Zero {
 			pub fn new() -> Self {
-				$V::<T> { d: [T::zero(); $N] }
+				$V::<T>::zero()
 			}
 		}
 	)
@@ -141,6 +161,7 @@ macro_rules! vn_all {
 	($V:ident, $N:expr) => (
 		vn_struct!($V, $N);
 		vn_index!($V, $N);
+		vn_zero!($V, $N);
 		vn_new!($V, $N);
 		vn_from!($V, $N);
 		vn_neg!($V, $N);
@@ -164,14 +185,14 @@ macro_rules! vn_all {
 	)
 }
 
-vn_all!(v2, 2);
-vn_all!(v3, 3);
-vn_all!(v4, 4);
+vn_all!(vec2, 2);
+vn_all!(vec3, 3);
+vn_all!(vec4, 4);
 
-impl<T> v3<T> where T: Copy + Num {
-	pub fn cross(self, vec: v3<T>) -> v3<T> {
+impl<T> vec3<T> where T: Copy + Num {
+	pub fn cross(self, vec: vec3<T>) -> vec3<T> {
 		let a = &self.d;
 		let b = &vec.d;
-		v3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
+		vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
 	}
 }
