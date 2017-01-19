@@ -30,7 +30,7 @@ macro_rules! vn_content_test {
 		}
 
 		for i in 0..$N {
-			v.d[i] = i + 2;
+			v[i] = i + 2;
 		}
 		for i in 0..$N {
 			assert_eq!(v.d[i], i + 2);
@@ -47,14 +47,26 @@ fn content() {
 	vn_content_test!(vec4, 4);
 }
 
+macro_rules! vn_eq_test {
+	($V:ident, $N:expr) => (
+		let va = $V::<usize> { d: vn_arr![i; i + 1; $N] };
+		let vb = $V::<usize> { d: vn_arr![i; i + 1; $N] };
+		assert_eq!(va, vb);
+	)
+}
+
+#[test]
+fn eq() {
+	vn_eq_test!(vec2, 2);
+	vn_eq_test!(vec3, 3);
+	vn_eq_test!(vec4, 4);
+}
+
 macro_rules! vn_copy_test {
 	($V:ident, $N:expr) => (
 		let v = $V::<usize> { d: vn_arr![i; i + 1; $N] };
 		let cv = v;
-
-		for i in 0..$N {
-			assert_eq!(cv.d[i], i + 1);
-		}
+		assert_eq!(cv, v);
 	)
 }
 
@@ -87,26 +99,6 @@ fn index() {
 	vn_index_test!(vec4, 4);
 }
 
-macro_rules! vn_zero_test {
-	($V:ident, $N:expr) => (
-		let z = $V::<i32>::zero();
-		for i in 0..$N {
-			assert_eq!(z.d[i], 0);
-		}
-		assert!(z.is_zero());
-		
-		let nz = $V::<i32> { d: [1; $N] };
-		assert!(!nz.is_zero());
-	)
-}
-
-#[test]
-fn zero() {
-	vn_zero_test!(vec2, 2);
-	vn_zero_test!(vec3, 3);
-	vn_zero_test!(vec4, 4);
-}
-
 macro_rules! vn_new_test {
 	($V:ident, $N:expr) => (
 		$V::<i32>::new();
@@ -125,12 +117,12 @@ macro_rules! vn_from_test {
 	($V:ident, $N:expr) => (
 		let vf: $V<usize> = $V::from(vn_arr![i; i + 1; $N]);
 		for i in 0..$N {
-			assert_eq!(vf.d[i], i + 1);
+			assert_eq!(vf[i], i + 1);
 		}
 
 		let vi: $V<usize> = vn_arr![i; i + 2; $N].into();
 		for i in 0..$N {
-			assert_eq!(vi.d[i], i + 2);
+			assert_eq!(vi[i], i + 2);
 		}
 	)
 }
@@ -147,7 +139,7 @@ macro_rules! vn_neg_test {
 		let v: $V<i32> = vn_arr![i; i as i32; $N].into();
 		let nv = -v;
 		for i in 0..$N {
-			assert_eq!(-v.d[i], nv.d[i]);
+			assert_eq!(-v[i], nv[i]);
 		}
 	)
 }
@@ -171,7 +163,7 @@ macro_rules! vn_vec_op_test {
 		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
 		let vc = $op!(va, vb);
 		for i in 0..$N {
-			assert_eq!(vc.d[i], $op!(va.d[i], vb.d[i]));
+			assert_eq!(vc[i], $op!(va[i], vb[i]));
 		}
 	)
 }
@@ -217,7 +209,7 @@ macro_rules! vn_scal_op_test {
 		let a: i32 = 3;
 		let va = $op!(v, a);
 		for i in 0..$N {
-			assert_eq!(va.d[i], $op!(v.d[i], a));
+			assert_eq!(va[i], $op!(v[i], a));
 		}
 	)
 }
@@ -255,9 +247,7 @@ macro_rules! vn_vec_op_assign_test {
 		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
 		let mut vc = va;
 		$op_assign!(vc, vb);
-		for i in 0..$N {
-			assert_eq!(vc.d[i], $op!(va.d[i], vb.d[i]));
-		}
+		assert_eq!(vc, $op!(va, vb));
 	)
 }
 
@@ -302,9 +292,7 @@ macro_rules! vn_scal_op_assign_test {
 		let a: i32 = 3;
 		let mut va = v;
 		$op_assign!(va, a);
-		for i in 0..$N {
-			assert_eq!(va.d[i], $op!(v.d[i], a));
-		}
+		assert_eq!(va, $op!(v, a));
 	)
 }
 
@@ -345,12 +333,137 @@ fn dot() {
 	vn_dot_test!(vec4, 4);
 }
 
+macro_rules! vn_zero_test {
+	($V:ident, $N:expr) => (
+		let z = $V::<i32>::zero();
+		assert_eq!(z, [0; $N].into());
+		assert!(z.is_zero());
+		
+		let nz: $V<i32> = [1; $N].into();
+		assert!(!nz.is_zero());
+	)
+}
+
+#[test]
+fn zero() {
+	vn_zero_test!(vec2, 2);
+	vn_zero_test!(vec3, 3);
+	vn_zero_test!(vec4, 4);
+}
+
+macro_rules! vn_bool_not_test {
+	($V:ident, $N:expr) => (
+		let z = $V::<bool>::from([false; $N]);
+		let nz = !z;
+		for i in 0..$N {
+			assert_eq!(nz[i], !z[i]);
+		}
+	)
+}
+
+#[test]
+fn bool_not() {
+	vn_bool_not_test!(vec2, 2);
+	vn_bool_not_test!(vec3, 3);
+	vn_bool_not_test!(vec4, 4);
+}
+
+macro_rules! vn_bool_any_test {
+	($V:ident, $N:expr) => (
+		let mut v = $V::<bool>::from([false; $N]);
+		assert!(!v.any());
+		v[0] = true;
+		assert!(v.any());
+	)
+}
+
+#[test]
+fn bool_any() {
+	vn_bool_any_test!(vec2, 2);
+	vn_bool_any_test!(vec3, 3);
+	vn_bool_any_test!(vec4, 4);
+}
+
+macro_rules! vn_bool_all_test {
+	($V:ident, $N:expr) => (
+		let mut v = $V::<bool>::from([true; $N]);
+		assert!(v.all());
+		v[0] = false;
+		assert!(!v.all());
+	)
+}
+
+#[test]
+fn bool_all() {
+	vn_bool_all_test!(vec2, 2);
+	vn_bool_all_test!(vec3, 3);
+	vn_bool_all_test!(vec4, 4);
+}
+
+macro_rules! vn_vec_eq_test {
+	($V:ident, $N:expr) => (
+		let va = $V::<i32>::from(vn_arr![i; ($N - i) as i32; $N]);
+		let vb = $V::<i32>::from(vn_arr![i; i as i32; $N]);
+		
+		let eq = va.eq_(vb);
+		for i in 0..$N {
+			assert_eq!(eq[i], $N - i == i);
+		}
+
+		let ne = va.ne_(vb);
+		for i in 0..$N {
+			assert_eq!(ne[i], $N - i != i);
+		}
+	)
+}
+
+#[test]
+fn vec_eq() {
+	vn_vec_eq_test!(vec2, 2);
+	vn_vec_eq_test!(vec3, 3);
+	vn_vec_eq_test!(vec4, 4);
+}
+
+macro_rules! vn_vec_cmp_test {
+	($V:ident, $N:expr) => (
+		let va = $V::<i32>::from(vn_arr![i; ($N - i) as i32; $N]);
+		let vb = $V::<i32>::from(vn_arr![i; i as i32; $N]);
+		
+		let lt = va.lt_(vb);
+		for i in 0..$N {
+			assert_eq!(lt[i], $N - i < i);
+		}
+
+		let le = va.le_(vb);
+		for i in 0..$N {
+			assert_eq!(le[i], $N - i <= i);
+		}
+
+		let gt = va.gt_(vb);
+		for i in 0..$N {
+			assert_eq!(gt[i], $N - i > i);
+		}
+
+		let ge = va.ge_(vb);
+		for i in 0..$N {
+			assert_eq!(ge[i], $N - i >= i);
+		}
+	)
+}
+
+#[test]
+fn vec_cmp() {
+	vn_vec_cmp_test!(vec2, 2);
+	vn_vec_cmp_test!(vec3, 3);
+	vn_vec_cmp_test!(vec4, 4);
+}
+
 #[test]
 fn cross() {
 	let va: vec3<i32> = [1, 0, 0].into();
 	let vb: vec3<i32> = [0, 1, 0].into();
 	let vc = va.cross(vb);
-	assert_eq!(vc.d[0], 0);
-	assert_eq!(vc.d[1], 0);
-	assert_eq!(vc.d[2], 1);
+	assert_eq!(vc[0], 0);
+	assert_eq!(vc[1], 0);
+	assert_eq!(vc[2], 1);
 }
