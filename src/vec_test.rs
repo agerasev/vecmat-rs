@@ -157,7 +157,7 @@ macro_rules! op_mul { ($a:expr, $b:expr) => ({ $a*$b }) }
 macro_rules! op_div { ($a:expr, $b:expr) => ({ $a/$b }) }
 macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
-macro_rules! vn_vec_op_test {
+macro_rules! vn_op_vec_test {
 	($V:ident, $N:expr, $op:ident) => (
 		let va: $V<i32> = vn_arr![i; (2*i + 2) as i32; $N].into();
 		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
@@ -170,40 +170,40 @@ macro_rules! vn_vec_op_test {
 
 #[test]
 fn vec_add() {
-	vn_vec_op_test!(vec2, 2, op_add);
-	vn_vec_op_test!(vec3, 3, op_add);
-	vn_vec_op_test!(vec4, 4, op_add);
+	vn_op_vec_test!(vec2, 2, op_add);
+	vn_op_vec_test!(vec3, 3, op_add);
+	vn_op_vec_test!(vec4, 4, op_add);
 }
 
 #[test]
 fn vec_sub() {
-	vn_vec_op_test!(vec2, 2, op_sub);
-	vn_vec_op_test!(vec3, 3, op_sub);
-	vn_vec_op_test!(vec4, 4, op_sub);
+	vn_op_vec_test!(vec2, 2, op_sub);
+	vn_op_vec_test!(vec3, 3, op_sub);
+	vn_op_vec_test!(vec4, 4, op_sub);
 }
 
 #[test]
 fn vec_mul() {
-	vn_vec_op_test!(vec2, 2, op_mul);
-	vn_vec_op_test!(vec3, 3, op_mul);
-	vn_vec_op_test!(vec4, 4, op_mul);
+	vn_op_vec_test!(vec2, 2, op_mul);
+	vn_op_vec_test!(vec3, 3, op_mul);
+	vn_op_vec_test!(vec4, 4, op_mul);
 }
 
 #[test]
 fn vec_div() {
-	vn_vec_op_test!(vec2, 2, op_div);
-	vn_vec_op_test!(vec3, 3, op_div);
-	vn_vec_op_test!(vec4, 4, op_div);
+	vn_op_vec_test!(vec2, 2, op_div);
+	vn_op_vec_test!(vec3, 3, op_div);
+	vn_op_vec_test!(vec4, 4, op_div);
 }
 
 #[test]
 fn vec_rem() {
-	vn_vec_op_test!(vec2, 2, op_rem);
-	vn_vec_op_test!(vec3, 3, op_rem);
-	vn_vec_op_test!(vec4, 4, op_rem);
+	vn_op_vec_test!(vec2, 2, op_rem);
+	vn_op_vec_test!(vec3, 3, op_rem);
+	vn_op_vec_test!(vec4, 4, op_rem);
 }
 
-macro_rules! vn_scal_op_test {
+macro_rules! vn_op_scal_test {
 	($V:ident, $N:expr, $op:ident) => (
 		let v: $V<i32> = vn_arr![i; (2*i + 1) as i32; $N].into();
 		let a: i32 = 3;
@@ -216,23 +216,23 @@ macro_rules! vn_scal_op_test {
 
 #[test]
 fn scal_mul() {
-	vn_scal_op_test!(vec2, 2, op_mul);
-	vn_scal_op_test!(vec3, 3, op_mul);
-	vn_scal_op_test!(vec4, 4, op_mul);
+	vn_op_scal_test!(vec2, 2, op_mul);
+	vn_op_scal_test!(vec3, 3, op_mul);
+	vn_op_scal_test!(vec4, 4, op_mul);
 }
 
 #[test]
 fn scal_div() {
-	vn_scal_op_test!(vec2, 2, op_div);
-	vn_scal_op_test!(vec3, 3, op_div);
-	vn_scal_op_test!(vec4, 4, op_div);
+	vn_op_scal_test!(vec2, 2, op_div);
+	vn_op_scal_test!(vec3, 3, op_div);
+	vn_op_scal_test!(vec4, 4, op_div);
 }
 
 #[test]
 fn scal_rem() {
-	vn_scal_op_test!(vec2, 2, op_rem);
-	vn_scal_op_test!(vec3, 3, op_rem);
-	vn_scal_op_test!(vec4, 4, op_rem);
+	vn_op_scal_test!(vec2, 2, op_rem);
+	vn_op_scal_test!(vec3, 3, op_rem);
+	vn_op_scal_test!(vec4, 4, op_rem);
 }
 
 macro_rules! op_add_assign { ($a:expr, $b:expr) => ({ $a += $b }) }
@@ -241,7 +241,7 @@ macro_rules! op_mul_assign { ($a:expr, $b:expr) => ({ $a *= $b }) }
 macro_rules! op_div_assign { ($a:expr, $b:expr) => ({ $a /= $b }) }
 macro_rules! op_rem_assign { ($a:expr, $b:expr) => ({ $a %= $b }) }
 
-macro_rules! vn_vec_op_assign_test {
+macro_rules! vn_op_vec_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
 		let va: $V<i32> = vn_arr![i; (2*i + 2) as i32; $N].into();
 		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
@@ -253,40 +253,40 @@ macro_rules! vn_vec_op_assign_test {
 
 #[test]
 fn vec_add_assign() {
-	vn_vec_op_assign_test!(vec2, 2, op_add_assign, op_add);
-	vn_vec_op_assign_test!(vec3, 3, op_add_assign, op_add);
-	vn_vec_op_assign_test!(vec4, 4, op_add_assign, op_add);
+	vn_op_vec_assign_test!(vec2, 2, op_add_assign, op_add);
+	vn_op_vec_assign_test!(vec3, 3, op_add_assign, op_add);
+	vn_op_vec_assign_test!(vec4, 4, op_add_assign, op_add);
 }
 
 #[test]
 fn vec_sub_assign() {
-	vn_vec_op_assign_test!(vec2, 2, op_sub_assign, op_sub);
-	vn_vec_op_assign_test!(vec3, 3, op_sub_assign, op_sub);
-	vn_vec_op_assign_test!(vec4, 4, op_sub_assign, op_sub);
+	vn_op_vec_assign_test!(vec2, 2, op_sub_assign, op_sub);
+	vn_op_vec_assign_test!(vec3, 3, op_sub_assign, op_sub);
+	vn_op_vec_assign_test!(vec4, 4, op_sub_assign, op_sub);
 }
 
 #[test]
 fn vec_mul_assign() {
-	vn_vec_op_assign_test!(vec2, 2, op_mul_assign, op_mul);
-	vn_vec_op_assign_test!(vec3, 3, op_mul_assign, op_mul);
-	vn_vec_op_assign_test!(vec4, 4, op_mul_assign, op_mul);
+	vn_op_vec_assign_test!(vec2, 2, op_mul_assign, op_mul);
+	vn_op_vec_assign_test!(vec3, 3, op_mul_assign, op_mul);
+	vn_op_vec_assign_test!(vec4, 4, op_mul_assign, op_mul);
 }
 
 #[test]
 fn vec_div_assign() {
-	vn_vec_op_assign_test!(vec2, 2, op_div_assign, op_div);
-	vn_vec_op_assign_test!(vec3, 3, op_div_assign, op_div);
-	vn_vec_op_assign_test!(vec4, 4, op_div_assign, op_div);
+	vn_op_vec_assign_test!(vec2, 2, op_div_assign, op_div);
+	vn_op_vec_assign_test!(vec3, 3, op_div_assign, op_div);
+	vn_op_vec_assign_test!(vec4, 4, op_div_assign, op_div);
 }
 
 #[test]
 fn vec_rem_assign() {
-	vn_vec_op_assign_test!(vec2, 2, op_rem_assign, op_rem);
-	vn_vec_op_assign_test!(vec3, 3, op_rem_assign, op_rem);
-	vn_vec_op_assign_test!(vec4, 4, op_rem_assign, op_rem);
+	vn_op_vec_assign_test!(vec2, 2, op_rem_assign, op_rem);
+	vn_op_vec_assign_test!(vec3, 3, op_rem_assign, op_rem);
+	vn_op_vec_assign_test!(vec4, 4, op_rem_assign, op_rem);
 }
 
-macro_rules! vn_scal_op_assign_test {
+macro_rules! vn_op_scal_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
 		let v: $V<i32> = vn_arr![i; (2*i + 1) as i32; $N].into();
 		let a: i32 = 3;
@@ -298,23 +298,23 @@ macro_rules! vn_scal_op_assign_test {
 
 #[test]
 fn scal_mul_assign() {
-	vn_scal_op_assign_test!(vec2, 2, op_mul_assign, op_mul);
-	vn_scal_op_assign_test!(vec3, 3, op_mul_assign, op_mul);
-	vn_scal_op_assign_test!(vec4, 4, op_mul_assign, op_mul);
+	vn_op_scal_assign_test!(vec2, 2, op_mul_assign, op_mul);
+	vn_op_scal_assign_test!(vec3, 3, op_mul_assign, op_mul);
+	vn_op_scal_assign_test!(vec4, 4, op_mul_assign, op_mul);
 }
 
 #[test]
 fn scal_div_assign() {
-	vn_scal_op_assign_test!(vec2, 2, op_div_assign, op_div);
-	vn_scal_op_assign_test!(vec3, 3, op_div_assign, op_div);
-	vn_scal_op_assign_test!(vec4, 4, op_div_assign, op_div);
+	vn_op_scal_assign_test!(vec2, 2, op_div_assign, op_div);
+	vn_op_scal_assign_test!(vec3, 3, op_div_assign, op_div);
+	vn_op_scal_assign_test!(vec4, 4, op_div_assign, op_div);
 }
 
 #[test]
 fn scal_rem_assign() {
-	vn_scal_op_assign_test!(vec2, 2, op_rem_assign, op_rem);
-	vn_scal_op_assign_test!(vec3, 3, op_rem_assign, op_rem);
-	vn_scal_op_assign_test!(vec4, 4, op_rem_assign, op_rem);
+	vn_op_scal_assign_test!(vec2, 2, op_rem_assign, op_rem);
+	vn_op_scal_assign_test!(vec3, 3, op_rem_assign, op_rem);
+	vn_op_scal_assign_test!(vec4, 4, op_rem_assign, op_rem);
 }
 
 macro_rules! vn_dot_test {

@@ -2,7 +2,6 @@ use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssi
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
 use num::{Num, Zero, Signed};
 
-
 macro_rules! vn_struct {
 	($V:ident, $N:expr) => (
 		#[allow(non_camel_case_types)]
@@ -86,7 +85,7 @@ macro_rules! vn_from {
 
 macro_rules! vn_neg {
 	($V:ident, $N:expr) => (
-		impl<T> Neg for $V<T> where T: Copy + Default + Signed {
+		impl<T> Neg for $V<T> where T: Copy + Default + Num + Signed {
 			type Output = $V<T>;
 			fn neg(self) -> Self::Output {
 				vn_map![i; -self[i]; $V, $N]
@@ -101,7 +100,7 @@ macro_rules! op_mul { ($a:expr, $b:expr) => ({ $a*$b }) }
 macro_rules! op_div { ($a:expr, $b:expr) => ({ $a/$b }) }
 macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
-macro_rules! vn_vec_op {
+macro_rules! vn_op_vec {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
@@ -112,7 +111,7 @@ macro_rules! vn_vec_op {
 	)
 }
 
-macro_rules! vn_scal_op {
+macro_rules! vn_op_scal {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
@@ -123,7 +122,7 @@ macro_rules! vn_scal_op {
 	)
 }
 
-macro_rules! vn_vec_op_assign {
+macro_rules! vn_op_vec_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, vec: $V<T>) {
@@ -135,7 +134,7 @@ macro_rules! vn_vec_op_assign {
 	)
 }
 
-macro_rules! vn_scal_op_assign {
+macro_rules! vn_op_scal_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, a: T) {
@@ -149,7 +148,7 @@ macro_rules! vn_scal_op_assign {
 
 macro_rules! vn_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num + Zero {
+		impl<T> $V<T> where T: Copy + Default + Num {
 			pub fn dot(self, vec: $V<T>) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -163,7 +162,7 @@ macro_rules! vn_dot {
 
 macro_rules! vn_zero {
 	($V:ident, $N:expr) => (
-		impl<T> Zero for $V<T> where T: Copy + Default + Num + Zero {
+		impl<T> Zero for $V<T> where T: Copy + Default + Num {
 			fn zero() -> Self {
 				$V::<T> { d: [T::zero(); $N] }
 			}
@@ -262,22 +261,22 @@ macro_rules! vn_all {
 		vn_from!($V, $N);
 
 		vn_neg!($V, $N);
-		vn_vec_op!($V, $N, Add, add, op_add);
-		vn_vec_op!($V, $N, Sub, sub, op_sub);
-		vn_vec_op!($V, $N, Mul, mul, op_mul);
-		vn_vec_op!($V, $N, Div, div, op_div);
-		vn_vec_op!($V, $N, Rem, rem, op_rem);
-		vn_scal_op!($V, $N, Mul, mul, op_mul);
-		vn_scal_op!($V, $N, Div, div, op_div);
-		vn_scal_op!($V, $N, Rem, rem, op_rem);
-		vn_vec_op_assign!($V, $N, AddAssign, add_assign, op_add);
-		vn_vec_op_assign!($V, $N, SubAssign, sub_assign, op_sub);
-		vn_vec_op_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vn_vec_op_assign!($V, $N, DivAssign, div_assign, op_div);
-		vn_vec_op_assign!($V, $N, RemAssign, rem_assign, op_rem);
-		vn_scal_op_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vn_scal_op_assign!($V, $N, DivAssign, div_assign, op_div);
-		vn_scal_op_assign!($V, $N, RemAssign, rem_assign, op_rem);
+		vn_op_vec!($V, $N, Add, add, op_add);
+		vn_op_vec!($V, $N, Sub, sub, op_sub);
+		vn_op_vec!($V, $N, Mul, mul, op_mul);
+		vn_op_vec!($V, $N, Div, div, op_div);
+		vn_op_vec!($V, $N, Rem, rem, op_rem);
+		vn_op_scal!($V, $N, Mul, mul, op_mul);
+		vn_op_scal!($V, $N, Div, div, op_div);
+		vn_op_scal!($V, $N, Rem, rem, op_rem);
+		vn_op_vec_assign!($V, $N, AddAssign, add_assign, op_add);
+		vn_op_vec_assign!($V, $N, SubAssign, sub_assign, op_sub);
+		vn_op_vec_assign!($V, $N, MulAssign, mul_assign, op_mul);
+		vn_op_vec_assign!($V, $N, DivAssign, div_assign, op_div);
+		vn_op_vec_assign!($V, $N, RemAssign, rem_assign, op_rem);
+		vn_op_scal_assign!($V, $N, MulAssign, mul_assign, op_mul);
+		vn_op_scal_assign!($V, $N, DivAssign, div_assign, op_div);
+		vn_op_scal_assign!($V, $N, RemAssign, rem_assign, op_rem);
 		vn_dot!($V, $N);
 
 		vn_zero!($V, $N);

@@ -1,5 +1,9 @@
 #[allow(unused_imports)]
+use num::{Zero, One};
+#[allow(unused_imports)]
 use mat::*;
+#[allow(unused_imports)]
+use vec::*;
 
 macro_rules! vnm_arr {
 	[$i:ident, $j:ident; $v:expr; $N:expr, $M:expr] => ({
@@ -126,45 +130,31 @@ fn index() {
 	vnm_index_test!(mat4x4, 4, 4);
 }
 
-/*
 macro_rules! vnm_zero_test {
-	($V:ident, $N:expr) => (
+	($V:ident, $N:expr, $M:expr) => (
 		let z = $V::<i32>::zero();
-		for i in 0..($N*$N) {
+		for i in 0..($N*$M) {
 			assert_eq!(z.d[i], 0);
 		}
 		assert!(z.is_zero());
 		
-		let nz = $V::<i32> { d: [1; ($N*$N)] };
+		let nz = $V::<i32> { d: [1; ($N*$M)] };
 		assert!(!nz.is_zero());
 	)
 }
 
 #[test]
 fn zero() {
-	vnm_zero_test!(mat2, 2);
-	vnm_zero_test!(mat3, 3);
-	vnm_zero_test!(mat4, 4);
+	vnm_zero_test!(mat2x2, 2, 2);
+	vnm_zero_test!(mat2x3, 2, 3);
+	vnm_zero_test!(mat2x4, 2, 4);
+	vnm_zero_test!(mat3x2, 3, 2);
+	vnm_zero_test!(mat3x3, 3, 3);
+	vnm_zero_test!(mat3x4, 3, 4);
+	vnm_zero_test!(mat4x2, 4, 2);
+	vnm_zero_test!(mat4x3, 4, 3);
+	vnm_zero_test!(mat4x4, 4, 4);
 }
-
-macro_rules! vnm_one_test {
-	($V:ident, $N:expr) => (
-		let o = $V::<i32>::one();
-		for j in 0..$N {
-			for i in 0..$N {
-				assert_eq!(o.d[i], if i == j { 1 } else { 0 });
-			}
-		}
-	)
-}
-
-#[test]
-fn one() {
-	vnm_one_test!(mat2, 2);
-	vnm_one_test!(mat3, 3);
-	vnm_one_test!(mat4, 4);
-}
-*/
 
 macro_rules! vnm_new_test {
 	($V:ident, $N:expr, $M:expr) => (
@@ -240,4 +230,49 @@ fn neg() {
 	vnm_neg_test!(mat4x2, 4, 2);
 	vnm_neg_test!(mat4x3, 4, 3);
 	vnm_neg_test!(mat4x4, 4, 4);
+}
+
+macro_rules! vnm_outer_test {
+	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
+		let vn = vn_map![i; i as i32; $Vn, $N];
+		let vm = vn_map![i; 2*i as i32; $Vm, $M];
+		let mat = vnm_map![i, j; (2*i*j) as i32; $Vnm, $N, $M];
+		let res = vm.outer(vn);
+		for j in 0..$M {
+			for i in 0..$N {
+				assert_eq!(res[(i, j)], mat[(i, j)]);
+			}
+		}
+	)
+}
+
+#[test]
+fn outer() {
+	vnm_outer_test!(mat2x2, vec2, vec2, 2, 2);
+	vnm_outer_test!(mat2x3, vec2, vec3, 2, 3);
+	vnm_outer_test!(mat2x4, vec2, vec4, 2, 4);
+	vnm_outer_test!(mat3x2, vec3, vec2, 3, 2);
+	vnm_outer_test!(mat3x3, vec3, vec3, 3, 3);
+	vnm_outer_test!(mat3x4, vec3, vec4, 3, 4);
+	vnm_outer_test!(mat4x2, vec4, vec2, 4, 2);
+	vnm_outer_test!(mat4x3, vec4, vec3, 4, 3);
+	vnm_outer_test!(mat4x4, vec4, vec4, 4, 4);
+}
+
+macro_rules! vnm_one_test {
+	($V:ident, $N:expr) => (
+		let o = $V::<i32>::one();
+		for j in 0..$N {
+			for i in 0..$N {
+				assert_eq!(o[(i, j)], if i == j { 1 } else { 0 });
+			}
+		}
+	)
+}
+
+#[test]
+fn one() {
+	vnm_one_test!(mat2x2, 2);
+	vnm_one_test!(mat3x3, 3);
+	vnm_one_test!(mat4x4, 4);
 }
