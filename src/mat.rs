@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut, Neg, Add, Mul};
+use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
 use num::{Num, Zero, One, Signed};
 use vec::*;
@@ -98,23 +98,49 @@ macro_rules! vnm_neg {
 	)
 }
 
-macro_rules! vnm_add {
-	($V:ident, $N:expr, $M:expr) => (
-		impl<T> Add<$V<T>> for $V<T> where T: Copy + Default + Num {
+macro_rules! op_add { ($a:expr, $b:expr) => ({ $a + $b }) }
+macro_rules! op_sub { ($a:expr, $b:expr) => ({ $a - $b }) }
+macro_rules! op_mul { ($a:expr, $b:expr) => ({ $a*$b }) }
+macro_rules! op_div { ($a:expr, $b:expr) => ({ $a/$b }) }
+macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
+
+macro_rules! vnm_op_mat {
+	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
-			fn add(self, mat: $V<T>) -> Self::Output {
-				vnm_map![i, j; self[(i, j)] + mat[(i, j)]; $V, $N, $M]
+			fn $method(self, mat: $V<T>) -> Self::Output {
+				vnm_map![i, j; $op!(self[(i, j)], mat[(i, j)]); $V, $N, $M]
 			}
 		}
 	)
 }
 
-macro_rules! vnm_sub {
-	($V:ident, $N:expr, $M:expr) => (
-		impl<T> Add<$V<T>> for $V<T> where T: Copy + Default + Num {
+macro_rules! vnm_op_scal {
+	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
-			fn add(self, mat: $V<T>) -> Self::Output {
-				vnm_map![i, j; self[(i, j)] - mat[(i, j)]; $V, $N, $M]
+			fn $method(self, a: T) -> Self::Output {
+				vnm_map![i, j; $op!(self[(i, j)], a); $V, $N, $M]
+			}
+		}
+	)
+}
+
+macro_rules! vnm_op_mat_assign {
+	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
+			fn $method(&mut self, mat: $V<T>) {
+				*self = $op!(*self, mat);
+			}
+		}
+	)
+}
+
+macro_rules! vnm_op_scal_assign {
+	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
+			fn $method(&mut self, a: T) {
+				*self = $op!(*self, a);
 			}
 		}
 	)
@@ -146,8 +172,20 @@ macro_rules! vnm_all {
 		vnm_index!($V, $N, $M);
 		vnm_new!($V, $N, $M);
 		vnm_from!($V, $N, $M);
+
 		vnm_neg!($V, $N, $M);
-		vnm_add!($V, $N, $M);
+
+		vnm_op_mat!($V, $N, $M, Add, add, op_add);
+		vnm_op_mat!($V, $N, $M, Sub, sub, op_sub);
+		vnm_op_scal!($V, $N, $M, Mul, mul, op_mul);
+		vnm_op_scal!($V, $N, $M, Div, div, op_div);
+		vnm_op_scal!($V, $N, $M, Rem, rem, op_rem);
+		vnm_op_mat_assign!($V, $N, $M, AddAssign, add_assign, op_add);
+		vnm_op_mat_assign!($V, $N, $M, SubAssign, sub_assign, op_sub);
+		vnm_op_scal_assign!($V, $N, $M, MulAssign, mul_assign, op_mul);
+		vnm_op_scal_assign!($V, $N, $M, DivAssign, div_assign, op_div);
+		vnm_op_scal_assign!($V, $N, $M, RemAssign, rem_assign, op_rem);
+
 		vnm_zero!($V, $N, $M);
 	)
 }
@@ -161,6 +199,26 @@ vnm_all!(mat3x4, 3, 4);
 vnm_all!(mat4x2, 4, 2);
 vnm_all!(mat4x3, 4, 3);
 vnm_all!(mat4x4, 4, 4);
+
+macro_rules! vnm_transpose {
+	($Vnm:ident, $Vmn:ident, $N:expr, $M:expr) => (
+		impl<T> $Vnm<T> where T: Copy + Default {
+			pub fn transpose(self) -> $Vmn<T> {
+				vnm_map![i, j; self[(j, i)]; $Vmn, $M, $N]
+			}
+		}
+	)
+}
+
+vnm_transpose!(mat2x2, mat2x2, 2, 2);
+vnm_transpose!(mat2x3, mat3x2, 2, 3);
+vnm_transpose!(mat2x4, mat4x2, 2, 4);
+vnm_transpose!(mat3x2, mat2x3, 3, 2);
+vnm_transpose!(mat3x3, mat3x3, 3, 3);
+vnm_transpose!(mat3x4, mat4x3, 3, 4);
+vnm_transpose!(mat4x2, mat2x4, 4, 2);
+vnm_transpose!(mat4x3, mat3x4, 4, 3);
+vnm_transpose!(mat4x4, mat4x4, 4, 4);
 
 pub trait Outer<VT> {
 	type Output;
@@ -183,16 +241,6 @@ macro_rules! vnm_outer {
 		}
 	)
 }
-
-vnm_outer!(mat2x2, vec2, vec2, 2, 2);
-vnm_outer!(mat2x3, vec2, vec3, 2, 3);
-vnm_outer!(mat2x4, vec2, vec4, 2, 4);
-vnm_outer!(mat3x2, vec3, vec2, 3, 2);
-vnm_outer!(mat3x3, vec3, vec3, 3, 3);
-vnm_outer!(mat3x4, vec3, vec4, 3, 4);
-vnm_outer!(mat4x2, vec4, vec2, 4, 2);
-vnm_outer!(mat4x3, vec4, vec3, 4, 3);
-vnm_outer!(mat4x4, vec4, vec4, 4, 4);
 
 macro_rules! vnm_mul_vec {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
@@ -234,6 +282,7 @@ macro_rules! vnm_mul_vec_mat {
 
 macro_rules! vnm_mul_vec_all {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
+		vnm_outer!($Vnm, $Vn, $Vm, $N, $M);
 		vnm_mul_vec!($Vnm, $Vn, $Vm, $N, $M);
 		vnm_mul_vec_mat!($Vnm, $Vn, $Vm, $N, $M);
 	)

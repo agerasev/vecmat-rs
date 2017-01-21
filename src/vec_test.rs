@@ -136,7 +136,7 @@ fn from() {
 
 macro_rules! vn_neg_test {
 	($V:ident, $N:expr) => (
-		let v: $V<i32> = vn_arr![i; i as i32; $N].into();
+		let v = vn_map![i; i as i32; $V, $N];
 		let nv = -v;
 		for i in 0..$N {
 			assert_eq!(-v[i], nv[i]);
@@ -159,8 +159,8 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! vn_op_vec_test {
 	($V:ident, $N:expr, $op:ident) => (
-		let va: $V<i32> = vn_arr![i; (2*i + 2) as i32; $N].into();
-		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
+		let va = vn_map![i; (2*i + 2) as i32; $V, $N];
+		let vb = vn_map![i; (i + 1) as i32; $V, $N];
 		let vc = $op!(va, vb);
 		for i in 0..$N {
 			assert_eq!(vc[i], $op!(va[i], vb[i]));
@@ -205,7 +205,7 @@ fn vec_rem() {
 
 macro_rules! vn_op_scal_test {
 	($V:ident, $N:expr, $op:ident) => (
-		let v: $V<i32> = vn_arr![i; (2*i + 1) as i32; $N].into();
+		let v = vn_map![i; (2*i + 1) as i32; $V, $N];
 		let a: i32 = 3;
 		let va = $op!(v, a);
 		for i in 0..$N {
@@ -243,8 +243,8 @@ macro_rules! op_rem_assign { ($a:expr, $b:expr) => ({ $a %= $b }) }
 
 macro_rules! vn_op_vec_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
-		let va: $V<i32> = vn_arr![i; (2*i + 2) as i32; $N].into();
-		let vb: $V<i32> = vn_arr![i; (i + 1) as i32; $N].into();
+		let va = vn_map![i; (2*i + 2) as i32; $V, $N];
+		let vb = vn_map![i; (i + 1) as i32; $V, $N];
 		let mut vc = va;
 		$op_assign!(vc, vb);
 		assert_eq!(vc, $op!(va, vb));
@@ -288,8 +288,8 @@ fn vec_rem_assign() {
 
 macro_rules! vn_op_scal_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
-		let v: $V<i32> = vn_arr![i; (2*i + 1) as i32; $N].into();
-		let a: i32 = 3;
+		let v = vn_map![i; (2*i + 1) as i32; $V, $N];
+		let a = 3;
 		let mut va = v;
 		$op_assign!(va, a);
 		assert_eq!(va, $op!(v, a));
@@ -320,7 +320,7 @@ fn scal_rem_assign() {
 macro_rules! vn_dot_test {
 	($V:ident, $N:expr) => (
 		let va: $V<usize> = [1; $N].into();
-		let vb: $V<usize> = vn_arr![i; i + 1; $N].into();
+		let vb: $V<usize> = vn_map![i; i + 1; $V, $N];
 		let c = va.dot(vb);
 		assert_eq!(c, ($N*($N + 1))/2);
 	)
@@ -370,7 +370,7 @@ fn bool_not() {
 
 macro_rules! vn_bool_any_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::<bool>::from([false; $N]);
+		let mut v: $V<bool> = [false; $N].into();
 		assert!(!v.any());
 		v[0] = true;
 		assert!(v.any());
@@ -386,7 +386,7 @@ fn bool_any() {
 
 macro_rules! vn_bool_all_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::<bool>::from([true; $N]);
+		let mut v: $V<bool> = [true; $N].into();
 		assert!(v.all());
 		v[0] = false;
 		assert!(!v.all());
@@ -402,8 +402,8 @@ fn bool_all() {
 
 macro_rules! vn_vec_eq_test {
 	($V:ident, $N:expr) => (
-		let va = $V::<i32>::from(vn_arr![i; ($N - i) as i32; $N]);
-		let vb = $V::<i32>::from(vn_arr![i; i as i32; $N]);
+		let va = vn_map![i; ($N - i) as i32; $V, $N];
+		let vb = vn_map![i; i as i32; $V, $N];
 		
 		let eq = va.eq_(vb);
 		for i in 0..$N {
@@ -426,8 +426,8 @@ fn vec_eq() {
 
 macro_rules! vn_vec_cmp_test {
 	($V:ident, $N:expr) => (
-		let va = $V::<i32>::from(vn_arr![i; ($N - i) as i32; $N]);
-		let vb = $V::<i32>::from(vn_arr![i; i as i32; $N]);
+		let va = vn_map![i; ($N - i) as i32; $V, $N];
+		let vb = vn_map![i; i as i32; $V, $N];
 		
 		let lt = va.lt_(vb);
 		for i in 0..$N {

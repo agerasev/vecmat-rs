@@ -126,9 +126,7 @@ macro_rules! vn_op_vec_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, vec: $V<T>) {
-				for i in 0..$N {
-					self[i] = $op!(self[i], vec[i]);
-				}
+				*self = $op!(*self, vec);
 			}
 		}
 	)
@@ -138,11 +136,23 @@ macro_rules! vn_op_scal_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, a: T) {
-				for i in 0..$N {
-					self[i] = $op!(self[i], a);
-				}
+				*self = $op!(*self, a);
 			}
 		}
+	)
+}
+
+macro_rules! vn_ops_all {
+	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
+		vn_op_vec!($V, $N, $Trait, $method, $op);
+		vn_op_scal!($V, $N, $Trait, $method, $op);
+	)
+}
+
+macro_rules! vn_ops_all_assign {
+	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
+		vn_op_vec_assign!($V, $N, $Trait, $method, $op);
+		vn_op_scal_assign!($V, $N, $Trait, $method, $op);
 	)
 }
 
@@ -261,22 +271,18 @@ macro_rules! vn_all {
 		vn_from!($V, $N);
 
 		vn_neg!($V, $N);
+
 		vn_op_vec!($V, $N, Add, add, op_add);
 		vn_op_vec!($V, $N, Sub, sub, op_sub);
-		vn_op_vec!($V, $N, Mul, mul, op_mul);
-		vn_op_vec!($V, $N, Div, div, op_div);
-		vn_op_vec!($V, $N, Rem, rem, op_rem);
-		vn_op_scal!($V, $N, Mul, mul, op_mul);
-		vn_op_scal!($V, $N, Div, div, op_div);
-		vn_op_scal!($V, $N, Rem, rem, op_rem);
 		vn_op_vec_assign!($V, $N, AddAssign, add_assign, op_add);
 		vn_op_vec_assign!($V, $N, SubAssign, sub_assign, op_sub);
-		vn_op_vec_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vn_op_vec_assign!($V, $N, DivAssign, div_assign, op_div);
-		vn_op_vec_assign!($V, $N, RemAssign, rem_assign, op_rem);
-		vn_op_scal_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vn_op_scal_assign!($V, $N, DivAssign, div_assign, op_div);
-		vn_op_scal_assign!($V, $N, RemAssign, rem_assign, op_rem);
+		vn_ops_all!($V, $N, Mul, mul, op_mul);
+		vn_ops_all!($V, $N, Div, div, op_div);
+		vn_ops_all!($V, $N, Rem, rem, op_rem);
+		vn_ops_all_assign!($V, $N, MulAssign, mul_assign, op_mul);
+		vn_ops_all_assign!($V, $N, DivAssign, div_assign, op_div);
+		vn_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
+
 		vn_dot!($V, $N);
 
 		vn_zero!($V, $N);
