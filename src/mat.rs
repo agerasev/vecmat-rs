@@ -365,9 +365,103 @@ vnm_one!(mat2x2, 2);
 vnm_one!(mat3x3, 3);
 vnm_one!(mat4x4, 4);
 
+macro_rules! vnm_submatrix {
+	($Vs:ident, $Vr:ident, $N:expr) => (
+		impl<T> $Vs<T> where T: Copy + Default {
+			pub fn submatrix(self, x: usize, y: usize) -> $Vr<T> {
+				vnm_map![i, j; self[(i + (i >= x) as usize, j + (j >= y) as usize)]; $Vr, $N-1, $N-1]
+			}
+		}
+		
+	)
+}
+
+impl<T> mat2x2<T> where T: Copy + Default {
+	pub fn submatrix(self, x:usize, y:usize) -> T {
+		self[(1 - x, 1 - y)]
+	}
+}
+
+vnm_submatrix!(mat4x4, mat3x3, 4);
+vnm_submatrix!(mat3x3, mat2x2, 3);
+
+pub trait Det<T> {
+	fn det(self) -> T;
+}
+
+impl<T> Det<T> for T where T: Copy + Default + Num {
+	fn det(self) -> T {
+		self
+	}
+}
+
+macro_rules! vnm_cofactor {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+			pub fn cofactor(self, x: usize, y: usize) -> T {
+				(if (x + y) % 2 == 0 { T::one() } else { -T::one() })*self.submatrix(x,y).det()
+			}
+		}
+	)
+}
+
+vnm_cofactor!(mat4x4, 4);
+vnm_cofactor!(mat3x3, 3);
+vnm_cofactor!(mat2x2, 2);
+
+/* Determinant */
+macro_rules! vnm_det {
+	($V:ident, $N:expr) => (
+		impl<T> Det<T> for $V<T> where T: Copy + Default + Num + Signed {
+			fn det(self) -> T {
+				let mut tmp = T::zero();
+				let j = 0;
+				for i in 0..$N {
+					tmp = tmp + self[(i, j)]*self.cofactor(i, j);
+				}
+				tmp
+			}
+		}
+	)
+}
+
+vnm_det!(mat4x4, 4);
+vnm_det!(mat3x3, 3);
+vnm_det!(mat2x2, 2);
+
+/* Adjugate matrix */
+macro_rules! vnm_adj {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+			pub fn adj(self) -> $V<T> {
+				vnm_map![i, j; self.cofactor(j, i); $V, $N, $N]
+			}
+		}
+	)
+}
+
+vnm_adj!(mat4x4, 4);
+vnm_adj!(mat3x3, 3);
+vnm_adj!(mat2x2, 2);
+
+/* Inverse matrix */
+macro_rules! vnm_inverse {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+			pub fn inverse(self) -> $V<T> {
+				self.adj()/self.det()
+			}
+		}
+	)
+}
+
+vnm_inverse!(mat4x4, 4);
+vnm_inverse!(mat3x3, 3);
+vnm_inverse!(mat2x2, 2);
+
 #[allow(non_camel_case_types)]
-type mat2<T> = mat2x2<T>;
+pub type mat2<T> = mat2x2<T>;
 #[allow(non_camel_case_types)]
-type mat3<T> = mat3x3<T>;
+pub type mat3<T> = mat3x3<T>;
 #[allow(non_camel_case_types)]
-type mat4<T> = mat4x4<T>;
+pub type mat4<T> = mat4x4<T>;
