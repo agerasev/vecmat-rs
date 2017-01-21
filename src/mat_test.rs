@@ -557,3 +557,20 @@ fn one() {
 	vnm_one_test!(mat3x3, 3);
 	vnm_one_test!(mat4x4, 4);
 }
+
+#[test]
+fn det() {
+	let m: mat2<i32> = [11, 12, 21, 22].into();
+	assert_eq!(m.det(), 11*22 - 12*21);
+	
+	let m: mat3<i32> = [11, 12, 13, 21, 22, 23, 31, 32, 33].into();
+	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
+}
+
+#[test]
+fn inverse() {
+	let m = mat2::<f64>::from([11.0, 12.0, 21.0, 22.0]).inverse();
+	let im = mat2::<f64>::from([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
+	let dm = m - im;
+	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
+}
