@@ -2,7 +2,7 @@ use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssi
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
 use num::{Num, Zero, Signed};
 
-macro_rules! vn_struct {
+macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
 		#[allow(non_camel_case_types)]
 		#[derive(Clone, Copy, PartialEq)]
@@ -12,7 +12,7 @@ macro_rules! vn_struct {
 	)
 }
 
-macro_rules! vn_data {
+macro_rules! vec_data {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn data(&self) -> &[T; $N] {
@@ -22,7 +22,7 @@ macro_rules! vn_data {
 	)
 }
 
-macro_rules! vn_fmt {
+macro_rules! vec_fmt {
 	($V:ident, $N:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
 			fn fmt(&self, f: &mut Formatter) -> FmtResult {
@@ -44,7 +44,7 @@ macro_rules! vn_fmt {
 	)
 }
 
-macro_rules! vn_map {
+macro_rules! vec_map {
 	[$i:ident; $v:expr; $V:ident, $N:expr] => ({
 		let mut out = $V::new();
 		for $i in 0..$N {
@@ -54,7 +54,7 @@ macro_rules! vn_map {
 	})
 }
 
-macro_rules! vn_index {
+macro_rules! vec_index {
 	($V:ident, $N:expr) => (
 		impl<T> Index<usize> for $V<T> where T: Copy {
 			type Output = T;
@@ -73,7 +73,7 @@ macro_rules! vn_index {
 	)
 }
 
-macro_rules! vn_new {
+macro_rules! vec_new {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Default {
 			pub fn new() -> Self {
@@ -83,7 +83,7 @@ macro_rules! vn_new {
 	)
 }
 
-macro_rules! vn_from {
+macro_rules! vec_from {
 	($V:ident, $N:expr) => (
 		impl<T> From<[T; $N]> for $V<T> where T: Copy {
 			fn from(a: [T; $N]) -> Self {
@@ -93,12 +93,12 @@ macro_rules! vn_from {
 	)
 }
 
-macro_rules! vn_neg {
+macro_rules! vec_neg {
 	($V:ident, $N:expr) => (
 		impl<T> Neg for $V<T> where T: Copy + Default + Num + Signed {
 			type Output = $V<T>;
 			fn neg(self) -> Self::Output {
-				vn_map![i; -self[i]; $V, $N]
+				vec_map![i; -self[i]; $V, $N]
 			}
 		}
 	)
@@ -110,29 +110,29 @@ macro_rules! op_mul { ($a:expr, $b:expr) => ({ $a*$b }) }
 macro_rules! op_div { ($a:expr, $b:expr) => ({ $a/$b }) }
 macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
-macro_rules! vn_op_vec {
+macro_rules! vec_op_vec {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
-				vn_map![i; $op!(self[i], vec[i]); $V, $N]
+				vec_map![i; $op!(self[i], vec[i]); $V, $N]
 			}
 		}
 	)
 }
 
-macro_rules! vn_op_scal {
+macro_rules! vec_op_scal {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			type Output = $V<T>;
 			fn $method(self, a: T) -> Self::Output {
-				vn_map![i; $op!(self[i], a); $V, $N]
+				vec_map![i; $op!(self[i], a); $V, $N]
 			}
 		}
 	)
 }
 
-macro_rules! vn_op_vec_assign {
+macro_rules! vec_op_vec_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, vec: $V<T>) {
@@ -142,7 +142,7 @@ macro_rules! vn_op_vec_assign {
 	)
 }
 
-macro_rules! vn_op_scal_assign {
+macro_rules! vec_op_scal_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
 			fn $method(&mut self, a: T) {
@@ -152,21 +152,21 @@ macro_rules! vn_op_scal_assign {
 	)
 }
 
-macro_rules! vn_ops_all {
+macro_rules! vec_ops_all {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		vn_op_vec!($V, $N, $Trait, $method, $op);
-		vn_op_scal!($V, $N, $Trait, $method, $op);
+		vec_op_vec!($V, $N, $Trait, $method, $op);
+		vec_op_scal!($V, $N, $Trait, $method, $op);
 	)
 }
 
-macro_rules! vn_ops_all_assign {
+macro_rules! vec_ops_all_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		vn_op_vec_assign!($V, $N, $Trait, $method, $op);
-		vn_op_scal_assign!($V, $N, $Trait, $method, $op);
+		vec_op_vec_assign!($V, $N, $Trait, $method, $op);
+		vec_op_scal_assign!($V, $N, $Trait, $method, $op);
 	)
 }
 
-macro_rules! vn_dot {
+macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Default + Num {
 			pub fn dot(self, vec: $V<T>) -> T {
@@ -180,7 +180,7 @@ macro_rules! vn_dot {
 	)
 }
 
-macro_rules! vn_zero {
+macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
 		impl<T> Zero for $V<T> where T: Copy + Default + Num {
 			fn zero() -> Self {
@@ -199,18 +199,18 @@ macro_rules! vn_zero {
 	)
 }
 
-macro_rules! vn_bool_not {
+macro_rules! vec_bool_not {
 	($V:ident, $N:expr) => (
 		impl Not for $V<bool> {
 			type Output = $V<bool>;
 			fn not(self) -> Self::Output {
-				vn_map![i; !self[i]; $V, $N]
+				vec_map![i; !self[i]; $V, $N]
 			}
 		}
 	)
 }
 
-macro_rules! vn_bool_any {
+macro_rules! vec_bool_any {
 	($V:ident, $N:expr) => (
 		impl $V<bool> {
 			pub fn any(self) -> bool {
@@ -225,7 +225,7 @@ macro_rules! vn_bool_any {
 	)
 }
 
-macro_rules! vn_bool_all {
+macro_rules! vec_bool_all {
 	($V:ident, $N:expr) => (
 		impl $V<bool> {
 			pub fn all(self) -> bool {
@@ -240,74 +240,74 @@ macro_rules! vn_bool_all {
 	)
 }
 
-macro_rules! vn_vec_eq {
+macro_rules! vec_vec_eq {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialEq {
 			pub fn eq_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] == vec[i]; $V, $N]
+				vec_map![i; self[i] == vec[i]; $V, $N]
 			}
 			pub fn ne_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] != vec[i]; $V, $N]
+				vec_map![i; self[i] != vec[i]; $V, $N]
 			}
 		}
 	)
 }
 
-macro_rules! vn_vec_cmp {
+macro_rules! vec_vec_cmp {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialOrd {
 			pub fn lt_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] < vec[i]; $V, $N]
+				vec_map![i; self[i] < vec[i]; $V, $N]
 			}
 			pub fn le_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] <= vec[i]; $V, $N]
+				vec_map![i; self[i] <= vec[i]; $V, $N]
 			}
 			pub fn gt_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] > vec[i]; $V, $N]
+				vec_map![i; self[i] > vec[i]; $V, $N]
 			}
 			pub fn ge_(&self, vec: $V<T>) -> $V<bool> {
-				vn_map![i; self[i] >= vec[i]; $V, $N]
+				vec_map![i; self[i] >= vec[i]; $V, $N]
 			}
 		}
 	)
 }
 
-macro_rules! vn_all {
+macro_rules! vec_all {
 	($V:ident, $N:expr) => (
-		vn_struct!($V, $N);
-		vn_data!($V, $N);
-		vn_fmt!($V, $N);
-		vn_index!($V, $N);
-		vn_new!($V, $N);
-		vn_from!($V, $N);
+		vec_struct!($V, $N);
+		vec_data!($V, $N);
+		vec_fmt!($V, $N);
+		vec_index!($V, $N);
+		vec_new!($V, $N);
+		vec_from!($V, $N);
 
-		vn_neg!($V, $N);
+		vec_neg!($V, $N);
 
-		vn_op_vec!($V, $N, Add, add, op_add);
-		vn_op_vec!($V, $N, Sub, sub, op_sub);
-		vn_op_vec_assign!($V, $N, AddAssign, add_assign, op_add);
-		vn_op_vec_assign!($V, $N, SubAssign, sub_assign, op_sub);
-		vn_ops_all!($V, $N, Mul, mul, op_mul);
-		vn_ops_all!($V, $N, Div, div, op_div);
-		vn_ops_all!($V, $N, Rem, rem, op_rem);
-		vn_ops_all_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vn_ops_all_assign!($V, $N, DivAssign, div_assign, op_div);
-		vn_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
+		vec_op_vec!($V, $N, Add, add, op_add);
+		vec_op_vec!($V, $N, Sub, sub, op_sub);
+		vec_op_vec_assign!($V, $N, AddAssign, add_assign, op_add);
+		vec_op_vec_assign!($V, $N, SubAssign, sub_assign, op_sub);
+		vec_ops_all!($V, $N, Mul, mul, op_mul);
+		vec_ops_all!($V, $N, Div, div, op_div);
+		vec_ops_all!($V, $N, Rem, rem, op_rem);
+		vec_ops_all_assign!($V, $N, MulAssign, mul_assign, op_mul);
+		vec_ops_all_assign!($V, $N, DivAssign, div_assign, op_div);
+		vec_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
 
-		vn_dot!($V, $N);
+		vec_dot!($V, $N);
 
-		vn_zero!($V, $N);
-		vn_bool_not!($V, $N);
-		vn_bool_any!($V, $N);
-		vn_bool_all!($V, $N);
-		vn_vec_eq!($V, $N);
-		vn_vec_cmp!($V, $N);
+		vec_zero!($V, $N);
+		vec_bool_not!($V, $N);
+		vec_bool_any!($V, $N);
+		vec_bool_all!($V, $N);
+		vec_vec_eq!($V, $N);
+		vec_vec_cmp!($V, $N);
 	)
 }
 
-vn_all!(vec2, 2);
-vn_all!(vec3, 3);
-vn_all!(vec4, 4);
+vec_all!(vec2, 2);
+vec_all!(vec3, 3);
+vec_all!(vec4, 4);
 
 impl<T> vec3<T> where T: Copy + Num {
 	pub fn cross(self, vec: vec3<T>) -> vec3<T> {
@@ -316,3 +316,27 @@ impl<T> vec3<T> where T: Copy + Num {
 		vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
 	}
 }
+
+
+macro_rules! vec_type {
+	($Va:ident, $V:ident, $T:ident) => (
+		#[allow(non_camel_case_types)]
+		pub type $Va = $V<$T>;
+	)
+}
+
+vec_type!(vec2b, vec2, bool);
+vec_type!(vec3b, vec3, bool);
+vec_type!(vec4b, vec4, bool);
+vec_type!(vec2i, vec2, i32);
+vec_type!(vec3i, vec3, i32);
+vec_type!(vec4i, vec4, i32);
+vec_type!(vec2u, vec2, u32);
+vec_type!(vec3u, vec3, u32);
+vec_type!(vec4u, vec4, u32);
+vec_type!(vec2f, vec2, f32);
+vec_type!(vec3f, vec3, f32);
+vec_type!(vec4f, vec4, f32);
+vec_type!(vec2d, vec2, f64);
+vec_type!(vec3d, vec3, f64);
+vec_type!(vec4d, vec4, f64);

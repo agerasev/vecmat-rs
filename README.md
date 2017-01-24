@@ -14,8 +14,10 @@ All of them are templated by type `T` that should implement `num::Num` trait or 
 
 ## TODO:
 - [x] determinant, matrix inversion
+- [x] short names for vectors and matrices of bool, i32, f32 and etc.
 - [ ] `sqr`, `length` of vector
 - [ ] component-wise multiplication of 2 matrices
 - [ ] map with lambda
 - [ ] logic ops for boolean vector
 - [ ] component-wise `abs`, `sign` and etc
+- [ ] impl Default trait
