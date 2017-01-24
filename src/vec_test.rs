@@ -47,6 +47,25 @@ fn content() {
 	vn_content_test!(vec4, 4);
 }
 
+macro_rules! vn_data_test {
+	($V:ident, $N:expr) => (
+		let v = $V { d: vn_arr![i; i + 1; $N] };
+
+		let a = &v.d;
+		let b = v.data(); 
+		for i in 0..$N {
+			assert_eq!(a[i], b[i]);
+		}
+	)
+}
+
+#[test]
+fn data() {
+	vn_data_test!(vec2, 2);
+	vn_data_test!(vec3, 3);
+	vn_data_test!(vec4, 4);
+}
+
 macro_rules! vn_eq_test {
 	($V:ident, $N:expr) => (
 		let va = $V::<usize> { d: vn_arr![i; i + 1; $N] };

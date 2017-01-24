@@ -13,6 +13,16 @@ macro_rules! vnm_struct {
 	)
 }
 
+macro_rules! vnm_data {
+	($V:ident, $N:expr, $M:expr) => (
+		impl<T> $V<T> where T: Copy {
+			pub fn data(&self) -> &[T; $N*$M] {
+				&self.d
+			}
+		}
+	)
+}
+
 macro_rules! vnm_fmt {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
@@ -168,6 +178,7 @@ macro_rules! vnm_zero {
 macro_rules! vnm_all {
 	($V:ident, $N:expr, $M:expr) => (
 		vnm_struct!($V, $N, $M);
+		vnm_data!($V, $N, $M);
 		vnm_fmt!($V, $N, $M);
 		vnm_index!($V, $N, $M);
 		vnm_new!($V, $N, $M);

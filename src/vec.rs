@@ -12,6 +12,16 @@ macro_rules! vn_struct {
 	)
 }
 
+macro_rules! vn_data {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy {
+			pub fn data(&self) -> &[T; $N] {
+				&self.d
+			}
+		}
+	)
+}
+
 macro_rules! vn_fmt {
 	($V:ident, $N:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
@@ -265,6 +275,7 @@ macro_rules! vn_vec_cmp {
 macro_rules! vn_all {
 	($V:ident, $N:expr) => (
 		vn_struct!($V, $N);
+		vn_data!($V, $N);
 		vn_fmt!($V, $N);
 		vn_index!($V, $N);
 		vn_new!($V, $N);

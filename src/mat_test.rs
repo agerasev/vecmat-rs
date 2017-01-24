@@ -54,6 +54,31 @@ fn content() {
 	vnm_content_test!(mat4x4, 4, 4);
 }
 
+macro_rules! vnm_data_test {
+	($V:ident, $N:expr, $M:expr) => (
+		let v = $V { d: vnm_arr![i, j; i + j + 1; $N, $M] };
+
+		let a = &v.d;
+		let b = v.data(); 
+		for i in 0..($N*$M) {
+			assert_eq!(a[i], b[i]);
+		}
+	)
+}
+
+#[test]
+fn data() {
+	vnm_data_test!(mat2x2, 2, 2);
+	vnm_data_test!(mat2x3, 2, 3);
+	vnm_data_test!(mat2x4, 2, 4);
+	vnm_data_test!(mat3x2, 3, 2);
+	vnm_data_test!(mat3x3, 3, 3);
+	vnm_data_test!(mat3x4, 3, 4);
+	vnm_data_test!(mat4x2, 4, 2);
+	vnm_data_test!(mat4x3, 4, 3);
+	vnm_data_test!(mat4x4, 4, 4);
+}
+
 macro_rules! vnm_eq_test {
 	($V:ident, $N:expr, $M:expr) => (
 		let va = $V::<usize> { d: vnm_arr![i, j; i + j; $N, $M] };
