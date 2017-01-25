@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, Not};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-use num::{Num, Zero, Signed};
+pub use num::{Num, Zero, Signed};
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (

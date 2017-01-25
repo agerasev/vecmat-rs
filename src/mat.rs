@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-use num::{Num, Zero, One, Signed};
+pub use num::{/*Num, Zero, Signed, */One};
 use vec::*;
 
 macro_rules! mat_struct {
