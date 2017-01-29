@@ -89,9 +89,9 @@ macro_rules! mat_new {
 
 macro_rules! mat_from {
 	($V:ident, $N:expr, $M:expr) => (
-		impl<T> From<[T; ($N*$M)]> for $V<T> where T: Copy {
-			fn from(a: [T; ($N*$M)]) -> Self {
-				$V::<T> { d: a }
+		impl<T, U> From<[U; ($N*$M)]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
+			fn from(a: [U; ($N*$M)]) -> Self {
+				mat_map![i, j; T::from(a[i + j*$N]); $V, $N, $M]
 			}
 		}
 	)

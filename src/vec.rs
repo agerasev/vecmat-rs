@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, Not};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-pub use num::{Num, Zero, Signed};
+pub use num::{Num, Zero, Signed, Float};
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
@@ -85,11 +85,20 @@ macro_rules! vec_new {
 
 macro_rules! vec_from {
 	($V:ident, $N:expr) => (
-		impl<T> From<[T; $N]> for $V<T> where T: Copy {
-			fn from(a: [T; $N]) -> Self {
-				$V::<T> { d: a }
+		impl<T, U> From<[U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
+			fn from(a: [U; $N]) -> Self {
+				vec_map![i; T::from(a[i]); $V, $N]
 			}
 		}
+
+		/*
+		// Waiting for negative traits implementation in Rust
+		impl<T, U: !T> From<$V<U>> for $V<T> where T: Copy + Default + From<U>, U: Copy {
+			fn from(a: $V<U>) -> Self {
+				$V::<T>::from(a.data())
+			}
+		}
+		*/
 	)
 }
 
@@ -175,6 +184,30 @@ macro_rules! vec_dot {
 					out = out + self[i]*vec[i];
 				}
 				out
+			}
+		}
+	)
+}
+
+macro_rules! vec_norm {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default + Num {
+			pub fn sqr(self) -> T {
+				let mut out = T::zero();
+				for i in 0..$N {
+					out = out + self[i]*self[i];
+				}
+				out
+			}
+		}
+
+		impl<T> $V<T> where T: Copy + Default + Num + Float {
+			pub fn length(self) -> T {
+				self.sqr().sqrt()
+			}
+
+			pub fn normalize(self) -> $V<T> {
+				self/self.length()
 			}
 		}
 	)
@@ -295,6 +328,7 @@ macro_rules! vec_all {
 		vec_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
 
 		vec_dot!($V, $N);
+		vec_norm!($V, $N);
 
 		vec_zero!($V, $N);
 		vec_bool_not!($V, $N);
