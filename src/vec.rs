@@ -1,4 +1,10 @@
-use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, Not};
+use std::ops::{
+	Index, IndexMut, 
+	Neg, Add, Sub, Mul, Div, Rem, 
+	AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, 
+	Not, BitAnd, BitOr, BitXor,
+	BitAndAssign, BitOrAssign, BitXorAssign,
+};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
 pub use num::{Num, Zero, Signed, Float};
 
@@ -243,6 +249,31 @@ macro_rules! vec_bool_not {
 	)
 }
 
+macro_rules! op_bit_and { ($a:expr, $b:expr) => ({ $a & $b }) }
+macro_rules! op_bit_or  { ($a:expr, $b:expr) => ({ $a | $b }) }
+macro_rules! op_bit_xor { ($a:expr, $b:expr) => ({ $a ^ $b }) }
+
+macro_rules! vec_bool_op {
+	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl $Trait for $V<bool> {
+			type Output = $V<bool>;
+			fn $method(self, other: $V<bool>) -> Self::Output {
+				vec_map![i; $op!(self[i], other[i]); $V, $N]
+			}
+		}
+	)
+}
+
+macro_rules! vec_bool_op_assign {
+	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
+		impl $Trait for $V<bool> {
+			fn $method(&mut self, other: $V<bool>) {
+				*self = $op!(*self, other);
+			}
+		}
+	)
+}
+
 macro_rules! vec_bool_any {
 	($V:ident, $N:expr) => (
 		impl $V<bool> {
@@ -332,8 +363,18 @@ macro_rules! vec_all {
 
 		vec_zero!($V, $N);
 		vec_bool_not!($V, $N);
+
+		vec_bool_op!($V, $N, BitAnd, bitand, op_bit_and);
+		vec_bool_op!($V, $N, BitOr, bitor, op_bit_or);
+		vec_bool_op!($V, $N, BitXor, bitxor, op_bit_xor);
+
+		vec_bool_op_assign!($V, $N, BitAndAssign, bitand_assign, op_bit_and);
+		vec_bool_op_assign!($V, $N, BitOrAssign, bitor_assign, op_bit_or);
+		vec_bool_op_assign!($V, $N, BitXorAssign, bitxor_assign, op_bit_xor);
+
 		vec_bool_any!($V, $N);
 		vec_bool_all!($V, $N);
+
 		vec_vec_eq!($V, $N);
 		vec_vec_cmp!($V, $N);
 	)
