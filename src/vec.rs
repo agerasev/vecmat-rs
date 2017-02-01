@@ -85,26 +85,47 @@ macro_rules! vec_new {
 			pub fn new() -> Self {
 				$V::<T> { d: [T::default(); $N] }
 			}
+			
+			pub fn map<F>(f: F) -> Self where F: Fn(usize) -> T {
+				vec_map![i; f(i); $V, $N]
+			}
 		}
 	)
 }
 
+pub trait From_<VU> {
+	fn from_(v: VU) -> Self;
+}
+
+pub trait Into_<VT> {
+	fn into_(self) -> VT;
+}
+
 macro_rules! vec_from {
 	($V:ident, $N:expr) => (
-		impl<T, U> From<[U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
-			fn from(a: [U; $N]) -> Self {
+		impl<'a, T, U> From<&'a [U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
+			fn from(a: &'a [U; $N]) -> Self {
 				vec_map![i; T::from(a[i]); $V, $N]
 			}
 		}
 
-		/*
-		// Waiting for negative traits implementation in Rust
-		impl<T, U: !T> From<$V<U>> for $V<T> where T: Copy + Default + From<U>, U: Copy {
-			fn from(a: $V<U>) -> Self {
-				$V::<T>::from(a.data())
+		impl<T, U> From<[U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
+			fn from(a: [U; $N]) -> Self {
+				Self::from(&a)
 			}
 		}
-		*/
+
+		impl<T, U> From_<$V<U>> for $V<T> where T: Copy + Default + From<U>, U: Copy + Default {
+			fn from_(a: $V<U>) -> Self {
+				Self::from(a.data())
+			}
+		}
+
+		impl<T, U> Into_<$V<T>> for $V<U> where T: Copy + Default + From<U>, U: Copy + Default {
+			fn into_(self) -> $V<T> {
+				self.data().into()
+			}
+		}
 	)
 }
 
