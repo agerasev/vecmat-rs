@@ -6,7 +6,7 @@ use std::ops::{
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-pub use num::{Num, Zero, Signed, Float};
+pub use num::{Num, Zero, Signed, Float, Integer};
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
@@ -66,14 +66,16 @@ macro_rules! vec_index {
 			type Output = T;
 			#[inline]
 			fn index(&self, i: usize) -> &Self::Output {
-				&self.d[i]
+				assert!(i < $N);
+				unsafe { self.d.get_unchecked(i) }
 			}
 		}
 
 		impl<T> IndexMut<usize> for $V<T> where T: Copy {
 			#[inline]
 			fn index_mut(&mut self, i: usize) -> &mut Self::Output {
-				&mut self.d[i]
+				assert!(i < $N);
+				unsafe { self.d.get_unchecked_mut(i) }
 			}
 		}
 	)
@@ -124,6 +126,12 @@ macro_rules! vec_from {
 		impl<T, U> Into_<$V<T>> for $V<U> where T: Copy + Default + From<U>, U: Copy + Default {
 			fn into_(self) -> $V<T> {
 				self.data().into()
+			}
+		}
+
+		impl<T> $V<T> where T: Copy + Default {
+			pub fn from_scal(a: T) -> Self {
+				vec_map![i; T::from(a); $V, $N]
 			}
 		}
 	)
@@ -199,6 +207,31 @@ macro_rules! vec_ops_all_assign {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
 		vec_op_vec_assign!($V, $N, $Trait, $method, $op);
 		vec_op_scal_assign!($V, $N, $Trait, $method, $op);
+	)
+}
+
+macro_rules! vec_ops_int {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default + Integer {
+			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
+				vec_map![i; self[i].div_floor(&other[i]); $V, $N]
+			}
+
+			pub fn mod_floor(&self, other: $V<T>) -> $V<T> {
+				vec_map![i; self[i].mod_floor(&other[i]); $V, $N]
+			}
+
+			pub fn div_mod_floor(&self, other: $V<T>) -> ($V<T>, $V<T>) {
+				let mut dv = $V::<T>::new();
+				let mut mv = $V::<T>::new();
+				for i in 0..$N {
+					let (d, m) = self[i].div_mod_floor(&other[i]);
+					dv[i] = d;
+					mv[i] = m;
+				}
+				(dv, mv)
+			}
+		}
 	)
 }
 
@@ -354,6 +387,30 @@ macro_rules! vec_vec_cmp {
 				vec_map![i; self[i] >= vec[i]; $V, $N]
 			}
 		}
+
+		impl<T> $V<T> where T: Copy + PartialOrd {
+			pub fn min_(&self) -> T {
+				let mut mv = self[0];
+				for i in 1..$N {
+					let v = self[i];
+					if v < mv {
+						mv = v;
+					}
+				}
+				mv
+			}
+			
+			pub fn max_(&self) -> T {
+				let mut mv = self[0];
+				for i in 1..$N {
+					let v = self[i];
+					if v > mv {
+						mv = v;
+					}
+				}
+				mv
+			}
+		}
 	)
 }
 
@@ -378,6 +435,8 @@ macro_rules! vec_all {
 		vec_ops_all_assign!($V, $N, MulAssign, mul_assign, op_mul);
 		vec_ops_all_assign!($V, $N, DivAssign, div_assign, op_div);
 		vec_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
+
+		vec_ops_int!($V, $N);
 
 		vec_dot!($V, $N);
 		vec_norm!($V, $N);
