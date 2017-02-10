@@ -5,8 +5,13 @@ use std::ops::{
 	Not, BitAnd, BitOr, BitXor,
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
+use std::iter::{Iterator};
 use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-pub use num::{Num, Zero, Signed, Float, Integer};
+use num::{Num, Zero, One, Signed, Float, Integer};
+
+pub trait Vector<T> {
+	fn dim() -> i32;
+}
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
@@ -14,6 +19,12 @@ macro_rules! vec_struct {
 		#[derive(Clone, Copy, PartialEq)]
 		pub struct $V<T: Copy> {
 			pub d: [T; $N],
+		}
+
+		impl<T> Vector<T> for $V<T> where T: Copy {
+			fn dim() -> i32 {
+				return $N;
+			}
 		}
 	)
 }
@@ -132,6 +143,44 @@ macro_rules! vec_from {
 		impl<T> $V<T> where T: Copy + Default {
 			pub fn from_scal(a: T) -> Self {
 				vec_map![i; T::from(a); $V, $N]
+			}
+		}
+	)
+}
+
+pub struct VecIter<VT> {
+	pub begin: VT,
+	pub end: VT,
+	pub current: VT,
+}
+
+macro_rules! vec_iter {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy {
+			pub fn iter_to(self, other: $V<T>) -> VecIter<$V<T>> {
+				VecIter { begin: self, end: other, current: self }
+			}
+		}
+
+		impl<T> Iterator for VecIter<$V<T>> where T: Copy + Add<Output=T> + AddAssign + One + PartialOrd {
+			type Item = $V<T>;
+			fn next(&mut self) -> Option<Self::Item> {
+				let cur = self.current;
+				self.current[0] += T::one();
+				for i in 1..$N {
+					if self.current[i - 1] >= self.end[i - 1] {
+						self.current[i] += T::one();
+						self.current[i - 1] = self.begin[i - 1];
+					} else {
+					    break;
+					}
+				}
+				
+				if cur[$N - 1] < self.end[$N - 1] {
+					Some(cur)
+				} else {
+					None
+				}
 			}
 		}
 	)
@@ -422,6 +471,7 @@ macro_rules! vec_all {
 		vec_index!($V, $N);
 		vec_new!($V, $N);
 		vec_from!($V, $N);
+		vec_iter!($V, $N);
 
 		vec_neg!($V, $N);
 

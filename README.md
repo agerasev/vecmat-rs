@@ -18,6 +18,7 @@ All of them are templated by type `T` that should implement `num::Num` trait or 
 - [x] `sqr`, `length`, `normalize` vector
 - [x] logic ops for boolean vectors
 - [x] `div_floor` and `mod_floor` for integer vectors
+- [x] iterate over cubic volume
 - [ ] component-wise multiplication of two matrices
 - [ ] map vector or matrix with lambda
 - [ ] component-wise `abs`, `sign` and etc
