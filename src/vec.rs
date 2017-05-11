@@ -7,9 +7,8 @@ use std::ops::{
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use num::{Zero, Float};
-
-use num::Integer;
+use num_traits::{Zero, Float};
+use num_integer::{Integer};
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
