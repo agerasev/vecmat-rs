@@ -3,10 +3,11 @@ use std::ops::{
 	Index, IndexMut, 
 	Neg, Add, Sub, Mul, Div, Rem, 
 	AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, 
-//	Not, BitAnd, BitOr, BitXor,
-//	BitAndAssign, BitOrAssign, BitXorAssign,
+	Not, BitAnd, BitOr, BitXor,
+	BitAndAssign, BitOrAssign, BitXorAssign,
 };
 use std::fmt::{Display, Formatter, Result as FmtResult};
+use num::{Zero, Float};
 
 use num::Integer;
 
@@ -188,10 +189,10 @@ macro_rules! vec_div_mod_floor {
 		}
 	)
 }
-/*
+
 macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num {
+		impl<T> $V<T> where T: Copy + Default + Zero + Add + Mul<Output=T> {
 			pub fn dot(self, vec: $V<T>) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -205,7 +206,7 @@ macro_rules! vec_dot {
 
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num {
+		impl<T> $V<T> where T: Copy + Default + Zero + Add + Mul<Output=T> {
 			pub fn sqr(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -215,7 +216,7 @@ macro_rules! vec_norm {
 			}
 		}
 
-		impl<T> $V<T> where T: Copy + Default + Num + Float {
+		impl<T> $V<T> where T: Copy + Default + Float {
 			pub fn length(self) -> T {
 				self.sqr().sqrt()
 			}
@@ -229,18 +230,28 @@ macro_rules! vec_norm {
 
 macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
-		impl<T> Zero for $V<T> where T: Copy + Default + Num {
-			fn zero() -> Self {
-				$V::<T> { d: [T::zero(); $N] }
+		impl<T> $V<T> where T: Copy + Default + Zero {
+			pub fn zero() -> Self {
+				$V::new_scal(T::zero())
 			}
 
-			fn is_zero(&self) -> bool {
+			pub fn is_zero(&self) -> bool {
 				for i in 0..$N {
 					if !self[i].is_zero() {
 						return false;
 					}
 				}
 				true
+			}
+		}
+
+		impl<T> Zero for $V<T> where T: Copy + Default + Zero {
+			fn zero() -> Self {
+				$V::zero()
+			}
+
+			fn is_zero(&self) -> bool {
+				$V::is_zero(self)
 			}
 		}
 	)
@@ -251,7 +262,7 @@ macro_rules! vec_bool_not {
 		impl Not for $V<bool> {
 			type Output = $V<bool>;
 			fn not(self) -> Self::Output {
-				vec_map![i; !self[i]; $V, $N]
+				$V::new_map(|i| !self[i])
 			}
 		}
 	)
@@ -266,7 +277,7 @@ macro_rules! vec_bool_op {
 		impl $Trait for $V<bool> {
 			type Output = $V<bool>;
 			fn $method(self, other: $V<bool>) -> Self::Output {
-				vec_map![i; $op!(self[i], other[i]); $V, $N]
+				$V::new_map(|i| $op!(self[i], other[i]))
 			}
 		}
 	)
@@ -312,38 +323,38 @@ macro_rules! vec_bool_all {
 	)
 }
 
-macro_rules! vecvec_eq {
+macro_rules! vec_veq {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialEq {
-			pub fn eq_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] == vec[i]; $V, $N]
+			pub fn veq(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] == vec[i])
 			}
-			pub fn ne_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] != vec[i]; $V, $N]
+			pub fn vne(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] != vec[i])
 			}
 		}
 	)
 }
 
-macro_rules! vecvec_cmp {
+macro_rules! vec_vcmp {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialOrd {
-			pub fn lt_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] < vec[i]; $V, $N]
+			pub fn vlt(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] < vec[i])
 			}
-			pub fn le_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] <= vec[i]; $V, $N]
+			pub fn vle(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] <= vec[i])
 			}
-			pub fn gt_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] > vec[i]; $V, $N]
+			pub fn vgt(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] > vec[i])
 			}
-			pub fn ge_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] >= vec[i]; $V, $N]
+			pub fn vge(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] >= vec[i])
 			}
 		}
 
 		impl<T> $V<T> where T: Copy + PartialOrd {
-			pub fn min_(&self) -> T {
+			pub fn min(&self) -> T {
 				let mut mv = self[0];
 				for i in 1..$N {
 					let v = self[i];
@@ -354,7 +365,7 @@ macro_rules! vecvec_cmp {
 				mv
 			}
 			
-			pub fn max_(&self) -> T {
+			pub fn max(&self) -> T {
 				let mut mv = self[0];
 				for i in 1..$N {
 					let v = self[i];
@@ -367,7 +378,7 @@ macro_rules! vecvec_cmp {
 		}
 	)
 }
-*/
+
 macro_rules! vec_all {
 	($V:ident, $N:expr) => (
 		vec_struct!($V, $N);
@@ -390,11 +401,11 @@ macro_rules! vec_all {
 		vec_ops_all_assign!($V, $N, RemAssign, Rem, rem_assign, op_rem);
 		
 		vec_div_mod_floor!($V, $N);
-		/*
+		
 		vec_dot!($V, $N);
 		vec_norm!($V, $N);
-
 		vec_zero!($V, $N);
+		
 		vec_bool_not!($V, $N);
 
 		vec_bool_op!($V, $N, BitAnd, bitand, op_bit_and);
@@ -408,9 +419,8 @@ macro_rules! vec_all {
 		vec_bool_any!($V, $N);
 		vec_bool_all!($V, $N);
 
-		vecvec_eq!($V, $N);
-		vecvec_cmp!($V, $N);
-		*/
+		vec_veq!($V, $N);
+		vec_vcmp!($V, $N);
 	)
 }
 
@@ -418,15 +428,13 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
-/*
-impl<T> vec3<T> where T: Copy + Num {
-	pub fn cross(self, vec: vec3<T>) -> vec3<T> {
+impl<T> Vec3<T> where T: Copy + Sub<Output=T> + Mul<Output=T> {
+	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
 		let b = &vec;
-		vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
+		Vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
 	}
 }
-*/
 
 macro_rules! vec_type {
 	($Va:ident, $V:ident, $T:ident) => (

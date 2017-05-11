@@ -320,14 +320,16 @@ fn scal_rem_assign() {
 
 #[test]
 fn div_mod_floor() {
-	assert_eq!(Vec4::new_data(&[-2, -3, -4, -5]).div_mod_floor(Vec4::new_data(&[4, 3, 2, 1])), (Vec4::new_data(&[-1, -1, -2, -5]),Vec4::new_data(&[2, 0, 0, 0])));
+	assert_eq!(
+		Vec4::new_data(&[-2, -3, -4, -5]).div_mod_floor(Vec4::new_data(&[4, 3, 2, 1])), 
+		(Vec4::new_data(&[-1, -1, -2, -5]), Vec4::new_data(&[2, 0, 0, 0]))
+		);
 }
 
-/*
 macro_rules! vec_dot_test {
 	($V:ident, $N:expr) => (
-		let va: $V<usize> = [1; $N].into();
-		let vb: $V<usize> = vec_map![i; i + 1; $V, $N];
+		let va = $V::<usize>::new_scal(1);
+		let vb = $V::<usize>::new_map(|i| i + 1);
 		let c = va.dot(vb);
 		assert_eq!(c, ($N*($N + 1))/2);
 	)
@@ -340,13 +342,26 @@ fn dot() {
 	vec_dot_test!(Vec4, 4);
 }
 
+macro_rules! vec_norm_test {
+	($V:ident, $N:expr) => (
+		assert_eq!($V::new_scal(2).sqr(), $N*4);
+	)
+}
+
+#[test]
+fn norm() {
+	vec_norm_test!(Vec2, 2);
+	vec_norm_test!(Vec3, 3);
+	vec_norm_test!(Vec4, 4);
+}
+
 macro_rules! vec_zero_test {
 	($V:ident, $N:expr) => (
 		let z = $V::<i32>::zero();
-		assert_eq!(z, [0; $N].into());
+		assert_eq!(z, $V::new_scal(0));
 		assert!(z.is_zero());
 		
-		let nz: $V<i32> = [1; $N].into();
+		let nz: $V<i32> = $V::new_scal(1);
 		assert!(!nz.is_zero());
 	)
 }
@@ -360,7 +375,7 @@ fn zero() {
 
 macro_rules! vec_bool_not_test {
 	($V:ident, $N:expr) => (
-		let z = $V::<bool>::from([false; $N]);
+		let z = $V::new_scal(false);
 		let nz = !z;
 		for i in 0..$N {
 			assert_eq!(nz[i], !z[i]);
@@ -377,7 +392,7 @@ fn bool_not() {
 
 macro_rules! vec_bool_any_test {
 	($V:ident, $N:expr) => (
-		let mut v: $V<bool> = [false; $N].into();
+		let mut v = $V::new_scal(false);
 		assert!(!v.any());
 		v[0] = true;
 		assert!(v.any());
@@ -393,7 +408,7 @@ fn bool_any() {
 
 macro_rules! vec_bool_all_test {
 	($V:ident, $N:expr) => (
-		let mut v: $V<bool> = [true; $N].into();
+		let mut v = $V::new_scal(true);
 		assert!(v.all());
 		v[0] = false;
 		assert!(!v.all());
@@ -407,17 +422,17 @@ fn bool_all() {
 	vec_bool_all_test!(Vec4, 4);
 }
 
-macro_rules! vec_vec_eq_test {
+macro_rules! vec_veq_test {
 	($V:ident, $N:expr) => (
-		let va = vec_map![i; ($N - i) as i32; $V, $N];
-		let vb = vec_map![i; i as i32; $V, $N];
+		let va = $V::new_map(|i| ($N - i) as i32);
+		let vb = $V::new_map(|i| i as i32);
 		
-		let eq = va.eq_(vb);
+		let eq = va.veq(vb);
 		for i in 0..$N {
 			assert_eq!(eq[i], $N - i == i);
 		}
 
-		let ne = va.ne_(vb);
+		let ne = va.vne(vb);
 		for i in 0..$N {
 			assert_eq!(ne[i], $N - i != i);
 		}
@@ -426,32 +441,32 @@ macro_rules! vec_vec_eq_test {
 
 #[test]
 fn vec_eq() {
-	vec_vec_eq_test!(Vec2, 2);
-	vec_vec_eq_test!(Vec3, 3);
-	vec_vec_eq_test!(Vec4, 4);
+	vec_veq_test!(Vec2, 2);
+	vec_veq_test!(Vec3, 3);
+	vec_veq_test!(Vec4, 4);
 }
 
-macro_rules! vec_vec_cmp_test {
+macro_rules! vec_vcmp_test {
 	($V:ident, $N:expr) => (
-		let va = vec_map![i; ($N - i) as i32; $V, $N];
-		let vb = vec_map![i; i as i32; $V, $N];
+		let va = $V::new_map(|i| ($N - i) as i32);
+		let vb = $V::new_map(|i| i as i32);
 		
-		let lt = va.lt_(vb);
+		let lt = va.vlt(vb);
 		for i in 0..$N {
 			assert_eq!(lt[i], $N - i < i);
 		}
 
-		let le = va.le_(vb);
+		let le = va.vle(vb);
 		for i in 0..$N {
 			assert_eq!(le[i], $N - i <= i);
 		}
 
-		let gt = va.gt_(vb);
+		let gt = va.vgt(vb);
 		for i in 0..$N {
 			assert_eq!(gt[i], $N - i > i);
 		}
 
-		let ge = va.ge_(vb);
+		let ge = va.vge(vb);
 		for i in 0..$N {
 			assert_eq!(ge[i], $N - i >= i);
 		}
@@ -459,19 +474,18 @@ macro_rules! vec_vec_cmp_test {
 }
 
 #[test]
-fn vec_cmp() {
-	vec_vec_cmp_test!(Vec2, 2);
-	vec_vec_cmp_test!(Vec3, 3);
-	vec_vec_cmp_test!(Vec4, 4);
+fn vec_vcmp() {
+	vec_vcmp_test!(Vec2, 2);
+	vec_vcmp_test!(Vec3, 3);
+	vec_vcmp_test!(Vec4, 4);
 }
 
 #[test]
 fn cross() {
-	let va: Vec3<i32> = [1, 0, 0].into();
-	let vb: Vec3<i32> = [0, 1, 0].into();
+	let va = Vec3::<i32>::new_data(&[1, 0, 0]);
+	let vb = Vec3::<i32>::new_data(&[0, 1, 0]);
 	let vc = va.cross(vb);
 	assert_eq!(vc[0], 0);
 	assert_eq!(vc[1], 0);
 	assert_eq!(vc[2], 1);
 }
-*/
