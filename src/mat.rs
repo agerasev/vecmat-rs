@@ -1,14 +1,48 @@
-use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
-use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-use num::{Num, Zero, Signed, One};
-use vec::*;
+use std::mem;
+//use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+//use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
+
+//use num_traits::{Signed, One, Zero, Float};
+//use num_integer::{Integer};
+
+//use vec::*;
+
 
 macro_rules! mat_struct {
 	($V:ident, $N:expr, $M:expr) => (
-		#[allow(non_camel_case_types)]
-		#[derive(Clone, Copy, PartialEq)]
+		#[derive(Clone, Copy, Debug, PartialEq)]
 		pub struct $V<T: Copy> {
 			pub d: [T; $N*$M],
+		}
+	)
+}
+
+macro_rules! mat_new {
+	($V:ident, $N:expr, $M:expr) => (
+		impl<T> $V<T> where T: Copy + Default {
+			pub fn new() -> Self {
+				$V { d: [T::default(); $N*$M] }
+			}
+		}
+
+		impl<T> $V<T> where T: Copy {
+			pub fn new_data(a: &[T; $N*$M]) -> Self {
+				$V { d: *a }
+			}
+
+			pub fn new_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
+				let mut arr: [T; $N*$M] = unsafe { mem::uninitialized() };
+				for j in 0..$M {
+					for i in 0..$N {
+						arr[j*$N + i] = f(i, j);
+					}
+				}
+				$V { d: arr }
+			}
+
+			pub fn new_scal(v: T) -> Self {
+				$V { d: [v; $N*$M] }
+			}
 		}
 	)
 }
@@ -22,7 +56,7 @@ macro_rules! mat_data {
 		}
 	)
 }
-
+/*
 macro_rules! mat_fmt {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
@@ -36,13 +70,6 @@ macro_rules! mat_fmt {
 				}
 				try!(write!(f, "]"));
 				Ok(())
-			}
-		}
-
-		impl<T> Debug for $V<T> where T: Copy + Display {
-			#[inline]
-			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				Display::fmt(self, f)
 			}
 		}
 	)
@@ -72,16 +99,6 @@ macro_rules! mat_index {
 		impl<T> IndexMut<(usize, usize)> for $V<T> where T: Copy {
 			fn index_mut(&mut self, ij: (usize, usize)) -> &mut Self::Output {
 				&mut self.d[ij.0 + ij.1*$N]
-			}
-		}
-	)
-}
-
-macro_rules! mat_new {
-	($V:ident, $N:expr, $M:expr) => (
-		impl<T> $V<T> where T: Copy + Default {
-			pub fn new() -> Self {
-				$V::<T> { d: [T::default(); $N*$M] }
 			}
 		}
 	)
@@ -174,11 +191,13 @@ macro_rules! mat_zero {
 		}
 	)
 }
-
+*/
 macro_rules! mat_all {
 	($V:ident, $N:expr, $M:expr) => (
 		mat_struct!($V, $N, $M);
+		mat_new!($V, $N, $M);
 		mat_data!($V, $N, $M);
+		/*
 		mat_fmt!($V, $N, $M);
 		mat_index!($V, $N, $M);
 		mat_new!($V, $N, $M);
@@ -198,19 +217,20 @@ macro_rules! mat_all {
 		mat_op_scal_assign!($V, $N, $M, RemAssign, rem_assign, op_rem);
 
 		mat_zero!($V, $N, $M);
+		*/
 	)
 }
 
-mat_all!(mat2x2, 2, 2);
-mat_all!(mat2x3, 2, 3);
-mat_all!(mat2x4, 2, 4);
-mat_all!(mat3x2, 3, 2);
-mat_all!(mat3x3, 3, 3);
-mat_all!(mat3x4, 3, 4);
-mat_all!(mat4x2, 4, 2);
-mat_all!(mat4x3, 4, 3);
-mat_all!(mat4x4, 4, 4);
-
+mat_all!(Mat2x2, 2, 2);
+mat_all!(Mat2x3, 2, 3);
+mat_all!(Mat2x4, 2, 4);
+mat_all!(Mat3x2, 3, 2);
+mat_all!(Mat3x3, 3, 3);
+mat_all!(Mat3x4, 3, 4);
+mat_all!(Mat4x2, 4, 2);
+mat_all!(Mat4x3, 4, 3);
+mat_all!(Mat4x4, 4, 4);
+/*
 macro_rules! mat_transpose {
 	($Vnm:ident, $Vmn:ident, $N:expr, $M:expr) => (
 		impl<T> $Vnm<T> where T: Copy + Default {
@@ -221,15 +241,15 @@ macro_rules! mat_transpose {
 	)
 }
 
-mat_transpose!(mat2x2, mat2x2, 2, 2);
-mat_transpose!(mat2x3, mat3x2, 2, 3);
-mat_transpose!(mat2x4, mat4x2, 2, 4);
-mat_transpose!(mat3x2, mat2x3, 3, 2);
-mat_transpose!(mat3x3, mat3x3, 3, 3);
-mat_transpose!(mat3x4, mat4x3, 3, 4);
-mat_transpose!(mat4x2, mat2x4, 4, 2);
-mat_transpose!(mat4x3, mat3x4, 4, 3);
-mat_transpose!(mat4x4, mat4x4, 4, 4);
+mat_transpose!(Mat2x2, Mat2x2, 2, 2);
+mat_transpose!(Mat2x3, Mat3x2, 2, 3);
+mat_transpose!(Mat2x4, Mat4x2, 2, 4);
+mat_transpose!(Mat3x2, Mat2x3, 3, 2);
+mat_transpose!(Mat3x3, Mat3x3, 3, 3);
+mat_transpose!(Mat3x4, Mat4x3, 3, 4);
+mat_transpose!(Mat4x2, Mat2x4, 4, 2);
+mat_transpose!(Mat4x3, Mat3x4, 4, 3);
+mat_transpose!(Mat4x4, Mat4x4, 4, 4);
 
 pub trait Outer<VT> {
 	type Output;
@@ -299,15 +319,15 @@ macro_rules! mat_mul_vec_all {
 	)
 }
 
-mat_mul_vec_all!(mat2x2, vec2, vec2, 2, 2);
-mat_mul_vec_all!(mat2x3, vec2, vec3, 2, 3);
-mat_mul_vec_all!(mat2x4, vec2, vec4, 2, 4);
-mat_mul_vec_all!(mat3x2, vec3, vec2, 3, 2);
-mat_mul_vec_all!(mat3x3, vec3, vec3, 3, 3);
-mat_mul_vec_all!(mat3x4, vec3, vec4, 3, 4);
-mat_mul_vec_all!(mat4x2, vec4, vec2, 4, 2);
-mat_mul_vec_all!(mat4x3, vec4, vec3, 4, 3);
-mat_mul_vec_all!(mat4x4, vec4, vec4, 4, 4);
+mat_mul_vec_all!(Mat2x2, vec2, vec2, 2, 2);
+mat_mul_vec_all!(Mat2x3, vec2, vec3, 2, 3);
+mat_mul_vec_all!(Mat2x4, vec2, vec4, 2, 4);
+mat_mul_vec_all!(Mat3x2, vec3, vec2, 3, 2);
+mat_mul_vec_all!(Mat3x3, vec3, vec3, 3, 3);
+mat_mul_vec_all!(Mat3x4, vec3, vec4, 3, 4);
+mat_mul_vec_all!(Mat4x2, vec4, vec2, 4, 2);
+mat_mul_vec_all!(Mat4x3, vec4, vec3, 4, 3);
+mat_mul_vec_all!(Mat4x4, vec4, vec4, 4, 4);
 
 macro_rules! mat_mul_mat {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
@@ -330,33 +350,33 @@ macro_rules! mat_mul_mat {
 	)
 }
 
-mat_mul_mat!(mat2x2, mat2x2, mat2x2, 2, 2, 2);
-mat_mul_mat!(mat2x2, mat3x2, mat3x2, 2, 2, 3);
-mat_mul_mat!(mat2x2, mat4x2, mat4x2, 2, 2, 4);
-mat_mul_mat!(mat2x3, mat2x2, mat2x3, 2, 3, 2);
-mat_mul_mat!(mat2x3, mat3x2, mat3x3, 2, 3, 3);
-mat_mul_mat!(mat2x3, mat4x2, mat4x3, 2, 3, 4);
-mat_mul_mat!(mat2x4, mat2x2, mat2x4, 2, 4, 2);
-mat_mul_mat!(mat2x4, mat3x2, mat3x4, 2, 4, 3);
-mat_mul_mat!(mat2x4, mat4x2, mat4x4, 2, 4, 4);
-mat_mul_mat!(mat3x2, mat2x3, mat2x2, 3, 2, 2);
-mat_mul_mat!(mat3x2, mat3x3, mat3x2, 3, 2, 3);
-mat_mul_mat!(mat3x2, mat4x3, mat4x2, 3, 2, 4);
-mat_mul_mat!(mat3x3, mat2x3, mat2x3, 3, 3, 2);
-mat_mul_mat!(mat3x3, mat3x3, mat3x3, 3, 3, 3);
-mat_mul_mat!(mat3x3, mat4x3, mat4x3, 3, 3, 4);
-mat_mul_mat!(mat3x4, mat2x3, mat2x4, 3, 4, 2);
-mat_mul_mat!(mat3x4, mat3x3, mat3x4, 3, 4, 3);
-mat_mul_mat!(mat3x4, mat4x3, mat4x4, 3, 4, 4);
-mat_mul_mat!(mat4x2, mat2x4, mat2x2, 4, 2, 2);
-mat_mul_mat!(mat4x2, mat3x4, mat3x2, 4, 2, 3);
-mat_mul_mat!(mat4x2, mat4x4, mat4x2, 4, 2, 4);
-mat_mul_mat!(mat4x3, mat2x4, mat2x3, 4, 3, 2);
-mat_mul_mat!(mat4x3, mat3x4, mat3x3, 4, 3, 3);
-mat_mul_mat!(mat4x3, mat4x4, mat4x3, 4, 3, 4);
-mat_mul_mat!(mat4x4, mat2x4, mat2x4, 4, 4, 2);
-mat_mul_mat!(mat4x4, mat3x4, mat3x4, 4, 4, 3);
-mat_mul_mat!(mat4x4, mat4x4, mat4x4, 4, 4, 4);
+mat_mul_mat!(Mat2x2, Mat2x2, Mat2x2, 2, 2, 2);
+mat_mul_mat!(Mat2x2, Mat3x2, Mat3x2, 2, 2, 3);
+mat_mul_mat!(Mat2x2, Mat4x2, Mat4x2, 2, 2, 4);
+mat_mul_mat!(Mat2x3, Mat2x2, Mat2x3, 2, 3, 2);
+mat_mul_mat!(Mat2x3, Mat3x2, Mat3x3, 2, 3, 3);
+mat_mul_mat!(Mat2x3, Mat4x2, Mat4x3, 2, 3, 4);
+mat_mul_mat!(Mat2x4, Mat2x2, Mat2x4, 2, 4, 2);
+mat_mul_mat!(Mat2x4, Mat3x2, Mat3x4, 2, 4, 3);
+mat_mul_mat!(Mat2x4, Mat4x2, Mat4x4, 2, 4, 4);
+mat_mul_mat!(Mat3x2, Mat2x3, Mat2x2, 3, 2, 2);
+mat_mul_mat!(Mat3x2, Mat3x3, Mat3x2, 3, 2, 3);
+mat_mul_mat!(Mat3x2, Mat4x3, Mat4x2, 3, 2, 4);
+mat_mul_mat!(Mat3x3, Mat2x3, Mat2x3, 3, 3, 2);
+mat_mul_mat!(Mat3x3, Mat3x3, Mat3x3, 3, 3, 3);
+mat_mul_mat!(Mat3x3, Mat4x3, Mat4x3, 3, 3, 4);
+mat_mul_mat!(Mat3x4, Mat2x3, Mat2x4, 3, 4, 2);
+mat_mul_mat!(Mat3x4, Mat3x3, Mat3x4, 3, 4, 3);
+mat_mul_mat!(Mat3x4, Mat4x3, Mat4x4, 3, 4, 4);
+mat_mul_mat!(Mat4x2, Mat2x4, Mat2x2, 4, 2, 2);
+mat_mul_mat!(Mat4x2, Mat3x4, Mat3x2, 4, 2, 3);
+mat_mul_mat!(Mat4x2, Mat4x4, Mat4x2, 4, 2, 4);
+mat_mul_mat!(Mat4x3, Mat2x4, Mat2x3, 4, 3, 2);
+mat_mul_mat!(Mat4x3, Mat3x4, Mat3x3, 4, 3, 3);
+mat_mul_mat!(Mat4x3, Mat4x4, Mat4x3, 4, 3, 4);
+mat_mul_mat!(Mat4x4, Mat2x4, Mat2x4, 4, 4, 2);
+mat_mul_mat!(Mat4x4, Mat3x4, Mat3x4, 4, 4, 3);
+mat_mul_mat!(Mat4x4, Mat4x4, Mat4x4, 4, 4, 4);
 
 macro_rules! mat_one {
 	($V:ident, $N:expr) => (
@@ -372,9 +392,9 @@ macro_rules! mat_one {
 	)
 }
 
-mat_one!(mat2x2, 2);
-mat_one!(mat3x3, 3);
-mat_one!(mat4x4, 4);
+mat_one!(Mat2x2, 2);
+mat_one!(Mat3x3, 3);
+mat_one!(Mat4x4, 4);
 
 macro_rules! mat_submatrix {
 	($Vs:ident, $Vr:ident, $N:expr) => (
@@ -387,14 +407,14 @@ macro_rules! mat_submatrix {
 	)
 }
 
-impl<T> mat2x2<T> where T: Copy + Default {
+impl<T> Mat2x2<T> where T: Copy + Default {
 	pub fn submatrix(self, x:usize, y:usize) -> T {
 		self[(1 - x, 1 - y)]
 	}
 }
 
-mat_submatrix!(mat4x4, mat3x3, 4);
-mat_submatrix!(mat3x3, mat2x2, 3);
+mat_submatrix!(Mat4x4, Mat3x3, 4);
+mat_submatrix!(Mat3x3, Mat2x2, 3);
 
 pub trait Det<T> {
 	fn det(self) -> T;
@@ -416,9 +436,9 @@ macro_rules! mat_cofactor {
 	)
 }
 
-mat_cofactor!(mat4x4, 4);
-mat_cofactor!(mat3x3, 3);
-mat_cofactor!(mat2x2, 2);
+mat_cofactor!(Mat4x4, 4);
+mat_cofactor!(Mat3x3, 3);
+mat_cofactor!(Mat2x2, 2);
 
 /* Determinant */
 macro_rules! mat_det {
@@ -436,9 +456,9 @@ macro_rules! mat_det {
 	)
 }
 
-mat_det!(mat4x4, 4);
-mat_det!(mat3x3, 3);
-mat_det!(mat2x2, 2);
+mat_det!(Mat4x4, 4);
+mat_det!(Mat3x3, 3);
+mat_det!(Mat2x2, 2);
 
 /* Adjugate matrix */
 macro_rules! mat_adj {
@@ -451,9 +471,9 @@ macro_rules! mat_adj {
 	)
 }
 
-mat_adj!(mat4x4, 4);
-mat_adj!(mat3x3, 3);
-mat_adj!(mat2x2, 2);
+mat_adj!(Mat4x4, 4);
+mat_adj!(Mat3x3, 3);
+mat_adj!(Mat2x2, 2);
 
 /* Inverse matrix */
 macro_rules! mat_inverse {
@@ -466,16 +486,16 @@ macro_rules! mat_inverse {
 	)
 }
 
-mat_inverse!(mat4x4, 4);
-mat_inverse!(mat3x3, 3);
-mat_inverse!(mat2x2, 2);
+mat_inverse!(Mat4x4, 4);
+mat_inverse!(Mat3x3, 3);
+mat_inverse!(Mat2x2, 2);
 
 #[allow(non_camel_case_types)]
-pub type mat2<T> = mat2x2<T>;
+pub type Mat2<T> = Mat2x2<T>;
 #[allow(non_camel_case_types)]
-pub type mat3<T> = mat3x3<T>;
+pub type Mat3<T> = Mat3x3<T>;
 #[allow(non_camel_case_types)]
-pub type mat4<T> = mat4x4<T>;
+pub type Mat4<T> = Mat4x4<T>;
 
 macro_rules! mat_type {
 	($Va:ident, $V:ident, $T:ident) => (
@@ -484,15 +504,16 @@ macro_rules! mat_type {
 	)
 }
 
-mat_type!(mat2i, mat2, i32);
-mat_type!(mat3i, mat3, i32);
-mat_type!(mat4i, mat4, i32);
-mat_type!(mat2u, mat2, u32);
-mat_type!(mat3u, mat3, u32);
-mat_type!(mat4u, mat4, u32);
-mat_type!(mat2f, mat2, f32);
-mat_type!(mat3f, mat3, f32);
-mat_type!(mat4f, mat4, f32);
-mat_type!(mat2d, mat2, f64);
-mat_type!(mat3d, mat3, f64);
-mat_type!(mat4d, mat4, f64);
+mat_type!(Mat2i32, Mat2, i32);
+mat_type!(Mat3i32, Mat3, i32);
+mat_type!(Mat4i32, Mat4, i32);
+mat_type!(Mat2u32, Mat2, u32);
+mat_type!(Mat3u32, Mat3, u32);
+mat_type!(Mat4u32, Mat4, u32);
+mat_type!(Mat2f32, Mat2, f32);
+mat_type!(Mat3f32, Mat3, f32);
+mat_type!(Mat4f32, Mat4, f32);
+mat_type!(Mat2f64, Mat2, f64);
+mat_type!(Mat3f64, Mat3, f64);
+mat_type!(Mat4f64, Mat4, f64);
+*/
