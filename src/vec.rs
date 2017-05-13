@@ -28,8 +28,8 @@ macro_rules! vec_new {
 		}
 		
 		impl<T> $V<T> where T: Copy {
-			pub fn new_data(a: &[T; $N]) -> Self {
-				$V { d: *a }
+			pub fn new_array(a: [T; $N]) -> Self {
+				$V { d: a }
 			}
 
 			pub fn new_map<F>(f: F) -> Self where F: Fn(usize) -> T {
@@ -57,10 +57,6 @@ macro_rules! vec_data {
 			pub fn data_mut(&mut self) -> &mut [T; $N] {
 				&mut self.d
 			}
-
-			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
-				$V::new_map(|i| f(self[i]))
-			}
 		}
 	)
 }
@@ -77,6 +73,16 @@ macro_rules! vec_index {
 		impl<T> IndexMut<usize> for $V<T> where T: Copy {
 			fn index_mut(&mut self, i: usize) -> &mut Self::Output {
 				&mut self.d[i]
+			}
+		}
+	)
+}
+
+macro_rules! vec_map {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy {
+			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
+				$V::new_map(|i| f(self[i]))
 			}
 		}
 	)
@@ -172,7 +178,7 @@ macro_rules! vec_ops_all_assign {
 
 macro_rules! vec_div_mod_floor {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Integer {
+		impl<T> $V<T> where T: Copy + Integer {
 			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
 				$V::new_map(|i| self[i].div_floor(&other[i]))
 			}
@@ -191,7 +197,7 @@ macro_rules! vec_div_mod_floor {
 
 macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Zero + Add + Mul<Output=T> {
+		impl<T> $V<T> where T: Copy + Zero + Add + Mul<Output=T> {
 			pub fn dot(self, vec: $V<T>) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -205,7 +211,7 @@ macro_rules! vec_dot {
 
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Zero + Add + Mul<Output=T> {
+		impl<T> $V<T> where T: Copy + Zero + Add + Mul<Output=T> {
 			pub fn sqr(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -215,7 +221,7 @@ macro_rules! vec_norm {
 			}
 		}
 
-		impl<T> $V<T> where T: Copy + Default + Float {
+		impl<T> $V<T> where T: Copy + Float {
 			pub fn length(self) -> T {
 				self.sqr().sqrt()
 			}
@@ -229,7 +235,7 @@ macro_rules! vec_norm {
 
 macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Zero {
+		impl<T> $V<T> where T: Copy + Zero {
 			pub fn zero() -> Self {
 				$V::new_scal(T::zero())
 			}
@@ -244,7 +250,7 @@ macro_rules! vec_zero {
 			}
 		}
 
-		impl<T> Zero for $V<T> where T: Copy + Default + Zero {
+		impl<T> Zero for $V<T> where T: Copy + Zero {
 			fn zero() -> Self {
 				$V::zero()
 			}
@@ -385,6 +391,7 @@ macro_rules! vec_all {
 		vec_new!($V, $N);
 		vec_data!($V, $N);
 		vec_fmt!($V, $N);
+		vec_map!($V, $N);
 
 		vec_neg!($V, $N);
 
