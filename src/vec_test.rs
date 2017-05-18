@@ -1,6 +1,4 @@
-#[allow(unused_imports)]
 use std::mem::size_of;
-#[allow(unused_imports)]
 use vec::*;
 
 macro_rules! vec_content_test {
@@ -321,8 +319,8 @@ fn scal_rem_assign() {
 #[test]
 fn div_mod_floor() {
 	assert_eq!(
-		Vec4::new_data(&[-2, -3, -4, -5]).div_mod_floor(Vec4::new_data(&[4, 3, 2, 1])), 
-		(Vec4::new_data(&[-1, -1, -2, -5]), Vec4::new_data(&[2, 0, 0, 0]))
+		Vec4::new_array([-2, -3, -4, -5]).div_mod_floor(Vec4::new_array([4, 3, 2, 1])), 
+		(Vec4::new_array([-1, -1, -2, -5]), Vec4::new_array([2, 0, 0, 0]))
 		);
 }
 
@@ -482,8 +480,8 @@ fn vec_vcmp() {
 
 #[test]
 fn cross() {
-	let va = Vec3::<i32>::new_data(&[1, 0, 0]);
-	let vb = Vec3::<i32>::new_data(&[0, 1, 0]);
+	let va = Vec3::<i32>::new_array([1, 0, 0]);
+	let vb = Vec3::<i32>::new_array([0, 1, 0]);
 	let vc = va.cross(vb);
 	assert_eq!(vc[0], 0);
 	assert_eq!(vc[1], 0);
