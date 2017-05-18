@@ -229,6 +229,45 @@ fn mat_sub() {
 	mat_op_mat_test!(Mat4x4, 4, 4, op_sub);
 }
 
+#[test]
+fn mat_mul() {
+	mat_op_mat_test!(Mat2x2, 2, 2, op_mul);
+	mat_op_mat_test!(Mat2x3, 2, 3, op_mul);
+	mat_op_mat_test!(Mat2x4, 2, 4, op_mul);
+	mat_op_mat_test!(Mat3x2, 3, 2, op_mul);
+	mat_op_mat_test!(Mat3x3, 3, 3, op_mul);
+	mat_op_mat_test!(Mat3x4, 3, 4, op_mul);
+	mat_op_mat_test!(Mat4x2, 4, 2, op_mul);
+	mat_op_mat_test!(Mat4x3, 4, 3, op_mul);
+	mat_op_mat_test!(Mat4x4, 4, 4, op_mul);
+}
+
+#[test]
+fn mat_div() {
+	mat_op_mat_test!(Mat2x2, 2, 2, op_div);
+	mat_op_mat_test!(Mat2x3, 2, 3, op_div);
+	mat_op_mat_test!(Mat2x4, 2, 4, op_div);
+	mat_op_mat_test!(Mat3x2, 3, 2, op_div);
+	mat_op_mat_test!(Mat3x3, 3, 3, op_div);
+	mat_op_mat_test!(Mat3x4, 3, 4, op_div);
+	mat_op_mat_test!(Mat4x2, 4, 2, op_div);
+	mat_op_mat_test!(Mat4x3, 4, 3, op_div);
+	mat_op_mat_test!(Mat4x4, 4, 4, op_div);
+}
+
+#[test]
+fn mat_rem() {
+	mat_op_mat_test!(Mat2x2, 2, 2, op_rem);
+	mat_op_mat_test!(Mat2x3, 2, 3, op_rem);
+	mat_op_mat_test!(Mat2x4, 2, 4, op_rem);
+	mat_op_mat_test!(Mat3x2, 3, 2, op_rem);
+	mat_op_mat_test!(Mat3x3, 3, 3, op_rem);
+	mat_op_mat_test!(Mat3x4, 3, 4, op_rem);
+	mat_op_mat_test!(Mat4x2, 4, 2, op_rem);
+	mat_op_mat_test!(Mat4x3, 4, 3, op_rem);
+	mat_op_mat_test!(Mat4x4, 4, 4, op_rem);
+}
+
 macro_rules! mat_op_scal_test {
 	($V:ident, $N:expr, $M:expr, $op:ident) => (
 		let v = $V::new_map(|i, j| (2*(i + j) + 2) as i32);
@@ -321,6 +360,45 @@ fn mat_sub_assign() {
 	mat_op_mat_assign_test!(Mat4x2, 4, 2, op_sub_assign, op_sub);
 	mat_op_mat_assign_test!(Mat4x3, 4, 3, op_sub_assign, op_sub);
 	mat_op_mat_assign_test!(Mat4x4, 4, 4, op_sub_assign, op_sub);
+}
+
+#[test]
+fn mat_mul_assign() {
+	mat_op_mat_assign_test!(Mat2x2, 2, 2, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat2x3, 2, 3, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat2x4, 2, 4, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat3x2, 3, 2, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat3x3, 3, 3, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat3x4, 3, 4, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat4x2, 4, 2, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat4x3, 4, 3, op_mul_assign, op_mul);
+	mat_op_mat_assign_test!(Mat4x4, 4, 4, op_mul_assign, op_mul);
+}
+
+#[test]
+fn mat_div_assign() {
+	mat_op_mat_assign_test!(Mat2x2, 2, 2, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat2x3, 2, 3, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat2x4, 2, 4, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat3x2, 3, 2, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat3x3, 3, 3, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat3x4, 3, 4, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat4x2, 4, 2, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat4x3, 4, 3, op_div_assign, op_div);
+	mat_op_mat_assign_test!(Mat4x4, 4, 4, op_div_assign, op_div);
+}
+
+#[test]
+fn mat_rem_assign() {
+	mat_op_mat_assign_test!(Mat2x2, 2, 2, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat2x3, 2, 3, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat2x4, 2, 4, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat3x2, 3, 2, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat3x3, 3, 3, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat3x4, 3, 4, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat4x2, 4, 2, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat4x3, 4, 3, op_rem_assign, op_rem);
+	mat_op_mat_assign_test!(Mat4x4, 4, 4, op_rem_assign, op_rem);
 }
 
 macro_rules! mat_op_scal_assign_test {
@@ -472,7 +550,7 @@ macro_rules! mat_mul_vec_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
 		let m = $Vnm::new_scal(1 as i32);
 		let v = $Vn::new_scal(1 as i32);
-		assert_eq!(m*v, $Vm::new_scal($N));
+		assert_eq!(m.dot(v), $Vm::new_scal($N));
 	)
 }
 
@@ -493,7 +571,7 @@ macro_rules! mat_mul_vec_mat_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
 		let m = $Vnm::new_scal(1 as i32);
 		let v = $Vm::new_scal(1 as i32);
-		assert_eq!(v*m, $Vn::new_scal($M));
+		assert_eq!(v.dot(m), $Vn::new_scal($M));
 	)
 }
 
@@ -514,7 +592,7 @@ macro_rules! mat_mul_mat_test {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
 		let vnm = $Vnm::new_scal(1 as i32);
 		let vln = $Vln::new_scal(1 as i32);
-		assert_eq!(vnm*vln, $Vlm::new_scal($N as i32));
+		assert_eq!(vnm.dot(vln), $Vlm::new_scal($N as i32));
 	)
 }
 

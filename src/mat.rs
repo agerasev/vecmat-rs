@@ -43,6 +43,12 @@ macro_rules! mat_new {
 				$V { d: [v; $N*$M] }
 			}
 		}
+
+		impl<T> Default for $V<T> where T: Copy + Default {
+			fn default() -> Self {
+				$V::new()
+			}
+		}
 	)
 }
 
@@ -206,12 +212,18 @@ macro_rules! mat_all {
 		
 		mat_op_mat!($V, $N, $M, Add, add, op_add);
 		mat_op_mat!($V, $N, $M, Sub, sub, op_sub);
+		mat_op_mat!($V, $N, $M, Mul, mul, op_mul);
+		mat_op_mat!($V, $N, $M, Div, div, op_div);
+		mat_op_mat!($V, $N, $M, Rem, rem, op_rem);
 		mat_op_scal!($V, $N, $M, Mul, mul, op_mul);
 		mat_op_scal!($V, $N, $M, Div, div, op_div);
 		mat_op_scal!($V, $N, $M, Rem, rem, op_rem);
 		
 		mat_op_mat_assign!($V, $N, $M, AddAssign, Add, add_assign, op_add);
 		mat_op_mat_assign!($V, $N, $M, SubAssign, Sub, sub_assign, op_sub);
+		mat_op_mat_assign!($V, $N, $M, MulAssign, Mul, mul_assign, op_mul);
+		mat_op_mat_assign!($V, $N, $M, DivAssign, Div, div_assign, op_div);
+		mat_op_mat_assign!($V, $N, $M, RemAssign, Rem, rem_assign, op_rem);
 		mat_op_scal_assign!($V, $N, $M, MulAssign, Mul, mul_assign, op_mul);
 		mat_op_scal_assign!($V, $N, $M, DivAssign, Div, div_assign, op_div);
 		mat_op_scal_assign!($V, $N, $M, RemAssign, Rem, rem_assign, op_rem);
@@ -282,9 +294,9 @@ macro_rules! mat_row_col {
 
 macro_rules! mat_mul_vec {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		impl<T> Mul<$Vn<T>> for $Vnm<T> where T: Copy + Num {
+		impl<T> Dot<$Vn<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vm<T>;
-			fn mul(self, vec: $Vn<T>) -> Self::Output {
+			fn dot(self, vec: $Vn<T>) -> Self::Output {
 				$Vm::new_map(|j| { self.row(j).dot(vec) })
 			}
 		}
@@ -293,9 +305,9 @@ macro_rules! mat_mul_vec {
 
 macro_rules! mat_mul_vec_mat {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		impl<T> Mul<$Vnm<T>> for $Vm<T> where T: Copy + Num {
+		impl<T> Dot<$Vnm<T>> for $Vm<T> where T: Copy + Num {
 			type Output = $Vn<T>;
-			fn mul(self, mat: $Vnm<T>) -> Self::Output {
+			fn dot(self, mat: $Vnm<T>) -> Self::Output {
 				$Vn::new_map(|i| { self.dot(mat.col(i)) })
 			}
 		}
@@ -323,9 +335,9 @@ mat_mul_vec_all!(Mat4x4, Vec4, Vec4, 4, 4);
 
 macro_rules! mat_mul_mat {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
-		impl<T> Mul<$Vln<T>> for $Vnm<T> where T: Copy + Num {
+		impl<T> Dot<$Vln<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vlm<T>;
-			fn mul(self, mat: $Vln<T>) -> Self::Output {
+			fn dot(self, mat: $Vln<T>) -> Self::Output {
 				$Vlm::new_map(|i, j| self.row(j).dot(mat.col(i)))
 			}
 		}

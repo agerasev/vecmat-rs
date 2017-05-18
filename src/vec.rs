@@ -44,6 +44,12 @@ macro_rules! vec_new {
 				$V { d: [v; $N] }
 			}
 		}
+
+		impl<T> Default for $V<T> where T: Copy + Default {
+			fn default() -> Self {
+				$V::new()
+			}
+		}
 	)
 }
 
@@ -195,10 +201,16 @@ macro_rules! vec_div_mod_floor {
 	)
 }
 
+pub trait Dot<VT> {
+	type Output;
+	fn dot(self, other: VT) -> Self::Output;
+}
+
 macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Num {
-			pub fn dot(self, vec: $V<T>) -> T {
+		impl<T> Dot<$V<T>> for $V<T> where T: Copy + Num {
+			type Output = T;
+			fn dot(self, vec: $V<T>) -> Self::Output {
 				let mut out = T::zero();
 				for i in 0..$N {
 					out = out + self[i]*vec[i];

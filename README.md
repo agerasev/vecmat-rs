@@ -1,4 +1,5 @@
 # linalg
+[![Build Status](https://travis-ci.org/nthend/linalg-rs.png?branch=refactor)](https://travis-ci.org/nthend/linalg-rs)
 
 Library for low-dimensional linear algebra written in Rust
 
@@ -12,8 +13,6 @@ Library for low-dimensional linear algebra written in Rust
 - [x] `sqr`, `length`, `normalize` vector
 - [x] logic ops for boolean vectors
 - [x] `div_floor` and `mod_floor` for integer vectors
-- [ ] iterate over cubic volume
-- [ ] component-wise multiplication of two matrices
-- [ ] map vector or matrix with lambda
-- [ ] component-wise `abs`, `sign` and etc
-- [ ] impl Default trait
+- [x] component-wise multiplication of two matrices
+- [x] map vector or matrix with lambda
+- [x] impl Default trait
