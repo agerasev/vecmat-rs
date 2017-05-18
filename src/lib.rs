@@ -1,7 +1,10 @@
-extern crate num;
+extern crate num_traits;
+extern crate num_integer;
 
-#[macro_use]
 pub mod vec;
+#[cfg(test)]
+mod vec_test;
 
-#[macro_use]
 pub mod mat;
+#[cfg(test)]
+mod mat_test;

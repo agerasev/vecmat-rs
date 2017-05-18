@@ -1,3 +1,4 @@
+use std::mem;
 use std::ops::{
 	Index, IndexMut, 
 	Neg, Add, Sub, Mul, Div, Rem, 
@@ -5,25 +6,49 @@ use std::ops::{
 	Not, BitAnd, BitOr, BitXor,
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
-use std::iter::{Iterator};
-use std::fmt::{Display, Debug, Formatter, Result as FmtResult};
-use num::{Num, Zero, One, Signed, Float, Integer};
+use std::fmt::{Display, Formatter, Result as FmtResult};
+use num_traits::{Num, Zero, Float, Signed};
+use num_integer::{Integer};
 
-pub trait Vector<T> {
-	fn dim() -> i32;
-}
 
 macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
-		#[allow(non_camel_case_types)]
-		#[derive(Clone, Copy, PartialEq)]
+		#[derive(Clone, Copy, Debug, PartialEq)]
 		pub struct $V<T: Copy> {
 			pub d: [T; $N],
 		}
+	)
+}
 
-		impl<T> Vector<T> for $V<T> where T: Copy {
-			fn dim() -> i32 {
-				return $N;
+macro_rules! vec_new {
+	($V:ident, $N:expr) => (
+		impl<T> $V<T> where T: Copy + Default {
+			pub fn new() -> Self {
+				$V { d: [T::default(); $N] }
+			}
+		}
+		
+		impl<T> $V<T> where T: Copy {
+			pub fn new_array(a: [T; $N]) -> Self {
+				$V { d: a }
+			}
+
+			pub fn new_map<F>(f: F) -> Self where F: Fn(usize) -> T {
+				let mut arr: [T; $N] = unsafe { mem::uninitialized() };
+				for i in 0..$N {
+					arr[i] = f(i);
+				}
+				$V { d: arr }
+			}
+
+			pub fn new_scal(v: T) -> Self {
+				$V { d: [v; $N] }
+			}
+		}
+
+		impl<T> Default for $V<T> where T: Copy + Default {
+			fn default() -> Self {
+				$V::new()
 			}
 		}
 	)
@@ -35,47 +60,18 @@ macro_rules! vec_data {
 			pub fn data(&self) -> &[T; $N] {
 				&self.d
 			}
-		}
-	)
-}
 
-macro_rules! vec_fmt {
-	($V:ident, $N:expr) => (
-		impl<T> Display for $V<T> where T: Copy + Display {
-			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				try!(write!(f, "{} [ ", stringify!($V)));
-				for i in 0..$N {
-					try!(write!(f, "\t{}, ", self[i]));
-				}
-				try!(write!(f, "]"));
-				Ok(())
-			}
-		}
-
-		impl<T> Debug for $V<T> where T: Copy + Display {
-			#[inline]
-			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				Display::fmt(self, f)
+			pub fn data_mut(&mut self) -> &mut [T; $N] {
+				&mut self.d
 			}
 		}
 	)
-}
-
-macro_rules! vec_map {
-	[$i:ident; $v:expr; $V:ident, $N:expr] => ({
-		let mut out = $V::new();
-		for $i in 0..$N {
-			out[$i] = $v;
-		}
-		out
-	})
 }
 
 macro_rules! vec_index {
 	($V:ident, $N:expr) => (
 		impl<T> Index<usize> for $V<T> where T: Copy {
 			type Output = T;
-			#[inline]
 			fn index(&self, i: usize) -> &Self::Output {
 				assert!(i < $N);
 				unsafe { self.d.get_unchecked(i) }
@@ -83,7 +79,6 @@ macro_rules! vec_index {
 		}
 
 		impl<T> IndexMut<usize> for $V<T> where T: Copy {
-			#[inline]
 			fn index_mut(&mut self, i: usize) -> &mut Self::Output {
 				assert!(i < $N);
 				unsafe { self.d.get_unchecked_mut(i) }
@@ -92,95 +87,26 @@ macro_rules! vec_index {
 	)
 }
 
-macro_rules! vec_new {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default {
-			pub fn new() -> Self {
-				$V::<T> { d: [T::default(); $N] }
-			}
-			
-			pub fn map<F>(f: F) -> Self where F: Fn(usize) -> T {
-				vec_map![i; f(i); $V, $N]
-			}
-		}
-	)
-}
-
-pub trait From_<VU> {
-	fn from_(v: VU) -> Self;
-}
-
-pub trait Into_<VT> {
-	fn into_(self) -> VT;
-}
-
-macro_rules! vec_from {
-	($V:ident, $N:expr) => (
-		impl<'a, T, U> From<&'a [U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
-			fn from(a: &'a [U; $N]) -> Self {
-				vec_map![i; T::from(a[i]); $V, $N]
-			}
-		}
-
-		impl<T, U> From<[U; $N]> for $V<T> where T: Copy + Default + From<U>, U: Copy {
-			fn from(a: [U; $N]) -> Self {
-				Self::from(&a)
-			}
-		}
-
-		impl<T, U> From_<$V<U>> for $V<T> where T: Copy + Default + From<U>, U: Copy + Default {
-			fn from_(a: $V<U>) -> Self {
-				Self::from(a.data())
-			}
-		}
-
-		impl<T, U> Into_<$V<T>> for $V<U> where T: Copy + Default + From<U>, U: Copy + Default {
-			fn into_(self) -> $V<T> {
-				self.data().into()
-			}
-		}
-
-		impl<T> $V<T> where T: Copy + Default {
-			pub fn from_scal(a: T) -> Self {
-				vec_map![i; T::from(a); $V, $N]
-			}
-		}
-	)
-}
-
-pub struct VecIter<VT> {
-	pub begin: VT,
-	pub end: VT,
-	pub current: VT,
-}
-
-macro_rules! vec_iter {
+macro_rules! vec_map {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy {
-			pub fn iter_to(self, other: $V<T>) -> VecIter<$V<T>> {
-				VecIter { begin: self, end: other, current: self }
+			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
+				$V::new_map(|i| f(self[i]))
 			}
 		}
+	)
+}
 
-		impl<T> Iterator for VecIter<$V<T>> where T: Copy + Add<Output=T> + AddAssign + One + PartialOrd {
-			type Item = $V<T>;
-			fn next(&mut self) -> Option<Self::Item> {
-				let cur = self.current;
-				self.current[0] += T::one();
-				for i in 1..$N {
-					if self.current[i - 1] >= self.end[i - 1] {
-						self.current[i] += T::one();
-						self.current[i - 1] = self.begin[i - 1];
-					} else {
-					    break;
-					}
+macro_rules! vec_fmt {
+	($V:ident, $N:expr) => (
+		impl<T> Display for $V<T> where T: Copy + Display {
+			fn fmt(&self, f: &mut Formatter) -> FmtResult {
+				try!(write!(f, "{}[", stringify!($V)));
+				for i in 0..$N-1 {
+					try!(write!(f, "{}, ", self[i]));
 				}
-				
-				if cur[$N - 1] < self.end[$N - 1] {
-					Some(cur)
-				} else {
-					None
-				}
+				try!(write!(f, "{}]", self[$N-1]));
+				Ok(())
 			}
 		}
 	)
@@ -188,10 +114,10 @@ macro_rules! vec_iter {
 
 macro_rules! vec_neg {
 	($V:ident, $N:expr) => (
-		impl<T> Neg for $V<T> where T: Copy + Default + Num + Signed {
+		impl<T> Neg for $V<T> where T: Copy + Num + Signed {
 			type Output = $V<T>;
 			fn neg(self) -> Self::Output {
-				vec_map![i; -self[i]; $V, $N]
+				self.map(|v| -v)
 			}
 		}
 	)
@@ -205,10 +131,10 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! vec_op_vec {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
+		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
-				vec_map![i; $op!(self[i], vec[i]); $V, $N]
+				$V::new_map(|i| $op!(self[i], vec[i]))
 			}
 		}
 	)
@@ -216,18 +142,18 @@ macro_rules! vec_op_vec {
 
 macro_rules! vec_op_scal {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, a: T) -> Self::Output {
-				vec_map![i; $op!(self[i], a); $V, $N]
+				self.map(|v| $op!(v, a))
 			}
 		}
 	)
 }
 
 macro_rules! vec_op_vec_assign {
-	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Default + Num {
+	($V:ident, $N:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, vec: $V<T>) {
 				*self = $op!(*self, vec);
 			}
@@ -236,8 +162,8 @@ macro_rules! vec_op_vec_assign {
 }
 
 macro_rules! vec_op_scal_assign {
-	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + Default + Num {
+	($V:ident, $N:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, a: T) {
 				*self = $op!(*self, a);
 			}
@@ -253,41 +179,41 @@ macro_rules! vec_ops_all {
 }
 
 macro_rules! vec_ops_all_assign {
-	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		vec_op_vec_assign!($V, $N, $Trait, $method, $op);
-		vec_op_scal_assign!($V, $N, $Trait, $method, $op);
+	($V:ident, $N:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
+		vec_op_vec_assign!($V, $N, $Trait, $BaseTrait, $method, $op);
+		vec_op_scal_assign!($V, $N, $Trait, $BaseTrait, $method, $op);
 	)
 }
 
-macro_rules! vec_ops_int {
+macro_rules! vec_div_mod_floor {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Integer {
+		impl<T> $V<T> where T: Copy + Integer {
 			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
-				vec_map![i; self[i].div_floor(&other[i]); $V, $N]
+				$V::new_map(|i| self[i].div_floor(&other[i]))
 			}
 
 			pub fn mod_floor(&self, other: $V<T>) -> $V<T> {
-				vec_map![i; self[i].mod_floor(&other[i]); $V, $N]
+				$V::new_map(|i| self[i].mod_floor(&other[i]))
 			}
 
 			pub fn div_mod_floor(&self, other: $V<T>) -> ($V<T>, $V<T>) {
-				let mut dv = $V::<T>::new();
-				let mut mv = $V::<T>::new();
-				for i in 0..$N {
-					let (d, m) = self[i].div_mod_floor(&other[i]);
-					dv[i] = d;
-					mv[i] = m;
-				}
-				(dv, mv)
+				let dm = $V::new_map(|i| self[i].div_mod_floor(&other[i]));
+				(dm.map(|v| v.0), dm.map(|v| v.1))
 			}
 		}
 	)
 }
 
+pub trait Dot<VT> {
+	type Output;
+	fn dot(self, other: VT) -> Self::Output;
+}
+
 macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num {
-			pub fn dot(self, vec: $V<T>) -> T {
+		impl<T> Dot<$V<T>> for $V<T> where T: Copy + Num {
+			type Output = T;
+			fn dot(self, vec: $V<T>) -> Self::Output {
 				let mut out = T::zero();
 				for i in 0..$N {
 					out = out + self[i]*vec[i];
@@ -300,7 +226,7 @@ macro_rules! vec_dot {
 
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num {
+		impl<T> $V<T> where T: Copy + Num {
 			pub fn sqr(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -310,7 +236,7 @@ macro_rules! vec_norm {
 			}
 		}
 
-		impl<T> $V<T> where T: Copy + Default + Num + Float {
+		impl<T> $V<T> where T: Copy + Num + Float {
 			pub fn length(self) -> T {
 				self.sqr().sqrt()
 			}
@@ -324,18 +250,28 @@ macro_rules! vec_norm {
 
 macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
-		impl<T> Zero for $V<T> where T: Copy + Default + Num {
-			fn zero() -> Self {
-				$V::<T> { d: [T::zero(); $N] }
+		impl<T> $V<T> where T: Copy + Zero {
+			pub fn zero() -> Self {
+				$V::new_scal(T::zero())
 			}
 
-			fn is_zero(&self) -> bool {
+			pub fn is_zero(&self) -> bool {
 				for i in 0..$N {
 					if !self[i].is_zero() {
 						return false;
 					}
 				}
 				true
+			}
+		}
+
+		impl<T> Zero for $V<T> where T: Copy + Num + Zero {
+			fn zero() -> Self {
+				$V::zero()
+			}
+
+			fn is_zero(&self) -> bool {
+				$V::is_zero(self)
 			}
 		}
 	)
@@ -346,7 +282,7 @@ macro_rules! vec_bool_not {
 		impl Not for $V<bool> {
 			type Output = $V<bool>;
 			fn not(self) -> Self::Output {
-				vec_map![i; !self[i]; $V, $N]
+				$V::new_map(|i| !self[i])
 			}
 		}
 	)
@@ -361,7 +297,7 @@ macro_rules! vec_bool_op {
 		impl $Trait for $V<bool> {
 			type Output = $V<bool>;
 			fn $method(self, other: $V<bool>) -> Self::Output {
-				vec_map![i; $op!(self[i], other[i]); $V, $N]
+				$V::new_map(|i| $op!(self[i], other[i]))
 			}
 		}
 	)
@@ -407,38 +343,38 @@ macro_rules! vec_bool_all {
 	)
 }
 
-macro_rules! vec_vec_eq {
+macro_rules! vec_veq {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialEq {
-			pub fn eq_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] == vec[i]; $V, $N]
+			pub fn veq(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] == vec[i])
 			}
-			pub fn ne_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] != vec[i]; $V, $N]
+			pub fn vne(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] != vec[i])
 			}
 		}
 	)
 }
 
-macro_rules! vec_vec_cmp {
+macro_rules! vec_vcmp {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialOrd {
-			pub fn lt_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] < vec[i]; $V, $N]
+			pub fn vlt(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] < vec[i])
 			}
-			pub fn le_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] <= vec[i]; $V, $N]
+			pub fn vle(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] <= vec[i])
 			}
-			pub fn gt_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] > vec[i]; $V, $N]
+			pub fn vgt(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] > vec[i])
 			}
-			pub fn ge_(&self, vec: $V<T>) -> $V<bool> {
-				vec_map![i; self[i] >= vec[i]; $V, $N]
+			pub fn vge(&self, vec: $V<T>) -> $V<bool> {
+				$V::new_map(|i| self[i] >= vec[i])
 			}
 		}
 
 		impl<T> $V<T> where T: Copy + PartialOrd {
-			pub fn min_(&self) -> T {
+			pub fn min(&self) -> T {
 				let mut mv = self[0];
 				for i in 1..$N {
 					let v = self[i];
@@ -449,7 +385,7 @@ macro_rules! vec_vec_cmp {
 				mv
 			}
 			
-			pub fn max_(&self) -> T {
+			pub fn max(&self) -> T {
 				let mut mv = self[0];
 				for i in 1..$N {
 					let v = self[i];
@@ -466,32 +402,31 @@ macro_rules! vec_vec_cmp {
 macro_rules! vec_all {
 	($V:ident, $N:expr) => (
 		vec_struct!($V, $N);
-		vec_data!($V, $N);
-		vec_fmt!($V, $N);
 		vec_index!($V, $N);
 		vec_new!($V, $N);
-		vec_from!($V, $N);
-		vec_iter!($V, $N);
+		vec_data!($V, $N);
+		vec_fmt!($V, $N);
+		vec_map!($V, $N);
 
 		vec_neg!($V, $N);
 
 		vec_op_vec!($V, $N, Add, add, op_add);
 		vec_op_vec!($V, $N, Sub, sub, op_sub);
-		vec_op_vec_assign!($V, $N, AddAssign, add_assign, op_add);
-		vec_op_vec_assign!($V, $N, SubAssign, sub_assign, op_sub);
+		vec_op_vec_assign!($V, $N, AddAssign, Add, add_assign, op_add);
+		vec_op_vec_assign!($V, $N, SubAssign, Sub, sub_assign, op_sub);
 		vec_ops_all!($V, $N, Mul, mul, op_mul);
 		vec_ops_all!($V, $N, Div, div, op_div);
 		vec_ops_all!($V, $N, Rem, rem, op_rem);
-		vec_ops_all_assign!($V, $N, MulAssign, mul_assign, op_mul);
-		vec_ops_all_assign!($V, $N, DivAssign, div_assign, op_div);
-		vec_ops_all_assign!($V, $N, RemAssign, rem_assign, op_rem);
-
-		vec_ops_int!($V, $N);
-
+		vec_ops_all_assign!($V, $N, MulAssign, Mul, mul_assign, op_mul);
+		vec_ops_all_assign!($V, $N, DivAssign, Div, div_assign, op_div);
+		vec_ops_all_assign!($V, $N, RemAssign, Rem, rem_assign, op_rem);
+		
+		vec_div_mod_floor!($V, $N);
+		
 		vec_dot!($V, $N);
 		vec_norm!($V, $N);
-
 		vec_zero!($V, $N);
+		
 		vec_bool_not!($V, $N);
 
 		vec_bool_op!($V, $N, BitAnd, bitand, op_bit_and);
@@ -505,43 +440,41 @@ macro_rules! vec_all {
 		vec_bool_any!($V, $N);
 		vec_bool_all!($V, $N);
 
-		vec_vec_eq!($V, $N);
-		vec_vec_cmp!($V, $N);
+		vec_veq!($V, $N);
+		vec_vcmp!($V, $N);
 	)
 }
 
-vec_all!(vec2, 2);
-vec_all!(vec3, 3);
-vec_all!(vec4, 4);
+vec_all!(Vec2, 2);
+vec_all!(Vec3, 3);
+vec_all!(Vec4, 4);
 
-impl<T> vec3<T> where T: Copy + Num {
-	pub fn cross(self, vec: vec3<T>) -> vec3<T> {
+impl<T> Vec3<T> where T: Copy + Num {
+	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
 		let b = &vec;
-		vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
+		Vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
 	}
 }
 
-
 macro_rules! vec_type {
 	($Va:ident, $V:ident, $T:ident) => (
-		#[allow(non_camel_case_types)]
 		pub type $Va = $V<$T>;
 	)
 }
 
-vec_type!(vec2b, vec2, bool);
-vec_type!(vec3b, vec3, bool);
-vec_type!(vec4b, vec4, bool);
-vec_type!(vec2i, vec2, i32);
-vec_type!(vec3i, vec3, i32);
-vec_type!(vec4i, vec4, i32);
-vec_type!(vec2u, vec2, u32);
-vec_type!(vec3u, vec3, u32);
-vec_type!(vec4u, vec4, u32);
-vec_type!(vec2f, vec2, f32);
-vec_type!(vec3f, vec3, f32);
-vec_type!(vec4f, vec4, f32);
-vec_type!(vec2d, vec2, f64);
-vec_type!(vec3d, vec3, f64);
-vec_type!(vec4d, vec4, f64);
+vec_type!(Vec2bool, Vec2, bool);
+vec_type!(Vec3bool, Vec3, bool);
+vec_type!(Vec4bool, Vec4, bool);
+vec_type!(Vec2i32, Vec2, i32);
+vec_type!(Vec3i32, Vec3, i32);
+vec_type!(Vec4i32, Vec4, i32);
+vec_type!(Vec2u32, Vec2, u32);
+vec_type!(Vec3u32, Vec3, u32);
+vec_type!(Vec4u32, Vec4, u32);
+vec_type!(Vec2f32, Vec2, f32);
+vec_type!(Vec3f32, Vec3, f32);
+vec_type!(Vec4f32, Vec4, f32);
+vec_type!(Vec2f64, Vec2, f64);
+vec_type!(Vec3f64, Vec3, f64);
+vec_type!(Vec4f64, Vec4, f64);
