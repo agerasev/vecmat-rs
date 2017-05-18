@@ -9,6 +9,7 @@
 
     <title>vecmat::mat::Outer - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
     
@@ -16,7 +17,7 @@
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -42,33 +43,33 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>vecmat</a>::<wbr><a href='index.html'>mat</a>::<wbr><a class='trait' href=''>Outer</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>vecmat</a>::<wbr><a href='index.html'>mat</a>::<wbr><a class="trait" href=''>Outer</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../../src/vecmat/mat.rs.html#264-267' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Outer&lt;VT&gt; {
-    type <a href='#associatedtype.Output' class='type'>Output</a>;
-    fn <a href='#tymethod.outer' class='fnname'>outer</a>(self, other: VT) -&gt; Self::<a class='trait' href='../../vecmat/mat/trait.Outer.html' title='vecmat::mat::Outer'>Output</a>;
+    type <a href='#associatedtype.Output' class="type">Output</a>;
+    fn <a href='#tymethod.outer' class='fnname'>outer</a>(self, other: VT) -&gt; Self::<a class="trait" href="../../vecmat/mat/trait.Outer.html" title="trait vecmat::mat::Outer">Output</a>;
 }</pre>
             <h2 id='associated-types'>Associated Types</h2>
             <div class='methods'>
-        <h3 id='associatedtype.Output' class='method stab '><span id='Output.t' class='invisible'><code>type <a href='#associatedtype.Output' class='type'>Output</a></code></span></h3></div>
+        <h3 id='associatedtype.Output' class='method'><span id='Output.t' class='invisible'><code>type <a href='#associatedtype.Output' class="type">Output</a></code></span></h3></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.outer' class='method stab '><span id='outer.v' class='invisible'><code>fn <a href='#tymethod.outer' class='fnname'>outer</a>(self, other: VT) -&gt; Self::<a class='trait' href='../../vecmat/mat/trait.Outer.html' title='vecmat::mat::Outer'>Output</a></code></span></h3></div>
+        <h3 id='tymethod.outer' class='method'><span id='outer.v' class='invisible'><code>fn <a href='#tymethod.outer' class='fnname'>outer</a>(self, other: VT) -&gt; Self::<a class="trait" href="../../vecmat/mat/trait.Outer.html" title="trait vecmat::mat::Outer">Output</a></code></span></h3></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec2.html' title='vecmat::vec::Vec2'>Vec2</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec3.html' title='vecmat::vec::Vec3'>Vec3</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
-<li><code>impl&lt;T&gt; Outer&lt;<a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt;&gt; for <a class='struct' href='../../vecmat/vec/struct.Vec4.html' title='vecmat::vec::Vec4'>Vec4</a>&lt;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num_traits/trait.Num.html' title='num_traits::Num'>Num</a></span></code></li>
+    <li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec2.html" title="struct vecmat::vec::Vec2">Vec2</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec3.html" title="struct vecmat::vec::Vec3">Vec3</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
+<li><code>impl&lt;T&gt; Outer&lt;<a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt;&gt; for <a class="struct" href="../../vecmat/vec/struct.Vec4.html" title="struct vecmat::vec::Vec4">Vec4</a>&lt;T&gt; <span class="where fmt-newline">where T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> + <a class="trait" href="../../num_traits/trait.Num.html" title="trait num_traits::Num">Num</a></span></code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/vecmat/mat/trait.Outer.js">
                  </script></section>

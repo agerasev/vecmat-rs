@@ -9,6 +9,7 @@
 
     <title>num_traits::ops::wrapping::WrappingMul - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
     
@@ -16,7 +17,7 @@
     <link rel="shortcut icon" href="https://rust-num.github.io/num/favicon.ico">
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -42,33 +43,33 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../../index.html'>num_traits</a>::<wbr><a href='../index.html'>ops</a>::<wbr><a href='index.html'>wrapping</a>::<wbr><a class='trait' href=''>WrappingMul</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../../index.html'>num_traits</a>::<wbr><a href='../index.html'>ops</a>::<wbr><a href='index.html'>wrapping</a>::<wbr><a class="trait" href=''>WrappingMul</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a class='srclink' href='../../../src/num_traits/ops/wrapping.rs.html#61-65' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait WrappingMul: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;Self, Output=Self&gt; {
+<pre class='rust trait'>pub trait WrappingMul: <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html" title="trait core::ops::Mul">Mul</a>&lt;Self, Output=Self&gt; {
     fn <a href='#tymethod.wrapping_mul' class='fnname'>wrapping_mul</a>(&amp;self, v: &amp;Self) -&gt; Self;
 }</pre><div class='docblock'><p>Performs multiplication that wraps around on overflow.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.wrapping_mul' class='method stab '><span id='wrapping_mul.v' class='invisible'><code>fn <a href='#tymethod.wrapping_mul' class='fnname'>wrapping_mul</a>(&amp;self, v: &amp;Self) -&gt; Self</code></span></h3><div class='docblock'><p>Wrapping (modular) multiplication. Computes <code>self * other</code>, wrapping around at the boundary
+        <h3 id='tymethod.wrapping_mul' class='method'><span id='wrapping_mul.v' class='invisible'><code>fn <a href='#tymethod.wrapping_mul' class='fnname'>wrapping_mul</a>(&amp;self, v: &amp;Self) -&gt; Self</code></span></h3><div class='docblock'><p>Wrapping (modular) multiplication. Computes <code>self * other</code>, wrapping around at the boundary
 of the type.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
-<li><code>impl WrappingMul for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
+    <li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i8.html">i8</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i16.html">i16</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a></code></li>
+<li><code>impl WrappingMul for <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a></code></li>
 </ul><script type="text/javascript" async
                          src="../../../implementors/num_traits/ops/wrapping/trait.WrappingMul.js">
                  </script></section>
