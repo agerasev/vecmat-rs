@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 description = "Lightweight low-dimensional vector and matrix library"
 documentation = "https://nthend.github.io/vecmat-rs/target/doc/vecmat/"
