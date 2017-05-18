@@ -1,18 +1,31 @@
-# linalg
-[![Build Status](https://travis-ci.org/nthend/linalg-rs.png?branch=refactor)](https://travis-ci.org/nthend/linalg-rs)
+# vecmat
+[![Build Status](https://travis-ci.org/nthend/vecmat-rs.png?branch=master)](https://travis-ci.org/nthend/vecmat-rs)
 
-Library for low-dimensional linear algebra written in Rust
+Lightweight low-dimensional vector and matrix library written in Rust
 
-## Structs
-+ Vectors with sizes 2, 3 and 4 -- `vecN` where `N` is 2, 3 or 4;
-+ Matrices with sizes 2, 3 and 4 for each dimension -- `matNxM` (or `matN` for square matrices) where `N` and `M` are 2, 3 or 4
+## Structs:
++ Vectors: `VecN<T>` where `N` is {2, 3, 4}
++ Matrices: `MatNxM<T>` (or `MatN<T>` for square matrices) where `N` and `M` are {2, 3, 4}
 
-## TODO:
-- [x] determinant, matrix inversion
-- [x] short names for vectors and matrices of bool, i32, f32 and etc.
-- [x] `sqr`, `length`, `normalize` vector
-- [x] logic ops for boolean vectors
+## Features:
+- [x] vector and matrix arithmetcs
+- [x] boolean vector logics
+- [x] vector dot, cross and outer products 
+- [x] matrix-matrix and matrix-vector products
+- [x] square matrix determinant and inversion
 - [x] `div_floor` and `mod_floor` for integer vectors
-- [x] component-wise multiplication of two matrices
-- [x] map vector or matrix with lambda
-- [x] impl Default trait
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
+additional terms or conditions.

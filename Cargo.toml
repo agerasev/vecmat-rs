@@ -1,7 +1,8 @@
 [package]
-name = "linalg"
-version = "0.1.0"
+name = "vecmat"
+version = "0.2.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
+license = "MIT/Apache-2.0"
 
 [dependencies]
 num-traits = "0.1.37"
