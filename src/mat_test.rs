@@ -498,7 +498,7 @@ macro_rules! mat_mul_vec_mat_test {
 }
 
 #[test]
-fn mul_mat_vec() {
+fn mul_vec_mat() {
 	mat_mul_vec_mat_test!(Mat2x2, Vec2, Vec2, 2, 2);
 	mat_mul_vec_mat_test!(Mat2x3, Vec2, Vec3, 2, 3);
 	mat_mul_vec_mat_test!(Mat2x4, Vec2, Vec4, 2, 4);
@@ -509,12 +509,12 @@ fn mul_mat_vec() {
 	mat_mul_vec_mat_test!(Mat4x3, Vec4, Vec3, 4, 3);
 	mat_mul_vec_mat_test!(Mat4x4, Vec4, Vec4, 4, 4);
 }
-/*
+
 macro_rules! mat_mul_mat_test {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
-		let vnm: $Vnm<i32> = [1; $N*$M].into();
-		let vln: $Vln<i32> = [1; $L*$N].into();
-		assert_eq!(vnm*vln, [$N; $L*$M].into());
+		let vnm = $Vnm::new_scal(1 as i32);
+		let vln = $Vln::new_scal(1 as i32);
+		assert_eq!(vnm*vln, $Vlm::new_scal($N as i32));
 	)
 }
 
@@ -569,18 +569,17 @@ fn one() {
 
 #[test]
 fn det() {
-	let m: Mat2<i32> = [11, 12, 21, 22].into();
+	let m = Mat2::<i32>::new_array([11, 12, 21, 22]);
 	assert_eq!(m.det(), 11*22 - 12*21);
 	
-	let m: Mat3<i32> = [11, 12, 13, 21, 22, 23, 31, 32, 33].into();
+	let m = Mat3::<i32>::new_array([11, 12, 13, 21, 22, 23, 31, 32, 33]);
 	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
 }
 
 #[test]
 fn inverse() {
-	let m = Mat2::<f64>::from([11.0, 12.0, 21.0, 22.0]).inverse();
-	let im = Mat2::<f64>::from([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
+	let m = Mat2::<f64>::new_array([11.0, 12.0, 21.0, 22.0]).inverse();
+	let im = Mat2::<f64>::new_array([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }
-*/

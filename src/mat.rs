@@ -2,8 +2,7 @@ use std::mem;
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use num_traits::{Zero/*, Signed, One, Float*/};
-//use num_integer::{Integer};
+use num_traits::{Num, Zero, One, Signed};
 
 use vec::*;
 
@@ -26,8 +25,8 @@ macro_rules! mat_new {
 		}
 
 		impl<T> $V<T> where T: Copy {
-			pub fn new_data(a: &[T; $N*$M]) -> Self {
-				$V { d: *a }
+			pub fn new_array(a: [T; $N*$M]) -> Self {
+				$V { d: a }
 			}
 
 			pub fn new_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
@@ -108,7 +107,7 @@ macro_rules! mat_map {
 
 macro_rules! mat_neg {
 	($V:ident, $N:expr, $M:expr) => (
-		impl<T> Neg for $V<T> where T: Copy + Neg<Output=T> {
+		impl<T> Neg for $V<T> where T: Copy + Num + Signed {
 			type Output = Self;
 			fn neg(self) -> Self::Output {
 				self.map(|v| -v)
@@ -125,7 +124,7 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! mat_op_mat {
 	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait for $V<T> where T: Copy + $Trait<Output=T> {
+		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, mat: $V<T>) -> Self::Output {
 				$V::new_map(|i, j| $op!(self[(i, j)], mat[(i, j)]))
@@ -136,7 +135,7 @@ macro_rules! mat_op_mat {
 
 macro_rules! mat_op_scal {
 	($V:ident, $N:expr, $M:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + $Trait<Output=T> {
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, a: T) -> Self::Output {
 				$V::new_map(|i, j| $op!(self[(i, j)], a))
@@ -147,7 +146,7 @@ macro_rules! mat_op_scal {
 
 macro_rules! mat_op_mat_assign {
 	($V:ident, $N:expr, $M:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + $BaseTrait<Output=T> {
+		impl<T> $Trait<$V<T>> for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, mat: $V<T>) {
 				*self = $op!(*self, mat);
 			}
@@ -157,7 +156,7 @@ macro_rules! mat_op_mat_assign {
 
 macro_rules! mat_op_scal_assign {
 	($V:ident, $N:expr, $M:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + $BaseTrait<Output=T> {
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, a: T) {
 				*self = $op!(*self, a);
 			}
@@ -182,7 +181,7 @@ macro_rules! mat_zero {
 			}
 		}
 
-		impl<T> Zero for $V<T> where T: Copy + Zero {
+		impl<T> Zero for $V<T> where T: Copy + Num + Zero {
 			fn zero() -> Self {
 				$V::zero()
 			}
@@ -258,7 +257,7 @@ pub trait Outer<VT> {
 
 macro_rules! mat_outer {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		impl<T> Outer<$Vn<T>> for $Vm<T> where T: Copy + Add + Mul<Output=T> {
+		impl<T> Outer<$Vn<T>> for $Vm<T> where T: Copy + Num {
 			type Output = $Vnm<T>;
 			fn outer(self, vec: $Vn<T>) -> Self::Output {
 				$Vnm::new_map(|i, j| self[j]*vec[i])
@@ -283,7 +282,7 @@ macro_rules! mat_row_col {
 
 macro_rules! mat_mul_vec {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		impl<T> Mul<$Vn<T>> for $Vnm<T> where T: Copy + Zero + Add + Mul<Output=T> {
+		impl<T> Mul<$Vn<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vm<T>;
 			fn mul(self, vec: $Vn<T>) -> Self::Output {
 				$Vm::new_map(|j| { self.row(j).dot(vec) })
@@ -294,7 +293,7 @@ macro_rules! mat_mul_vec {
 
 macro_rules! mat_mul_vec_mat {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		impl<T> Mul<$Vnm<T>> for $Vm<T> where T: Copy + Zero + Add + Mul<Output=T> {
+		impl<T> Mul<$Vnm<T>> for $Vm<T> where T: Copy + Num {
 			type Output = $Vn<T>;
 			fn mul(self, mat: $Vnm<T>) -> Self::Output {
 				$Vn::new_map(|i| { self.dot(mat.col(i)) })
@@ -321,23 +320,13 @@ mat_mul_vec_all!(Mat3x4, Vec3, Vec4, 3, 4);
 mat_mul_vec_all!(Mat4x2, Vec4, Vec2, 4, 2);
 mat_mul_vec_all!(Mat4x3, Vec4, Vec3, 4, 3);
 mat_mul_vec_all!(Mat4x4, Vec4, Vec4, 4, 4);
-/*
+
 macro_rules! mat_mul_mat {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
-		impl<T> Mul<$Vln<T>> for $Vnm<T> where T: Copy + Default + Num {
+		impl<T> Mul<$Vln<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vlm<T>;
 			fn mul(self, mat: $Vln<T>) -> Self::Output {
-				let mut out = $Vlm::<T>::zero();
-				for j in 0..$M {
-					for i in 0..$L {
-						let mut tmp = T::zero();
-						for k in 0..$N {
-							tmp = tmp + self[(k, j)]*mat[(i, k)];
-						}
-						out[(i, j)] = tmp;
-					}
-				}
-				out
+				$Vlm::new_map(|i, j| self.row(j).dot(mat.col(i)))
 			}
 		}
 	)
@@ -373,13 +362,15 @@ mat_mul_mat!(Mat4x4, Mat4x4, Mat4x4, 4, 4, 4);
 
 macro_rules! mat_one {
 	($V:ident, $N:expr) => (
-		impl<T> One for $V<T> where T: Copy + Default + Num {
+		impl<T> $V<T> where T: Copy + One + Zero {
+			pub fn one() -> Self {
+				$V::new_map(|i, j| if i == j { T::one() } else { T::zero() })
+			}
+		}
+
+		impl<T> One for $V<T> where T: Copy + Num + One + Zero {
 			fn one() -> Self {
-				let mut mat = $V::<T> { d: [T::zero(); ($N*$N)] };
-				for i in 0..$N {
-					mat.d[i*(1 + $N)] = T::one();
-				}
-				mat
+				$V::one()
 			}
 		}
 	)
@@ -391,16 +382,15 @@ mat_one!(Mat4x4, 4);
 
 macro_rules! mat_submatrix {
 	($Vs:ident, $Vr:ident, $N:expr) => (
-		impl<T> $Vs<T> where T: Copy + Default {
+		impl<T> $Vs<T> where T: Copy {
 			pub fn submatrix(self, x: usize, y: usize) -> $Vr<T> {
-				mat_map![i, j; self[(i + (i >= x) as usize, j + (j >= y) as usize)]; $Vr, $N-1, $N-1]
+				$Vr::new_map(|i, j| self[(i + (i >= x) as usize, j + (j >= y) as usize)])
 			}
 		}
-		
 	)
 }
 
-impl<T> Mat2x2<T> where T: Copy + Default {
+impl<T> Mat2x2<T> where T: Copy {
 	pub fn submatrix(self, x:usize, y:usize) -> T {
 		self[(1 - x, 1 - y)]
 	}
@@ -409,19 +399,9 @@ impl<T> Mat2x2<T> where T: Copy + Default {
 mat_submatrix!(Mat4x4, Mat3x3, 4);
 mat_submatrix!(Mat3x3, Mat2x2, 3);
 
-pub trait Det<T> {
-	fn det(self) -> T;
-}
-
-impl<T> Det<T> for T where T: Copy + Default + Num {
-	fn det(self) -> T {
-		self
-	}
-}
-
 macro_rules! mat_cofactor {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+		impl<T> $V<T> where T: Copy + Num + Signed {
 			pub fn cofactor(self, x: usize, y: usize) -> T {
 				(if (x + y) % 2 == 0 { T::one() } else { -T::one() })*self.submatrix(x,y).det()
 			}
@@ -429,15 +409,20 @@ macro_rules! mat_cofactor {
 	)
 }
 
+impl<T> Mat2x2<T> where T: Copy + Num + Signed {
+	pub fn cofactor(self, x: usize, y: usize) -> T {
+		(if (x + y) % 2 == 0 { T::one() } else { -T::one() })*self.submatrix(x,y)
+	}
+}
+
 mat_cofactor!(Mat4x4, 4);
 mat_cofactor!(Mat3x3, 3);
-mat_cofactor!(Mat2x2, 2);
 
 /* Determinant */
 macro_rules! mat_det {
 	($V:ident, $N:expr) => (
-		impl<T> Det<T> for $V<T> where T: Copy + Default + Num + Signed {
-			fn det(self) -> T {
+		impl<T> $V<T> where T: Copy + Num + Signed {
+			pub fn det(self) -> T {
 				let mut tmp = T::zero();
 				let j = 0;
 				for i in 0..$N {
@@ -449,16 +434,21 @@ macro_rules! mat_det {
 	)
 }
 
+impl<T> Mat2x2<T> where T: Copy + Num + Signed {
+	pub fn det(self) -> T {
+		self[(0, 0)]*self[(1, 1)] - self[(1, 0)]*self[(0, 1)]
+	}
+}
+
 mat_det!(Mat4x4, 4);
 mat_det!(Mat3x3, 3);
-mat_det!(Mat2x2, 2);
 
 /* Adjugate matrix */
 macro_rules! mat_adj {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+		impl<T> $V<T> where T: Copy + Num + Signed {
 			pub fn adj(self) -> $V<T> {
-				mat_map![i, j; self.cofactor(j, i); $V, $N, $N]
+				$V::new_map(|i, j| self.cofactor(j, i))
 			}
 		}
 	)
@@ -471,7 +461,7 @@ mat_adj!(Mat2x2, 2);
 /* Inverse matrix */
 macro_rules! mat_inverse {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default + Num + Signed {
+		impl<T> $V<T> where T: Copy + Num + Signed {
 			pub fn inverse(self) -> $V<T> {
 				self.adj()/self.det()
 			}
@@ -483,11 +473,8 @@ mat_inverse!(Mat4x4, 4);
 mat_inverse!(Mat3x3, 3);
 mat_inverse!(Mat2x2, 2);
 
-#[allow(non_camel_case_types)]
 pub type Mat2<T> = Mat2x2<T>;
-#[allow(non_camel_case_types)]
 pub type Mat3<T> = Mat3x3<T>;
-#[allow(non_camel_case_types)]
 pub type Mat4<T> = Mat4x4<T>;
 
 macro_rules! mat_type {
@@ -509,4 +496,3 @@ mat_type!(Mat4f32, Mat4, f32);
 mat_type!(Mat2f64, Mat2, f64);
 mat_type!(Mat3f64, Mat3, f64);
 mat_type!(Mat4f64, Mat4, f64);
-*/

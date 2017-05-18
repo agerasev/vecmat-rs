@@ -7,7 +7,7 @@ use std::ops::{
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use num_traits::{Zero, Float};
+use num_traits::{Num, Zero, Float, Signed};
 use num_integer::{Integer};
 
 macro_rules! vec_struct {
@@ -105,7 +105,7 @@ macro_rules! vec_fmt {
 
 macro_rules! vec_neg {
 	($V:ident, $N:expr) => (
-		impl<T> Neg for $V<T> where T: Copy + Neg<Output=T> {
+		impl<T> Neg for $V<T> where T: Copy + Num + Signed {
 			type Output = $V<T>;
 			fn neg(self) -> Self::Output {
 				self.map(|v| -v)
@@ -122,7 +122,7 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! vec_op_vec {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait for $V<T> where T: Copy + $Trait<Output=T> {
+		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
 				$V::new_map(|i| $op!(self[i], vec[i]))
@@ -133,7 +133,7 @@ macro_rules! vec_op_vec {
 
 macro_rules! vec_op_scal {
 	($V:ident, $N:expr, $Trait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + $Trait<Output=T> {
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, a: T) -> Self::Output {
 				self.map(|v| $op!(v, a))
@@ -144,7 +144,7 @@ macro_rules! vec_op_scal {
 
 macro_rules! vec_op_vec_assign {
 	($V:ident, $N:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait for $V<T> where T: Copy + $BaseTrait<Output=T> {
+		impl<T> $Trait for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, vec: $V<T>) {
 				*self = $op!(*self, vec);
 			}
@@ -154,7 +154,7 @@ macro_rules! vec_op_vec_assign {
 
 macro_rules! vec_op_scal_assign {
 	($V:ident, $N:expr, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-		impl<T> $Trait<T> for $V<T> where T: Copy + $BaseTrait<Output=T> {
+		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $BaseTrait<Output=T> {
 			fn $method(&mut self, a: T) {
 				*self = $op!(*self, a);
 			}
@@ -197,7 +197,7 @@ macro_rules! vec_div_mod_floor {
 
 macro_rules! vec_dot {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Zero + Add + Mul<Output=T> {
+		impl<T> $V<T> where T: Copy + Num {
 			pub fn dot(self, vec: $V<T>) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -211,7 +211,7 @@ macro_rules! vec_dot {
 
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Zero + Add + Mul<Output=T> {
+		impl<T> $V<T> where T: Copy + Num {
 			pub fn sqr(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
@@ -221,7 +221,7 @@ macro_rules! vec_norm {
 			}
 		}
 
-		impl<T> $V<T> where T: Copy + Float {
+		impl<T> $V<T> where T: Copy + Num + Float {
 			pub fn length(self) -> T {
 				self.sqr().sqrt()
 			}
@@ -250,7 +250,7 @@ macro_rules! vec_zero {
 			}
 		}
 
-		impl<T> Zero for $V<T> where T: Copy + Zero {
+		impl<T> Zero for $V<T> where T: Copy + Num + Zero {
 			fn zero() -> Self {
 				$V::zero()
 			}
@@ -434,7 +434,7 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
-impl<T> Vec3<T> where T: Copy + Sub<Output=T> + Mul<Output=T> {
+impl<T> Vec3<T> where T: Copy + Num {
 	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
 		let b = &vec;
