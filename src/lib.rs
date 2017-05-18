@@ -8,3 +8,6 @@ mod vec_test;
 pub mod mat;
 #[cfg(test)]
 mod mat_test;
+
+pub use vec::*;
+pub use mat::*;

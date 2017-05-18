@@ -1,5 +1,6 @@
 # vecmat
 [![Build Status](https://travis-ci.org/nthend/vecmat-rs.png?branch=master)](https://travis-ci.org/nthend/vecmat-rs)
+[![Version](https://img.shields.io/crates/v/vecmat.svg)](https://crates.io/crates/vecmat)
 
 Lightweight low-dimensional vector and matrix library written in Rust
 
