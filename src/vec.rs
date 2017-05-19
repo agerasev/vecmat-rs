@@ -36,7 +36,7 @@ macro_rules! vec_new {
 			pub fn new_map<F>(f: F) -> Self where F: Fn(usize) -> T {
 				let mut arr: [T; $N] = unsafe { mem::uninitialized() };
 				for i in 0..$N {
-					arr[i] = f(i);
+					unsafe { *arr.get_unchecked_mut(i) = f(i); }
 				}
 				$V { d: arr }
 			}
@@ -73,15 +73,23 @@ macro_rules! vec_index {
 		impl<T> Index<usize> for $V<T> where T: Copy {
 			type Output = T;
 			fn index(&self, i: usize) -> &Self::Output {
-				assert!(i < $N);
-				unsafe { self.d.get_unchecked(i) }
+				&self.d[i]
 			}
 		}
 
 		impl<T> IndexMut<usize> for $V<T> where T: Copy {
 			fn index_mut(&mut self, i: usize) -> &mut Self::Output {
-				assert!(i < $N);
-				unsafe { self.d.get_unchecked_mut(i) }
+				&mut self.d[i]
+			}
+		}
+
+		impl<T> $V<T> where T: Copy {
+			unsafe fn _i(&self, i: usize) -> &T {
+				self.d.get_unchecked(i)
+			}
+
+			unsafe fn _im(&mut self, i: usize) -> &mut T {
+				self.d.get_unchecked_mut(i)
 			}
 		}
 	)
@@ -91,7 +99,7 @@ macro_rules! vec_map {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
-				$V::new_map(|i| f(self[i]))
+				unsafe { $V::new_map(|i| f(*self._i(i))) }
 			}
 		}
 	)
@@ -134,7 +142,7 @@ macro_rules! vec_op_vec {
 		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
-				$V::new_map(|i| $op!(self[i], vec[i]))
+				unsafe { $V::new_map(|i| $op!(*self._i(i), *vec._i(i))) }
 			}
 		}
 	)
@@ -189,15 +197,15 @@ macro_rules! vec_div_mod_floor {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Integer {
 			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
-				$V::new_map(|i| self[i].div_floor(&other[i]))
+				unsafe { $V::new_map(|i| self[i].div_floor(other._i(i))) }
 			}
 
 			pub fn mod_floor(&self, other: $V<T>) -> $V<T> {
-				$V::new_map(|i| self[i].mod_floor(&other[i]))
+				unsafe { $V::new_map(|i| self[i].mod_floor(other._i(i))) }
 			}
 
 			pub fn div_mod_floor(&self, other: $V<T>) -> ($V<T>, $V<T>) {
-				let dm = $V::new_map(|i| self[i].div_mod_floor(&other[i]));
+				let dm = unsafe { $V::new_map(|i| self[i].div_mod_floor(other._i(i))) };
 				(dm.map(|v| v.0), dm.map(|v| v.1))
 			}
 		}
