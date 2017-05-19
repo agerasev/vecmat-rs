@@ -11,7 +11,7 @@ categories = ["algorithms", "data-structures"]
 license = "MIT/Apache-2.0"
 
 [badges]
-travis-ci = { repository = "https://github.com/nthend/vecmat-rs", branch = "master" }
+travis-ci = { repository = "nthend/vecmat-rs", branch = "master" }
 
 [dependencies]
 num-traits = "0.1.37"
