@@ -84,11 +84,11 @@ macro_rules! vec_index {
 		}
 
 		impl<T> $V<T> where T: Copy {
-			unsafe fn _i(&self, i: usize) -> &T {
+			unsafe fn _get(&self, i: usize) -> &T {
 				self.d.get_unchecked(i)
 			}
 
-			unsafe fn _im(&mut self, i: usize) -> &mut T {
+			unsafe fn _get_mut(&mut self, i: usize) -> &mut T {
 				self.d.get_unchecked_mut(i)
 			}
 		}
@@ -99,7 +99,7 @@ macro_rules! vec_map {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
-				unsafe { $V::new_map(|i| f(*self._i(i))) }
+				$V::new_map(|i| unsafe { f(*self._get(i)) })
 			}
 		}
 	)
@@ -142,7 +142,7 @@ macro_rules! vec_op_vec {
 		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
-				unsafe { $V::new_map(|i| $op!(*self._i(i), *vec._i(i))) }
+				$V::new_map(|i| unsafe { $op!(*self._get(i), *vec._get(i)) })
 			}
 		}
 	)
@@ -196,16 +196,16 @@ macro_rules! vec_ops_all_assign {
 macro_rules! vec_div_mod_floor {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Integer {
-			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
-				unsafe { $V::new_map(|i| self[i].div_floor(other._i(i))) }
+			pub fn div_floor(self, other: $V<T>) -> $V<T> {
+				$V::new_map(|i| unsafe { (*self._get(i)).div_floor(other._get(i)) })
 			}
 
-			pub fn mod_floor(&self, other: $V<T>) -> $V<T> {
-				unsafe { $V::new_map(|i| self[i].mod_floor(other._i(i))) }
+			pub fn mod_floor(self, other: $V<T>) -> $V<T> {
+				$V::new_map(|i| unsafe { (*self._get(i)).mod_floor(other._get(i)) })
 			}
 
-			pub fn div_mod_floor(&self, other: $V<T>) -> ($V<T>, $V<T>) {
-				let dm = unsafe { $V::new_map(|i| self[i].div_mod_floor(other._i(i))) };
+			pub fn div_mod_floor(self, other: $V<T>) -> ($V<T>, $V<T>) {
+				let dm = $V::new_map(|i| unsafe { (*self._get(i)).div_mod_floor(other._get(i)) });
 				(dm.map(|v| v.0), dm.map(|v| v.1))
 			}
 		}
@@ -224,7 +224,7 @@ macro_rules! vec_dot {
 			fn dot(self, vec: $V<T>) -> Self::Output {
 				let mut out = T::zero();
 				for i in 0..$N {
-					out = out + self[i]*vec[i];
+					unsafe { out = out + (*self._get(i))*(*vec._get(i)); }
 				}
 				out
 			}
@@ -238,7 +238,7 @@ macro_rules! vec_norm {
 			pub fn sqr(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
-					out = out + self[i]*self[i];
+					unsafe { out = out + (*self._get(i))*(*self._get(i)); }
 				}
 				out
 			}
@@ -265,7 +265,7 @@ macro_rules! vec_zero {
 
 			pub fn is_zero(&self) -> bool {
 				for i in 0..$N {
-					if !self[i].is_zero() {
+					if unsafe{ !(*self._get(i)).is_zero() } {
 						return false;
 					}
 				}
@@ -290,7 +290,7 @@ macro_rules! vec_bool_not {
 		impl Not for $V<bool> {
 			type Output = $V<bool>;
 			fn not(self) -> Self::Output {
-				$V::new_map(|i| !self[i])
+				$V::new_map(|i| unsafe { !(*self._get(i)) })
 			}
 		}
 	)
@@ -305,7 +305,7 @@ macro_rules! vec_bool_op {
 		impl $Trait for $V<bool> {
 			type Output = $V<bool>;
 			fn $method(self, other: $V<bool>) -> Self::Output {
-				$V::new_map(|i| $op!(self[i], other[i]))
+				$V::new_map(|i| unsafe { $op!((*self._get(i)), (*other._get(i))) })
 			}
 		}
 	)
@@ -326,7 +326,7 @@ macro_rules! vec_bool_any {
 		impl $V<bool> {
 			pub fn any(self) -> bool {
 				for i in 0..$N {
-					if self[i] {
+					if unsafe { *self._get(i) } {
 						return true;
 					}
 				}
@@ -341,7 +341,7 @@ macro_rules! vec_bool_all {
 		impl $V<bool> {
 			pub fn all(self) -> bool {
 				for i in 0..$N {
-					if !self[i] {
+					if !(unsafe { *self._get(i) }) {
 						return false;
 					}
 				}
@@ -355,10 +355,10 @@ macro_rules! vec_veq {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialEq {
 			pub fn veq(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] == vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) == (*vec._get(i)) })
 			}
 			pub fn vne(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] != vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) != (*vec._get(i)) })
 			}
 		}
 	)
@@ -368,24 +368,24 @@ macro_rules! vec_vcmp {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialOrd {
 			pub fn vlt(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] < vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) < (*vec._get(i)) })
 			}
 			pub fn vle(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] <= vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) <= (*vec._get(i)) })
 			}
 			pub fn vgt(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] > vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) > (*vec._get(i)) })
 			}
 			pub fn vge(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] >= vec[i])
+				$V::new_map(|i| unsafe { (*self._get(i)) >= (*vec._get(i)) })
 			}
 		}
 
 		impl<T> $V<T> where T: Copy + PartialOrd {
 			pub fn min(&self) -> T {
-				let mut mv = self[0];
+				let mut mv = unsafe { *self._get(0) };
 				for i in 1..$N {
-					let v = self[i];
+					let v = unsafe { *self._get(i) };
 					if v < mv {
 						mv = v;
 					}
@@ -394,9 +394,9 @@ macro_rules! vec_vcmp {
 			}
 			
 			pub fn max(&self) -> T {
-				let mut mv = self[0];
+				let mut mv = unsafe { *self._get(0) };
 				for i in 1..$N {
-					let v = self[i];
+					let v = unsafe { *self._get(i) };
 					if v > mv {
 						mv = v;
 					}
@@ -461,7 +461,13 @@ impl<T> Vec3<T> where T: Copy + Num {
 	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
 		let b = &vec;
-		Vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
+		unsafe { 
+			Vec3::<T> { d: [ 
+				(*a._get(1))*(*b._get(2)) - (*a._get(2))*(*b._get(1)),
+				(*a._get(2))*(*b._get(0)) - (*a._get(0))*(*b._get(2)),
+				(*a._get(0))*(*b._get(1)) - (*a._get(1))*(*b._get(0))
+			] }
+		}
 	}
 }
 
