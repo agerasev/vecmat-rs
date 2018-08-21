@@ -6,6 +6,8 @@ use std::ops::{
 	Not, BitAnd, BitOr, BitXor,
 	BitAndAssign, BitOrAssign, BitXorAssign,
 };
+use std::iter::{IntoIterator};
+use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use num_traits::{Num, Zero, Float, Signed};
 use num_integer::{Integer};
@@ -29,11 +31,11 @@ macro_rules! vec_new {
 		}
 		
 		impl<T> $V<T> where T: Copy {
-			pub fn new_array(a: [T; $N]) -> Self {
+			pub fn from_arr(a: [T; $N]) -> Self {
 				$V { d: a }
 			}
 
-			pub fn new_map<F>(f: F) -> Self where F: Fn(usize) -> T {
+			pub fn from_map<F>(f: F) -> Self where F: Fn(usize) -> T {
 				let mut arr: [T; $N] = unsafe { mem::uninitialized() };
 				for i in 0..$N {
 					arr[i] = f(i);
@@ -41,7 +43,7 @@ macro_rules! vec_new {
 				$V { d: arr }
 			}
 
-			pub fn new_scal(v: T) -> Self {
+			pub fn from_scal(v: T) -> Self {
 				$V { d: [v; $N] }
 			}
 		}
@@ -91,7 +93,36 @@ macro_rules! vec_map {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
-				$V::new_map(|i| f(self[i]))
+				$V::from_map(|i| f(self[i]))
+			}
+		}
+	)
+}
+
+macro_rules! vec_iter {
+	($V:ident, $N:expr) => (
+		impl <'a, T> $V<T> where T: Copy {
+			pub fn iter(&'a self) -> slice::Iter<'a, T> {
+				self.d.iter()
+			}
+		}
+		impl <'a, T> $V<T> where T: Copy {
+			pub fn iter_mut(&'a mut self) -> slice::IterMut<'a, T> {
+				self.d.iter_mut()
+			}
+		}
+		impl<'a, T> IntoIterator for &'a $V<T> where T: Copy {
+			type Item = &'a T;
+			type IntoIter = slice::Iter<'a, T>;
+			fn into_iter(self) -> Self::IntoIter {
+				self.d.into_iter()
+			}
+		}
+		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
+			type Item = &'a mut T;
+			type IntoIter = slice::IterMut<'a, T>;
+			fn into_iter(self) -> Self::IntoIter {
+				self.d.as_mut().into_iter()
 			}
 		}
 	)
@@ -134,7 +165,7 @@ macro_rules! vec_op_vec {
 		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, vec: $V<T>) -> Self::Output {
-				$V::new_map(|i| $op!(self[i], vec[i]))
+				$V::from_map(|i| $op!(self[i], vec[i]))
 			}
 		}
 	)
@@ -189,15 +220,15 @@ macro_rules! vec_div_mod_floor {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Integer {
 			pub fn div_floor(&self, other: $V<T>) -> $V<T> {
-				$V::new_map(|i| self[i].div_floor(&other[i]))
+				$V::from_map(|i| self[i].div_floor(&other[i]))
 			}
 
 			pub fn mod_floor(&self, other: $V<T>) -> $V<T> {
-				$V::new_map(|i| self[i].mod_floor(&other[i]))
+				$V::from_map(|i| self[i].mod_floor(&other[i]))
 			}
 
 			pub fn div_mod_floor(&self, other: $V<T>) -> ($V<T>, $V<T>) {
-				let dm = $V::new_map(|i| self[i].div_mod_floor(&other[i]));
+				let dm = $V::from_map(|i| self[i].div_mod_floor(&other[i]));
 				(dm.map(|v| v.0), dm.map(|v| v.1))
 			}
 		}
@@ -252,7 +283,7 @@ macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Zero {
 			pub fn zero() -> Self {
-				$V::new_scal(T::zero())
+				$V::from_scal(T::zero())
 			}
 
 			pub fn is_zero(&self) -> bool {
@@ -282,7 +313,7 @@ macro_rules! vec_bool_not {
 		impl Not for $V<bool> {
 			type Output = $V<bool>;
 			fn not(self) -> Self::Output {
-				$V::new_map(|i| !self[i])
+				$V::from_map(|i| !self[i])
 			}
 		}
 	)
@@ -297,7 +328,7 @@ macro_rules! vec_bool_op {
 		impl $Trait for $V<bool> {
 			type Output = $V<bool>;
 			fn $method(self, other: $V<bool>) -> Self::Output {
-				$V::new_map(|i| $op!(self[i], other[i]))
+				$V::from_map(|i| $op!(self[i], other[i]))
 			}
 		}
 	)
@@ -347,10 +378,10 @@ macro_rules! vec_veq {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialEq {
 			pub fn veq(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] == vec[i])
+				$V::from_map(|i| self[i] == vec[i])
 			}
 			pub fn vne(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] != vec[i])
+				$V::from_map(|i| self[i] != vec[i])
 			}
 		}
 	)
@@ -360,16 +391,16 @@ macro_rules! vec_vcmp {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + PartialOrd {
 			pub fn vlt(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] < vec[i])
+				$V::from_map(|i| self[i] < vec[i])
 			}
 			pub fn vle(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] <= vec[i])
+				$V::from_map(|i| self[i] <= vec[i])
 			}
 			pub fn vgt(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] > vec[i])
+				$V::from_map(|i| self[i] > vec[i])
 			}
 			pub fn vge(&self, vec: $V<T>) -> $V<bool> {
-				$V::new_map(|i| self[i] >= vec[i])
+				$V::from_map(|i| self[i] >= vec[i])
 			}
 		}
 
@@ -405,6 +436,7 @@ macro_rules! vec_all {
 		vec_index!($V, $N);
 		vec_new!($V, $N);
 		vec_data!($V, $N);
+		vec_iter!($V, $N);
 		vec_fmt!($V, $N);
 		vec_map!($V, $N);
 

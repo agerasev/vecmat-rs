@@ -1,5 +1,7 @@
 use std::mem;
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
+use std::iter::{IntoIterator};
+use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use num_traits::{Num, Zero, One, Signed};
 use vec::*;
@@ -23,11 +25,11 @@ macro_rules! mat_new {
 		}
 
 		impl<T> $V<T> where T: Copy {
-			pub fn new_array(a: [T; $N*$M]) -> Self {
+			pub fn from_arr(a: [T; $N*$M]) -> Self {
 				$V { d: a }
 			}
 
-			pub fn new_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
+			pub fn from_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
 				let mut arr: [T; $N*$M] = unsafe { mem::uninitialized() };
 				for j in 0..$M {
 					for i in 0..$N {
@@ -37,7 +39,7 @@ macro_rules! mat_new {
 				$V { d: arr }
 			}
 
-			pub fn new_scal(v: T) -> Self {
+			pub fn from_scal(v: T) -> Self {
 				$V { d: [v; $N*$M] }
 			}
 		}
@@ -81,6 +83,35 @@ macro_rules! mat_index {
 	)
 }
 
+macro_rules! mat_iter {
+	($V:ident, $N:expr, $M:expr) => (
+		impl <'a, T> $V<T> where T: Copy {
+			pub fn iter(&'a self) -> slice::Iter<'a, T> {
+				self.d.iter()
+			}
+		}
+		impl <'a, T> $V<T> where T: Copy {
+			pub fn iter_mut(&'a mut self) -> slice::IterMut<'a, T> {
+				self.d.iter_mut()
+			}
+		}
+		impl<'a, T> IntoIterator for &'a $V<T> where T: Copy {
+			type Item = &'a T;
+			type IntoIter = slice::Iter<'a, T>;
+			fn into_iter(self) -> Self::IntoIter {
+				self.d.into_iter()
+			}
+		}
+		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
+			type Item = &'a mut T;
+			type IntoIter = slice::IterMut<'a, T>;
+			fn into_iter(self) -> Self::IntoIter {
+				self.d.as_mut().into_iter()
+			}
+		}
+	)
+}
+
 macro_rules! mat_fmt {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
@@ -103,7 +134,7 @@ macro_rules! mat_map {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn map<F, S>(self, f: F) -> $V<S> where F: Fn(T) -> S, S: Copy {
-				$V::new_map(|i, j| f(self[(i, j)]))
+				$V::from_map(|i, j| f(self[(i, j)]))
 			}
 		}
 	)
@@ -131,7 +162,7 @@ macro_rules! mat_op_mat {
 		impl<T> $Trait for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, mat: $V<T>) -> Self::Output {
-				$V::new_map(|i, j| $op!(self[(i, j)], mat[(i, j)]))
+				$V::from_map(|i, j| $op!(self[(i, j)], mat[(i, j)]))
 			}
 		}
 	)
@@ -142,7 +173,7 @@ macro_rules! mat_op_scal {
 		impl<T> $Trait<T> for $V<T> where T: Copy + Num + $Trait<Output=T> {
 			type Output = $V<T>;
 			fn $method(self, a: T) -> Self::Output {
-				$V::new_map(|i, j| $op!(self[(i, j)], a))
+				$V::from_map(|i, j| $op!(self[(i, j)], a))
 			}
 		}
 	)
@@ -203,6 +234,7 @@ macro_rules! mat_all {
 
 		mat_new!($V, $N, $M);
 		mat_data!($V, $N, $M);
+		mat_iter!($V, $N, $M);
 		mat_fmt!($V, $N, $M);
 		mat_index!($V, $N, $M);
 		mat_map!($V, $N, $M);
@@ -245,7 +277,7 @@ macro_rules! mat_transpose {
 	($Vnm:ident, $Vmn:ident, $N:expr, $M:expr) => (
 		impl<T> $Vnm<T> where T: Copy {
 			pub fn transpose(self) -> $Vmn<T> {
-				$Vmn::new_map(|i, j| self[(j, i)])
+				$Vmn::from_map(|i, j| self[(j, i)])
 			}
 		}
 	)
@@ -271,7 +303,7 @@ macro_rules! mat_outer {
 		impl<T> Outer<$Vn<T>> for $Vm<T> where T: Copy + Num {
 			type Output = $Vnm<T>;
 			fn outer(self, vec: $Vn<T>) -> Self::Output {
-				$Vnm::new_map(|i, j| self[j]*vec[i])
+				$Vnm::from_map(|i, j| self[j]*vec[i])
 			}
 		}
 	)
@@ -281,11 +313,11 @@ macro_rules! mat_row_col {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
 		impl<T> $Vnm<T> where T: Copy {
 			pub fn row(self, j: usize) -> $Vn<T> {
-				$Vn::new_map(|i| self[(i, j)])
+				$Vn::from_map(|i| self[(i, j)])
 			}
 
 			pub fn col(self, i: usize) -> $Vm<T> {
-				$Vm::new_map(|j| self[(i, j)])
+				$Vm::from_map(|j| self[(i, j)])
 			}
 		}
 	)
@@ -296,7 +328,7 @@ macro_rules! mat_mul_vec {
 		impl<T> Dot<$Vn<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vm<T>;
 			fn dot(self, vec: $Vn<T>) -> Self::Output {
-				$Vm::new_map(|j| { self.row(j).dot(vec) })
+				$Vm::from_map(|j| { self.row(j).dot(vec) })
 			}
 		}
 	)
@@ -307,7 +339,7 @@ macro_rules! mat_mul_vec_mat {
 		impl<T> Dot<$Vnm<T>> for $Vm<T> where T: Copy + Num {
 			type Output = $Vn<T>;
 			fn dot(self, mat: $Vnm<T>) -> Self::Output {
-				$Vn::new_map(|i| { self.dot(mat.col(i)) })
+				$Vn::from_map(|i| { self.dot(mat.col(i)) })
 			}
 		}
 	)
@@ -337,7 +369,7 @@ macro_rules! mat_mul_mat {
 		impl<T> Dot<$Vln<T>> for $Vnm<T> where T: Copy + Num {
 			type Output = $Vlm<T>;
 			fn dot(self, mat: $Vln<T>) -> Self::Output {
-				$Vlm::new_map(|i, j| self.row(j).dot(mat.col(i)))
+				$Vlm::from_map(|i, j| self.row(j).dot(mat.col(i)))
 			}
 		}
 	)
@@ -375,7 +407,7 @@ macro_rules! mat_one {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + One + Zero {
 			pub fn one() -> Self {
-				$V::new_map(|i, j| if i == j { T::one() } else { T::zero() })
+				$V::from_map(|i, j| if i == j { T::one() } else { T::zero() })
 			}
 		}
 
@@ -395,7 +427,7 @@ macro_rules! mat_submatrix {
 	($Vs:ident, $Vr:ident, $N:expr) => (
 		impl<T> $Vs<T> where T: Copy {
 			pub fn submatrix(self, x: usize, y: usize) -> $Vr<T> {
-				$Vr::new_map(|i, j| self[(i + (i >= x) as usize, j + (j >= y) as usize)])
+				$Vr::from_map(|i, j| self[(i + (i >= x) as usize, j + (j >= y) as usize)])
 			}
 		}
 	)
@@ -459,7 +491,7 @@ macro_rules! mat_adj {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Num + Signed {
 			pub fn adj(self) -> $V<T> {
-				$V::new_map(|i, j| self.cofactor(j, i))
+				$V::from_map(|i, j| self.cofactor(j, i))
 			}
 		}
 	)
