@@ -53,7 +53,7 @@ macro_rules! vec_data_test {
 		let mut v = $V::new_map(|i| i + 1);
 
 		{
-			let mut b = v.data_mut(); 
+			let b = v.data_mut();
 			for i in 0..$N {
 				b[i] = i + 3;
 			}
