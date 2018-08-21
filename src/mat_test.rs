@@ -22,14 +22,14 @@ fn new() {
 
 macro_rules! mat_content_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let mut m = $V::new_map(|i, j| i + j);
+		let mut m = $V::from_map(|i, j| i + j);
 		for j in 0..$M {
 			for i in 0..$N {
 				assert_eq!(m.d[i + $N*j], i + j);
 			}
 		}
 
-		let z = $V::new_scal(0);
+		let z = $V::from_scal(0);
 		for i in 0..($N*$M) {
 			assert_eq!(z.d[i], 0);
 		}
@@ -58,7 +58,7 @@ fn content() {
 
 macro_rules! mat_data_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let v = $V::new_map(|i, j| i + j + 1);
+		let v = $V::from_map(|i, j| i + j + 1);
 
 		let a = &v.d;
 		let b = v.data(); 
@@ -83,8 +83,8 @@ fn data() {
 
 macro_rules! mat_eq_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let va = $V::new_map(|i, j| i + j);
-		let vb = $V::new_map(|i, j| i + j);
+		let va = $V::from_map(|i, j| i + j);
+		let vb = $V::from_map(|i, j| i + j);
 		assert_eq!(va, vb);
 	)
 }
@@ -104,7 +104,7 @@ fn eq() {
 
 macro_rules! mat_copy_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let m = $V::new_map(|i, j| i + j);
+		let m = $V::from_map(|i, j| i + j);
 		let cm = m;
 		assert_eq!(m, cm);
 	)
@@ -125,7 +125,7 @@ fn copy() {
 
 macro_rules! mat_index_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let mut m = $V::new_map(|i, j| i + j);
+		let mut m = $V::from_map(|i, j| i + j);
 		for j in 0..$M {
 			for i in 0..$N {
 				assert_eq!(m[(i, j)], i + j);
@@ -157,9 +157,52 @@ fn index() {
 	mat_index_test!(Mat4x4, 4, 4);
 }
 
+macro_rules! mat_iter_test {
+	($V:ident, $N:expr, $M:expr) => (
+		let mut m = $V::from_map(|i, j| i + j*$N + 1);
+		for (i, c) in m.iter().enumerate() {
+			assert_eq!(m.d[i], *c);
+		}
+		for (i, c) in m.iter_mut().enumerate() {
+			*c = i + 2;
+		}
+		for j in 0..$M {
+			for i in 0..$N {
+				assert_eq!(m[(i, j)], i + j*$N + 2);
+			}
+		}
+
+		let mut m = $V::from_scal(0);
+		for c in &m {
+			assert_eq!(*c, 0);
+		}
+		for c in &mut m {
+			*c = 1;
+		}
+		for j in 0..$M {
+			for i in 0..$N {
+				assert_eq!(m[(i, j)], 1);
+			}
+		}
+	)
+}
+
+#[test]
+fn iter() {
+	mat_iter_test!(Mat2x2, 2, 2);
+	mat_iter_test!(Mat2x3, 2, 3);
+	mat_iter_test!(Mat2x4, 2, 4);
+	mat_iter_test!(Mat3x2, 3, 2);
+	mat_iter_test!(Mat3x3, 3, 3);
+	mat_iter_test!(Mat3x4, 3, 4);
+	mat_iter_test!(Mat4x2, 4, 2);
+	mat_iter_test!(Mat4x3, 4, 3);
+	mat_iter_test!(Mat4x4, 4, 4);
+}
+
 macro_rules! mat_neg_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let m = $V::new_map(|i, j| (i + j + 1) as i32);
+		let m = $V::from_map(|i, j| (i + j + 1) as i32);
 		let nm = -m;
 		for j in 0..$M {
 			for i in 0..$N {
@@ -190,8 +233,8 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! mat_op_mat_test {
 	($V:ident, $N:expr, $M:expr, $op:ident) => (
-		let va = $V::new_map(|i, j| (2*(i + j) + 2) as i32);
-		let vb = $V::new_map(|i, j| (i + j + 1) as i32);
+		let va = $V::from_map(|i, j| (2*(i + j) + 2) as i32);
+		let vb = $V::from_map(|i, j| (i + j + 1) as i32);
 		let vc = $op!(va, vb);
 		for j in 0..$M {
 			for i in 0..$N {
@@ -268,7 +311,7 @@ fn mat_rem() {
 
 macro_rules! mat_op_scal_test {
 	($V:ident, $N:expr, $M:expr, $op:ident) => (
-		let v = $V::new_map(|i, j| (2*(i + j) + 2) as i32);
+		let v = $V::from_map(|i, j| (2*(i + j) + 2) as i32);
 		let a = 3;
 		let va = $op!(v, a);
 		for j in 0..$M {
@@ -326,8 +369,8 @@ macro_rules! op_rem_assign { ($a:expr, $b:expr) => ({ $a %= $b }) }
 
 macro_rules! mat_op_mat_assign_test {
 	($V:ident, $N:expr, $M:expr, $op_assign:ident, $op:ident) => (
-		let va = $V::new_map(|i, j| (2*(i + 2*j) + 2) as i32);
-		let vb = $V::new_map(|i, j| (i + j + 1) as i32);
+		let va = $V::from_map(|i, j| (2*(i + 2*j) + 2) as i32);
+		let vb = $V::from_map(|i, j| (i + j + 1) as i32);
 		let mut vc = va;
 		$op_assign!(vc, vb);
 		assert_eq!(vc, $op!(va, vb));
@@ -401,7 +444,7 @@ fn mat_rem_assign() {
 
 macro_rules! mat_op_scal_assign_test {
 	($V:ident, $N:expr, $M:expr, $op_assign:ident, $op:ident) => (
-		let v = $V::new_map(|i, j| (2*(i + 2*j) + 2) as i32);
+		let v = $V::from_map(|i, j| (2*(i + 2*j) + 2) as i32);
 		let a = 3;
 		let mut va = v;
 		$op_assign!(va, a);
@@ -476,8 +519,8 @@ fn zero() {
 
 macro_rules! mat_transpose_test {
 	($Vnm:ident, $Vmn:ident, $N:expr, $M:expr) => (
-		let vnm = $Vnm::new_map(|i, j| 2*i + 3*j);
-		let vmn = $Vmn::new_map(|i, j| 3*i + 2*j);
+		let vnm = $Vnm::from_map(|i, j| 2*i + 3*j);
+		let vmn = $Vmn::from_map(|i, j| 3*i + 2*j);
 		assert_eq!(vnm.transpose(), vmn);
 	)
 }
@@ -497,9 +540,9 @@ fn transpose() {
 
 macro_rules! mat_outer_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let vn = $Vn::new_map(|i| i as i32);
-		let vm = $Vm::new_map(|i| 2*i as i32);
-		let mat = $Vnm::new_map(|i, j| (2*i*j) as i32);
+		let vn = $Vn::from_map(|i| i as i32);
+		let vm = $Vm::from_map(|i| 2*i as i32);
+		let mat = $Vnm::from_map(|i, j| (2*i*j) as i32);
 		let res = vm.outer(vn);
 		assert_eq!(res, mat);
 	)
@@ -520,12 +563,12 @@ fn outer() {
 
 macro_rules! mat_row_col_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let mat = $Vnm::new_map(|i, j| 2*i + 3*j);
+		let mat = $Vnm::from_map(|i, j| 2*i + 3*j);
 		for i in 0..$N {
-			assert_eq!(mat.col(i), $Vm::new_map(|j| 2*i + 3*j));
+			assert_eq!(mat.col(i), $Vm::from_map(|j| 2*i + 3*j));
 		}
 		for j in 0..$M {
-			assert_eq!(mat.row(j), $Vn::new_map(|i| 2*i + 3*j));
+			assert_eq!(mat.row(j), $Vn::from_map(|i| 2*i + 3*j));
 		}
 		
 	)
@@ -546,9 +589,9 @@ fn row_col() {
 
 macro_rules! mat_mul_vec_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let m = $Vnm::new_scal(1 as i32);
-		let v = $Vn::new_scal(1 as i32);
-		assert_eq!(m.dot(v), $Vm::new_scal($N));
+		let m = $Vnm::from_scal(1 as i32);
+		let v = $Vn::from_scal(1 as i32);
+		assert_eq!(m.dot(v), $Vm::from_scal($N));
 	)
 }
 
@@ -567,9 +610,9 @@ fn mul_vec() {
 
 macro_rules! mat_mul_vec_mat_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let m = $Vnm::new_scal(1 as i32);
-		let v = $Vm::new_scal(1 as i32);
-		assert_eq!(v.dot(m), $Vn::new_scal($M));
+		let m = $Vnm::from_scal(1 as i32);
+		let v = $Vm::from_scal(1 as i32);
+		assert_eq!(v.dot(m), $Vn::from_scal($M));
 	)
 }
 
@@ -588,9 +631,9 @@ fn mul_vec_mat() {
 
 macro_rules! mat_mul_mat_test {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
-		let vnm = $Vnm::new_scal(1 as i32);
-		let vln = $Vln::new_scal(1 as i32);
-		assert_eq!(vnm.dot(vln), $Vlm::new_scal($N as i32));
+		let vnm = $Vnm::from_scal(1 as i32);
+		let vln = $Vln::from_scal(1 as i32);
+		assert_eq!(vnm.dot(vln), $Vlm::from_scal($N as i32));
 	)
 }
 
@@ -645,17 +688,17 @@ fn one() {
 
 #[test]
 fn det() {
-	let m = Mat2::<i32>::new_array([11, 12, 21, 22]);
+	let m = Mat2::<i32>::from_arr([11, 12, 21, 22]);
 	assert_eq!(m.det(), 11*22 - 12*21);
 	
-	let m = Mat3::<i32>::new_array([11, 12, 13, 21, 22, 23, 31, 32, 33]);
+	let m = Mat3::<i32>::from_arr([11, 12, 13, 21, 22, 23, 31, 32, 33]);
 	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
 }
 
 #[test]
 fn inverse() {
-	let m = Mat2::<f64>::new_array([11.0, 12.0, 21.0, 22.0]).inverse();
-	let im = Mat2::<f64>::new_array([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
+	let m = Mat2::<f64>::from_arr([11.0, 12.0, 21.0, 22.0]).inverse();
+	let im = Mat2::<f64>::from_arr([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }

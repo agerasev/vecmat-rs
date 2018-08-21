@@ -29,12 +29,12 @@ macro_rules! vec_new_test {
 			assert_eq!(v.d[i], i32::default());
 		}
 
-		let v = $V::new_map(|i| i + 1);
+		let v = $V::from_map(|i| i + 1);
 		for i in 0..$N {
 			assert_eq!(v.d[i], i + 1);
 		}
 
-		let z = $V::new_scal(5);
+		let z = $V::from_scal(5);
 		for i in 0..$N {
 			assert_eq!(z.d[i], 5);
 		}
@@ -50,7 +50,7 @@ fn new() {
 
 macro_rules! vec_data_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::new_map(|i| i + 1);
+		let mut v = $V::from_map(|i| i + 1);
 
 		{
 			let b = v.data_mut();
@@ -78,8 +78,8 @@ fn data() {
 
 macro_rules! vec_eq_test {
 	($V:ident, $N:expr) => (
-		let va = $V::new_map(|i| i + 1);
-		let vb = $V::new_map(|i| i + 1);
+		let va = $V::from_map(|i| i + 1);
+		let vb = $V::from_map(|i| i + 1);
 		assert_eq!(va, vb);
 	)
 }
@@ -93,7 +93,7 @@ fn eq() {
 
 macro_rules! vec_copy_test {
 	($V:ident, $N:expr) => (
-		let v = $V::new_map(|i| i + 1);
+		let v = $V::from_map(|i| i + 1);
 		let cv = v;
 		assert_eq!(cv, v);
 	)
@@ -108,7 +108,7 @@ fn copy() {
 
 macro_rules! vec_index_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::new_map(|i| i + 1);
+		let mut v = $V::from_map(|i| i + 1);
 		for i in 0..$N {
 			assert_eq!(v[i], i + 1);
 		}
@@ -128,14 +128,47 @@ fn index() {
 	vec_index_test!(Vec4, 4);
 }
 
+macro_rules! vec_iter_test {
+	($V:ident, $N:expr) => (
+		let mut v = $V::from_map(|i| i + 1);
+		for (i, c) in v.iter().enumerate() {
+			assert_eq!(v[i], *c);
+		}
+		for (i, c) in v.iter_mut().enumerate() {
+			*c = i + 2;
+		}
+		for i in 0..$N {
+			assert_eq!(v[i], i + 2);
+		}
+
+		let mut v = $V::from_scal(0);
+		for c in &v {
+			assert_eq!(*c, 0);
+		}
+		for c in &mut v {
+			*c = 1;
+		}
+		for i in 0..$N {
+			assert_eq!(v[i], 1);
+		}
+	)
+}
+
+#[test]
+fn iter() {
+	vec_iter_test!(Vec2, 2);
+	vec_iter_test!(Vec3, 3);
+	vec_iter_test!(Vec4, 4);
+}
+
 #[test]
 fn fmt() {
-	assert_eq!(format!("{}", Vec3::new_map(|i| i + 1)), "Vec3[1, 2, 3]");
+	assert_eq!(format!("{}", Vec3::from_map(|i| i + 1)), "Vec3[1, 2, 3]");
 }
 
 macro_rules! vec_neg_test {
 	($V:ident, $N:expr) => (
-		let v = $V::new_map(|i| i as i32);
+		let v = $V::from_map(|i| i as i32);
 		let nv = -v;
 		for i in 0..$N {
 			assert_eq!(-v[i], nv[i]);
@@ -158,8 +191,8 @@ macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a%$b }) }
 
 macro_rules! vec_op_vec_test {
 	($V:ident, $N:expr, $op:ident) => (
-		let va = $V::new_map(|i| (2*i + 2) as i32);
-		let vb = $V::new_map(|i| (i + 1) as i32);
+		let va = $V::from_map(|i| (2*i + 2) as i32);
+		let vb = $V::from_map(|i| (i + 1) as i32);
 		let vc = $op!(va, vb);
 		for i in 0..$N {
 			assert_eq!(vc[i], $op!(va[i], vb[i]));
@@ -204,7 +237,7 @@ fn vec_rem() {
 
 macro_rules! vec_op_scal_test {
 	($V:ident, $N:expr, $op:ident) => (
-		let v = $V::new_map(|i| (2*i + 1) as i32);
+		let v = $V::from_map(|i| (2*i + 1) as i32);
 		let a: i32 = 3;
 		let va = $op!(v, a);
 		for i in 0..$N {
@@ -242,8 +275,8 @@ macro_rules! op_rem_assign { ($a:expr, $b:expr) => ({ $a %= $b }) }
 
 macro_rules! vec_op_vec_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
-		let va = $V::new_map(|i| (2*i + 2) as i32);
-		let vb = $V::new_map(|i| (i + 1) as i32);
+		let va = $V::from_map(|i| (2*i + 2) as i32);
+		let vb = $V::from_map(|i| (i + 1) as i32);
 		let mut vc = va;
 		$op_assign!(vc, vb);
 		assert_eq!(vc, $op!(va, vb));
@@ -287,7 +320,7 @@ fn vec_rem_assign() {
 
 macro_rules! vec_op_scal_assign_test {
 	($V:ident, $N:expr, $op_assign:ident, $op:ident) => (
-		let v = $V::new_map(|i| (2*i + 1) as i32);
+		let v = $V::from_map(|i| (2*i + 1) as i32);
 		let a = 3;
 		let mut va = v;
 		$op_assign!(va, a);
@@ -319,15 +352,15 @@ fn scal_rem_assign() {
 #[test]
 fn div_mod_floor() {
 	assert_eq!(
-		Vec4::new_array([-2, -3, -4, -5]).div_mod_floor(Vec4::new_array([4, 3, 2, 1])), 
-		(Vec4::new_array([-1, -1, -2, -5]), Vec4::new_array([2, 0, 0, 0]))
+		Vec4::from_arr([-2, -3, -4, -5]).div_mod_floor(Vec4::from_arr([4, 3, 2, 1])), 
+		(Vec4::from_arr([-1, -1, -2, -5]), Vec4::from_arr([2, 0, 0, 0]))
 		);
 }
 
 macro_rules! vec_dot_test {
 	($V:ident, $N:expr) => (
-		let va = $V::<usize>::new_scal(1);
-		let vb = $V::<usize>::new_map(|i| i + 1);
+		let va = $V::<usize>::from_scal(1);
+		let vb = $V::<usize>::from_map(|i| i + 1);
 		let c = va.dot(vb);
 		assert_eq!(c, ($N*($N + 1))/2);
 	)
@@ -342,7 +375,7 @@ fn dot() {
 
 macro_rules! vec_norm_test {
 	($V:ident, $N:expr) => (
-		assert_eq!($V::new_scal(2).sqr(), $N*4);
+		assert_eq!($V::from_scal(2).sqr(), $N*4);
 	)
 }
 
@@ -356,10 +389,10 @@ fn norm() {
 macro_rules! vec_zero_test {
 	($V:ident, $N:expr) => (
 		let z = $V::<i32>::zero();
-		assert_eq!(z, $V::new_scal(0));
+		assert_eq!(z, $V::from_scal(0));
 		assert!(z.is_zero());
 		
-		let nz: $V<i32> = $V::new_scal(1);
+		let nz: $V<i32> = $V::from_scal(1);
 		assert!(!nz.is_zero());
 	)
 }
@@ -373,7 +406,7 @@ fn zero() {
 
 macro_rules! vec_bool_not_test {
 	($V:ident, $N:expr) => (
-		let z = $V::new_scal(false);
+		let z = $V::from_scal(false);
 		let nz = !z;
 		for i in 0..$N {
 			assert_eq!(nz[i], !z[i]);
@@ -390,7 +423,7 @@ fn bool_not() {
 
 macro_rules! vec_bool_any_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::new_scal(false);
+		let mut v = $V::from_scal(false);
 		assert!(!v.any());
 		v[0] = true;
 		assert!(v.any());
@@ -406,7 +439,7 @@ fn bool_any() {
 
 macro_rules! vec_bool_all_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::new_scal(true);
+		let mut v = $V::from_scal(true);
 		assert!(v.all());
 		v[0] = false;
 		assert!(!v.all());
@@ -422,8 +455,8 @@ fn bool_all() {
 
 macro_rules! vec_veq_test {
 	($V:ident, $N:expr) => (
-		let va = $V::new_map(|i| ($N - i) as i32);
-		let vb = $V::new_map(|i| i as i32);
+		let va = $V::from_map(|i| ($N - i) as i32);
+		let vb = $V::from_map(|i| i as i32);
 		
 		let eq = va.veq(vb);
 		for i in 0..$N {
@@ -446,8 +479,8 @@ fn vec_eq() {
 
 macro_rules! vec_vcmp_test {
 	($V:ident, $N:expr) => (
-		let va = $V::new_map(|i| ($N - i) as i32);
-		let vb = $V::new_map(|i| i as i32);
+		let va = $V::from_map(|i| ($N - i) as i32);
+		let vb = $V::from_map(|i| i as i32);
 		
 		let lt = va.vlt(vb);
 		for i in 0..$N {
@@ -480,8 +513,8 @@ fn vec_vcmp() {
 
 #[test]
 fn cross() {
-	let va = Vec3::<i32>::new_array([1, 0, 0]);
-	let vb = Vec3::<i32>::new_array([0, 1, 0]);
+	let va = Vec3::<i32>::from_arr([1, 0, 0]);
+	let vb = Vec3::<i32>::from_arr([0, 1, 0]);
 	let vc = va.cross(vb);
 	assert_eq!(vc[0], 0);
 	assert_eq!(vc[1], 0);
