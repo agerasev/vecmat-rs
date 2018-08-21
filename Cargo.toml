@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 description = "Lightweight low-dimensional vector and matrix library"
 documentation = "https://nthend.github.io/vecmat-rs/target/doc/vecmat/"
@@ -11,8 +11,8 @@ categories = ["algorithms", "data-structures"]
 license = "MIT/Apache-2.0"
 
 [badges]
-travis-ci = { repository = "https://github.com/nthend/vecmat-rs", branch = "master" }
+travis-ci = { repository = "nthend/vecmat-rs" }
 
 [dependencies]
-num-traits = "0.1.37"
-num-integer = "0.1.34"
+num-traits = "0.2"
+num-integer = "0.1"
