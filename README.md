@@ -72,8 +72,8 @@ fn main() {
 
 ## Structs:
 
-+ Vectors: `VecN<T>` where `N` is {2, 3, 4}
-+ Matrices: `MatNxM<T>` (or `MatN<T>` for square matrices) where `N` and `M` are {2, 3, 4}
++ Vectors: `VecN<T>` where `N` is 2, 3 or 4
++ Matrices: `MatNxM<T>` (or `MatN<T>` for square matrices) where `N` and `M` are 2, 3 or 4
 + Transformations: `map::AffineN<T>` - affine transformation for vectors
 
 ## Features:
