@@ -48,6 +48,39 @@ fn new() {
 	vec_new_test!(Vec4, 4);
 }
 
+#[test]
+fn new_no_gen() {
+	let v = Vec4i32::from(1, 2, 3, 4);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let v = Vec4i32::from_array([1, 2, 3, 4]);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let v = Vec4i32::from_array_ref(&[1, 2, 3, 4]);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let a = [1, 2, 3, 4, 5];
+
+	let o = Vec4i32::from_slice(&a[..4]);
+	assert!(o.is_some());
+	let v = o.unwrap();
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let o = Vec4i32::from_slice(&a[..3]);
+	assert!(o.is_none());
+
+	let o = Vec4i32::from_slice(&a[..]);
+	assert!(o.is_none());
+}
+
 macro_rules! vec_data_test {
 	($V:ident, $N:expr) => (
 		let mut v = $V::from_map(|i| i + 1);
@@ -265,6 +298,24 @@ fn scal_rem() {
 	vec_op_scal_test!(Vec2, 2, op_rem);
 	vec_op_scal_test!(Vec3, 3, op_rem);
 	vec_op_scal_test!(Vec4, 4, op_rem);
+}
+
+macro_rules! vec_mul_scal_rev_test {
+	($V:ident, $N:expr) => (
+		let v = $V::from_map(|i| (2*i + 1) as i32);
+		let a: i32 = 3;
+		let va = a*v;
+		for i in 0..$N {
+			assert_eq!(va[i], a*v[i]);
+		}
+	)
+}
+
+#[test]
+fn scal_mul_rev() {
+	vec_mul_scal_rev_test!(Vec2, 2);
+	vec_mul_scal_rev_test!(Vec3, 3);
+	vec_mul_scal_rev_test!(Vec4, 4);
 }
 
 macro_rules! op_add_assign { ($a:expr, $b:expr) => ({ $a += $b }) }

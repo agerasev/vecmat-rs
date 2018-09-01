@@ -20,6 +20,40 @@ fn new() {
 	mat_new_test!(Mat4x4, 4, 4);
 }
 
+#[test]
+fn new_no_gen() {
+	let v = Mat2i32::from(1, 2, 3, 4);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let v = Mat2i32::from_array([1, 2, 3, 4]);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let v = Mat2i32::from_array_ref(&[1, 2, 3, 4]);
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let a = [1, 2, 3, 4, 5];
+
+	let o = Mat2i32::from_slice(&a[..4]);
+	assert!(o.is_some());
+	let v = o.unwrap();
+	for i in 0..4 {
+		assert_eq!(v.d[i], i as i32 + 1);
+	}
+
+	let o = Mat2i32::from_slice(&a[..3]);
+	assert!(o.is_none());
+
+	let o = Mat2i32::from_slice(&a[..]);
+	assert!(o.is_none());
+}
+
+
 macro_rules! mat_content_test {
 	($V:ident, $N:expr, $M:expr) => (
 		let mut m = $V::from_map(|i, j| i + j);

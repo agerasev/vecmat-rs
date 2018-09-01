@@ -25,8 +25,26 @@ macro_rules! mat_new {
 		}
 
 		impl<T> $V<T> where T: Copy {
-			pub fn from_arr(a: [T; $N*$M]) -> Self {
+			pub fn from_array(a: [T; $N*$M]) -> Self {
 				$V { d: a }
+			}
+
+			pub fn from_array_ref(a: &[T; $N*$M]) -> Self {
+				$V { d: a.clone() }
+			}
+
+			pub fn from_arr(a: [T; $N*$M]) -> Self {
+				Self::from_array(a)
+			}
+
+			pub fn from_slice(s: &[T]) -> Option<Self> {
+				if s.len() == $N*$M {
+					let mut a: [T; $N*$M] = unsafe { mem::uninitialized() };
+					a.clone_from_slice(s);
+					Some($V::from_array(a))
+				} else {
+					None
+				}
 			}
 
 			pub fn from_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
@@ -516,6 +534,44 @@ mat_inverse!(Mat4x4, 4);
 mat_inverse!(Mat3x3, 3);
 mat_inverse!(Mat2x2, 2);
 
+macro_rules! mat_mul_scal_rev {
+	($V:ident, $T:ident) => (
+		impl Mul<$V<$T>> for $T {
+			type Output = $V<$T>;
+			fn mul(self, a: $V<$T>) -> Self::Output {
+				a*self
+			}
+		}
+	)
+}
+
+// T * MatNxM<T> workaround
+cartesian!(
+	mat_mul_scal_rev,
+	[Mat2x2, Mat2x3, Mat2x4, Mat3x2, Mat3x3, Mat3x4, Mat4x2, Mat4x3, Mat4x4],
+	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
+);
+
+macro_rules! mat_from_args {
+	($V:ident, [$( $a:ident ),*]) => (
+		impl<T> $V<T> where T: Copy {
+			pub fn from($( $a: T ),*) -> Self {
+				Self { d: [$( $a ),*] }
+			}
+		}
+	);
+}
+
+mat_from_args!(Mat2x2, [v00, v01, v10, v11]);
+mat_from_args!(Mat2x3, [v00, v01, v02, v10, v11, v12]);
+mat_from_args!(Mat2x4, [v00, v01, v02, v03, v10, v11, v12, v13]);
+mat_from_args!(Mat3x2, [v00, v01, v10, v11, v20, v21]);
+mat_from_args!(Mat3x3, [v00, v01, v02, v10, v11, v12, v20, v21, v22]);
+mat_from_args!(Mat3x4, [v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23]);
+mat_from_args!(Mat4x2, [v00, v01, v10, v11, v20, v21, v30, v31]);
+mat_from_args!(Mat4x3, [v00, v01, v02, v10, v11, v12, v20, v21, v22, v30, v31, v32]);
+mat_from_args!(Mat4x4, [v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33]);
+
 pub type Mat2<T> = Mat2x2<T>;
 pub type Mat3<T> = Mat3x3<T>;
 pub type Mat4<T> = Mat4x4<T>;
@@ -525,6 +581,43 @@ macro_rules! mat_type {
 		pub type $Va = $V<$T>;
 	)
 }
+
+mat_type!(Mat2x2i32, Mat2x2, i32);
+mat_type!(Mat2x3i32, Mat2x3, i32);
+mat_type!(Mat2x4i32, Mat2x4, i32);
+mat_type!(Mat3x2i32, Mat3x2, i32);
+mat_type!(Mat3x3i32, Mat3x3, i32);
+mat_type!(Mat3x4i32, Mat3x4, i32);
+mat_type!(Mat4x2i32, Mat4x2, i32);
+mat_type!(Mat4x3i32, Mat4x3, i32);
+mat_type!(Mat4x4i32, Mat4x4, i32);
+mat_type!(Mat2x2u32, Mat2x2, u32);
+mat_type!(Mat2x3u32, Mat2x3, u32);
+mat_type!(Mat2x4u32, Mat2x4, u32);
+mat_type!(Mat3x2u32, Mat3x2, u32);
+mat_type!(Mat3x3u32, Mat3x3, u32);
+mat_type!(Mat3x4u32, Mat3x4, u32);
+mat_type!(Mat4x2u32, Mat4x2, u32);
+mat_type!(Mat4x3u32, Mat4x3, u32);
+mat_type!(Mat4x4u32, Mat4x4, u32);
+mat_type!(Mat2x2f32, Mat2x2, f32);
+mat_type!(Mat2x3f32, Mat2x3, f32);
+mat_type!(Mat2x4f32, Mat2x4, f32);
+mat_type!(Mat3x2f32, Mat3x2, f32);
+mat_type!(Mat3x3f32, Mat3x3, f32);
+mat_type!(Mat3x4f32, Mat3x4, f32);
+mat_type!(Mat4x2f32, Mat4x2, f32);
+mat_type!(Mat4x3f32, Mat4x3, f32);
+mat_type!(Mat4x4f32, Mat4x4, f32);
+mat_type!(Mat2x2f64, Mat2x2, f64);
+mat_type!(Mat2x3f64, Mat2x3, f64);
+mat_type!(Mat2x4f64, Mat2x4, f64);
+mat_type!(Mat3x2f64, Mat3x2, f64);
+mat_type!(Mat3x3f64, Mat3x3, f64);
+mat_type!(Mat3x4f64, Mat3x4, f64);
+mat_type!(Mat4x2f64, Mat4x2, f64);
+mat_type!(Mat4x3f64, Mat4x3, f64);
+mat_type!(Mat4x4f64, Mat4x4, f64);
 
 mat_type!(Mat2i32, Mat2, i32);
 mat_type!(Mat3i32, Mat3, i32);
@@ -538,3 +631,53 @@ mat_type!(Mat4f32, Mat4, f32);
 mat_type!(Mat2f64, Mat2, f64);
 mat_type!(Mat3f64, Mat3, f64);
 mat_type!(Mat4f64, Mat4, f64);
+
+mat_type!(M22i32, Mat2x2, i32);
+mat_type!(M23i32, Mat2x3, i32);
+mat_type!(M24i32, Mat2x4, i32);
+mat_type!(M32i32, Mat3x2, i32);
+mat_type!(M33i32, Mat3x3, i32);
+mat_type!(M34i32, Mat3x4, i32);
+mat_type!(M42i32, Mat4x2, i32);
+mat_type!(M43i32, Mat4x3, i32);
+mat_type!(M44i32, Mat4x4, i32);
+mat_type!(M22u32, Mat2x2, u32);
+mat_type!(M23u32, Mat2x3, u32);
+mat_type!(M24u32, Mat2x4, u32);
+mat_type!(M32u32, Mat3x2, u32);
+mat_type!(M33u32, Mat3x3, u32);
+mat_type!(M34u32, Mat3x4, u32);
+mat_type!(M42u32, Mat4x2, u32);
+mat_type!(M43u32, Mat4x3, u32);
+mat_type!(M44u32, Mat4x4, u32);
+mat_type!(M22f32, Mat2x2, f32);
+mat_type!(M23f32, Mat2x3, f32);
+mat_type!(M24f32, Mat2x4, f32);
+mat_type!(M32f32, Mat3x2, f32);
+mat_type!(M33f32, Mat3x3, f32);
+mat_type!(M34f32, Mat3x4, f32);
+mat_type!(M42f32, Mat4x2, f32);
+mat_type!(M43f32, Mat4x3, f32);
+mat_type!(M44f32, Mat4x4, f32);
+mat_type!(M22f64, Mat2x2, f64);
+mat_type!(M23f64, Mat2x3, f64);
+mat_type!(M24f64, Mat2x4, f64);
+mat_type!(M32f64, Mat3x2, f64);
+mat_type!(M33f64, Mat3x3, f64);
+mat_type!(M34f64, Mat3x4, f64);
+mat_type!(M42f64, Mat4x2, f64);
+mat_type!(M43f64, Mat4x3, f64);
+mat_type!(M44f64, Mat4x4, f64);
+
+mat_type!(M2i32, Mat2, i32);
+mat_type!(M3i32, Mat3, i32);
+mat_type!(M4i32, Mat4, i32);
+mat_type!(M2u32, Mat2, u32);
+mat_type!(M3u32, Mat3, u32);
+mat_type!(M4u32, Mat4, u32);
+mat_type!(M2f32, Mat2, f32);
+mat_type!(M3f32, Mat3, f32);
+mat_type!(M4f32, Mat4, f32);
+mat_type!(M2f64, Mat2, f64);
+mat_type!(M3f64, Mat3, f64);
+mat_type!(M4f64, Mat4, f64);

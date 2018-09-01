@@ -31,8 +31,27 @@ macro_rules! vec_new {
 		}
 		
 		impl<T> $V<T> where T: Copy {
-			pub fn from_arr(a: [T; $N]) -> Self {
+			pub fn from_array(a: [T; $N]) -> Self {
 				$V { d: a }
+			}
+
+			pub fn from_array_ref(a: &[T; $N]) -> Self {
+				$V { d: a.clone() }
+			}
+
+			pub fn from_arr(a: [T; $N]) -> Self {
+				Self::from_array(a)
+			}
+
+			pub fn from_slice(s: &[T]) -> Option<Self> {
+				match s.len() {
+					$N => {
+						let mut a: [T; $N] = unsafe { mem::uninitialized() };
+						a.clone_from_slice(s);
+						Some($V::from_array(a))
+					},
+					_ => None,
+				}
 			}
 
 			pub fn from_map<F>(f: F) -> Self where F: Fn(usize) -> T {
@@ -258,22 +277,34 @@ macro_rules! vec_dot {
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Num {
-			pub fn sqr(self) -> T {
+			pub fn abs2(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
 					out = out + self[i]*self[i];
 				}
 				out
 			}
+
+			pub fn sqr(self) -> T {
+				self.abs2()
+			}
 		}
 
 		impl<T> $V<T> where T: Copy + Num + Float {
+			pub fn abs(self) -> T {
+				self.abs2().sqrt()
+			}
+
 			pub fn length(self) -> T {
-				self.sqr().sqrt()
+				self.abs()
+			}
+
+			pub fn norm(self) -> $V<T> {
+				self/self.abs()
 			}
 
 			pub fn normalize(self) -> $V<T> {
-				self/self.length()
+				self.norm()
 			}
 		}
 	)
@@ -481,6 +512,34 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
+// from args
+
+impl<T> Vec2<T> where T: Copy {
+	pub fn from(v0: T, v1: T) -> Self {
+		Self { d: [v0, v1] }
+	}
+}
+
+impl<T> Vec3<T> where T: Copy {
+	pub fn from(v0: T, v1: T, v2: T) -> Self {
+		Self { d: [v0, v1, v2] }
+	}
+}
+
+impl<T> Vec4<T> where T: Copy {
+	pub fn from(v0: T, v1: T, v2: T, v3: T) -> Self {
+		Self { d: [v0, v1, v2, v3] }
+	}
+}
+
+// cross product
+
+impl<T> Vec2<T> where T: Copy + Num {
+	pub fn cross(self, vec: Vec2<T>) -> T {
+		self[0]*vec[1] - self[1]*vec[0]
+	}
+}
+
 impl<T> Vec3<T> where T: Copy + Num {
 	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
@@ -489,15 +548,30 @@ impl<T> Vec3<T> where T: Copy + Num {
 	}
 }
 
+macro_rules! vec_mul_scal_rev {
+	($V:ident, $T:ident) => (
+		impl Mul<$V<$T>> for $T {
+			type Output = $V<$T>;
+			fn mul(self, a: $V<$T>) -> Self::Output {
+				a*self
+			}
+		}
+	)
+}
+
+// T * VecN<T> workaround
+cartesian!(
+	vec_mul_scal_rev,
+	[Vec2, Vec3, Vec4],
+	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
+);
+
 macro_rules! vec_type {
 	($Va:ident, $V:ident, $T:ident) => (
 		pub type $Va = $V<$T>;
 	)
 }
 
-vec_type!(Vec2bool, Vec2, bool);
-vec_type!(Vec3bool, Vec3, bool);
-vec_type!(Vec4bool, Vec4, bool);
 vec_type!(Vec2i32, Vec2, i32);
 vec_type!(Vec3i32, Vec3, i32);
 vec_type!(Vec4i32, Vec4, i32);
@@ -510,3 +584,22 @@ vec_type!(Vec4f32, Vec4, f32);
 vec_type!(Vec2f64, Vec2, f64);
 vec_type!(Vec3f64, Vec3, f64);
 vec_type!(Vec4f64, Vec4, f64);
+vec_type!(Vec2bool, Vec2, bool);
+vec_type!(Vec3bool, Vec3, bool);
+vec_type!(Vec4bool, Vec4, bool);
+
+vec_type!(V2i32, Vec2, i32);
+vec_type!(V3i32, Vec3, i32);
+vec_type!(V4i32, Vec4, i32);
+vec_type!(V2u32, Vec2, u32);
+vec_type!(V3u32, Vec3, u32);
+vec_type!(V4u32, Vec4, u32);
+vec_type!(V2f32, Vec2, f32);
+vec_type!(V3f32, Vec3, f32);
+vec_type!(V4f32, Vec4, f32);
+vec_type!(V2f64, Vec2, f64);
+vec_type!(V3f64, Vec3, f64);
+vec_type!(V4f64, Vec4, f64);
+vec_type!(V2bool, Vec2, bool);
+vec_type!(V3bool, Vec3, bool);
+vec_type!(V4bool, Vec4, bool);

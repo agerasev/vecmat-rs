@@ -1,6 +1,9 @@
 extern crate num_traits;
 extern crate num_integer;
 
+#[macro_use]
+pub mod macros;
+
 pub mod vec;
 #[cfg(test)]
 mod vec_test;
