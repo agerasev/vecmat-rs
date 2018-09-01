@@ -42,8 +42,8 @@ macro_rules! affine_inverse_test {
 	($Map:ident, $Mat:ident, $Vec:ident) => (
 		let m = $Map::from($Mat::from_scal(1.0) + $Mat::one(), $Vec::from_scal(1.0));
 		let v = $Vec::from_scal(1.0);
-		assert!((v - m.inverse().map(m.map(v))).abs2() < 1e-4);
-		assert!((v - m.map(m.inverse().map(v))).abs2() < 1e-4);
+		assert!((v - m.inverse().map(m.map(v))).abs2() < 1e-8);
+		assert!((v - m.map(m.inverse().map(v))).abs2() < 1e-8);
 	)
 }
 

@@ -137,7 +137,7 @@ macro_rules! mat_fmt {
 				try!(write!(f, "{} [\n", stringify!($V)));
 				for j in 0..$M {
 					for i in 0..$N {
-						try!(write!(f, "\t{}, ", self[(i, j)]));
+						try!(write!(f, " {}, ", self[(i, j)]));
 					}
 					try!(write!(f, "\n"));
 				}
@@ -296,6 +296,9 @@ macro_rules! mat_transpose {
 		impl<T> $Vnm<T> where T: Copy {
 			pub fn transpose(self) -> $Vmn<T> {
 				$Vmn::from_map(|i, j| self[(j, i)])
+			}
+			pub fn t(self) -> $Vmn<T> {
+				self.transpose()
 			}
 		}
 	)
