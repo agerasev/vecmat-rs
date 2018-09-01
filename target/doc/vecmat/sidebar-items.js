@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["mat",""],["vec",""]]});
+initSidebarItems({"mod":[["map",""],["mat",""],["vec",""]]});
