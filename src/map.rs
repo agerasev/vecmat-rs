@@ -1,6 +1,6 @@
 use vec::*;
 use mat::*;
-use num_traits::{Num, Float, Signed};
+use num::{Num, Float, Signed};
 
 macro_rules! affine {
 	($Map:ident, $Mat:ident, $Vec:ident) => (

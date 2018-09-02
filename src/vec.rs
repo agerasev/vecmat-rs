@@ -9,8 +9,8 @@ use std::ops::{
 use std::iter::{IntoIterator};
 use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use num_traits::{Num, Zero, Float, Signed};
-use num_integer::{Integer};
+use num::{Num, Zero, Float, Signed};
+use int::{Integer};
 
 
 macro_rules! vec_struct {

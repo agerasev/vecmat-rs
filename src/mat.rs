@@ -3,9 +3,8 @@ use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssi
 use std::iter::{IntoIterator};
 use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use num_traits::{Num, Zero, One, Signed};
+use num::{Num, Zero, One, Signed};
 use vec::*;
-
 
 macro_rules! mat_struct {
 	($V:ident, $N:expr, $M:expr) => (
