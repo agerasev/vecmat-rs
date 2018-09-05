@@ -35,7 +35,7 @@ fn main() {
     println!("{}", va.cross(vb)); // cross
 
     // Distance between two vectors
-    println!("{}", (va - vb).abs());
+    println!("{}", (va - vb).length());
 
     // Create matrices
     let mut ma = Mat3::<f64>::one(); // identity 3x3 matrix
