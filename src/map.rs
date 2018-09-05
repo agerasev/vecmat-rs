@@ -1,6 +1,6 @@
 use vec::*;
 use mat::*;
-use num::{Num, Float, Signed};
+use num_traits::{Num, Float, Signed};
 
 macro_rules! affine {
 	($Map:ident, $Mat:ident, $Vec:ident) => (
@@ -24,8 +24,14 @@ macro_rules! affine {
 					shift: -inv.dot(self.shift),
 				}
 			}
-			pub fn map(&self, v: $Vec<T>) -> $Vec<T> {
+			pub fn map_vec(&self, v: $Vec<T>) -> $Vec<T> {
 				self.linear.dot(v) + self.shift
+			}
+			pub fn map_mat(&self, m: $Mat<T>) -> $Mat<T> {
+				self.linear.dot(m)
+			}
+			pub fn chain(&self, a: &$Map<T>) -> Self {
+				Self::from(self.map_mat(a.linear), self.map_vec(a.shift))
 			}
 		}
 	)

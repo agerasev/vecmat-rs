@@ -3,14 +3,15 @@ use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssi
 use std::iter::{IntoIterator};
 use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use num::{Num, Zero, One, Signed};
+use num_traits::{Num, Zero, One, Signed};
 use vec::*;
+pub use vec::Dot;
 
 macro_rules! mat_struct {
 	($V:ident, $N:expr, $M:expr) => (
 		#[derive(Clone, Copy, Debug, PartialEq)]
 		pub struct $V<T: Copy> {
-			pub d: [T; $N*$M],
+			pub data: [T; $N*$M],
 		}
 	)
 }
@@ -19,21 +20,17 @@ macro_rules! mat_new {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> $V<T> where T: Copy + Default {
 			pub fn new() -> Self {
-				$V { d: [T::default(); $N*$M] }
+				$V { data: [T::default(); $N*$M] }
 			}
 		}
 
 		impl<T> $V<T> where T: Copy {
 			pub fn from_array(a: [T; $N*$M]) -> Self {
-				$V { d: a }
+				$V { data: a }
 			}
 
 			pub fn from_array_ref(a: &[T; $N*$M]) -> Self {
-				$V { d: a.clone() }
-			}
-
-			pub fn from_arr(a: [T; $N*$M]) -> Self {
-				Self::from_array(a)
+				$V { data: a.clone() }
 			}
 
 			pub fn from_slice(s: &[T]) -> Option<Self> {
@@ -53,11 +50,11 @@ macro_rules! mat_new {
 						arr[i + j*$N] = f(i, j);
 					}
 				}
-				$V { d: arr }
+				$V { data: arr }
 			}
 
-			pub fn from_scal(v: T) -> Self {
-				$V { d: [v; $N*$M] }
+			pub fn from_scalar(v: T) -> Self {
+				$V { data: [v; $N*$M] }
 			}
 		}
 
@@ -69,32 +66,18 @@ macro_rules! mat_new {
 	)
 }
 
-macro_rules! mat_data {
-	($V:ident, $N:expr, $M:expr) => (
-		impl<T> $V<T> where T: Copy {
-			pub fn data(&self) -> &[T; $N*$M] {
-				&self.d
-			}
-
-			pub fn data_mut(&mut self) -> &mut [T; $N*$M] {
-				&mut self.d
-			}
-		}
-	)
-}
-
 macro_rules! mat_index {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> Index<(usize, usize)> for $V<T> where T: Copy {
 			type Output = T;
 			fn index(&self, ij: (usize, usize)) -> &Self::Output {
-				&self.d[ij.0 + ij.1*$N]
+				&self.data[ij.0 + ij.1*$N]
 			}
 		}
 
 		impl<T> IndexMut<(usize, usize)> for $V<T> where T: Copy {
 			fn index_mut(&mut self, ij: (usize, usize)) -> &mut Self::Output {
-				&mut self.d[ij.0 + ij.1*$N]
+				&mut self.data[ij.0 + ij.1*$N]
 			}
 		}
 	)
@@ -104,26 +87,26 @@ macro_rules! mat_iter {
 	($V:ident, $N:expr, $M:expr) => (
 		impl <'a, T> $V<T> where T: Copy {
 			pub fn iter(&'a self) -> slice::Iter<'a, T> {
-				self.d.iter()
+				self.data.iter()
 			}
 		}
 		impl <'a, T> $V<T> where T: Copy {
 			pub fn iter_mut(&'a mut self) -> slice::IterMut<'a, T> {
-				self.d.iter_mut()
+				self.data.iter_mut()
 			}
 		}
 		impl<'a, T> IntoIterator for &'a $V<T> where T: Copy {
 			type Item = &'a T;
 			type IntoIter = slice::Iter<'a, T>;
 			fn into_iter(self) -> Self::IntoIter {
-				self.d.into_iter()
+				self.data.into_iter()
 			}
 		}
 		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
 			type Item = &'a mut T;
 			type IntoIter = slice::IterMut<'a, T>;
 			fn into_iter(self) -> Self::IntoIter {
-				self.d.as_mut().into_iter()
+				self.data.as_mut().into_iter()
 			}
 		}
 	)
@@ -220,12 +203,12 @@ macro_rules! mat_zero {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> $V<T> where T: Copy + Zero {
 			pub fn zero() -> Self {
-				$V::<T> { d: [T::zero(); ($N*$M)] }
+				$V::<T> { data: [T::zero(); ($N*$M)] }
 			}
 
 			pub fn is_zero(&self) -> bool {
 				for i in 0..($N*$M) {
-					if !self.d[i].is_zero() {
+					if !self.data[i].is_zero() {
 						return false;
 					}
 				}
@@ -250,7 +233,6 @@ macro_rules! mat_all {
 		mat_struct!($V, $N, $M);
 
 		mat_new!($V, $N, $M);
-		mat_data!($V, $N, $M);
 		mat_iter!($V, $N, $M);
 		mat_fmt!($V, $N, $M);
 		mat_index!($V, $N, $M);
@@ -295,9 +277,6 @@ macro_rules! mat_transpose {
 		impl<T> $Vnm<T> where T: Copy {
 			pub fn transpose(self) -> $Vmn<T> {
 				$Vmn::from_map(|i, j| self[(j, i)])
-			}
-			pub fn t(self) -> $Vmn<T> {
-				self.transpose()
 			}
 		}
 	)
@@ -558,7 +537,7 @@ macro_rules! mat_from_args {
 	($V:ident, [$( $a:ident ),*]) => (
 		impl<T> $V<T> where T: Copy {
 			pub fn from($( $a: T ),*) -> Self {
-				Self { d: [$( $a ),*] }
+				Self { data: [$( $a ),*] }
 			}
 		}
 	);
@@ -578,108 +557,9 @@ pub type Mat2<T> = Mat2x2<T>;
 pub type Mat3<T> = Mat3x3<T>;
 pub type Mat4<T> = Mat4x4<T>;
 
+#[allow(unused_macros)]
 macro_rules! mat_type {
 	($Va:ident, $V:ident, $T:ident) => (
 		pub type $Va = $V<$T>;
 	)
 }
-
-mat_type!(Mat2x2i32, Mat2x2, i32);
-mat_type!(Mat2x3i32, Mat2x3, i32);
-mat_type!(Mat2x4i32, Mat2x4, i32);
-mat_type!(Mat3x2i32, Mat3x2, i32);
-mat_type!(Mat3x3i32, Mat3x3, i32);
-mat_type!(Mat3x4i32, Mat3x4, i32);
-mat_type!(Mat4x2i32, Mat4x2, i32);
-mat_type!(Mat4x3i32, Mat4x3, i32);
-mat_type!(Mat4x4i32, Mat4x4, i32);
-mat_type!(Mat2x2u32, Mat2x2, u32);
-mat_type!(Mat2x3u32, Mat2x3, u32);
-mat_type!(Mat2x4u32, Mat2x4, u32);
-mat_type!(Mat3x2u32, Mat3x2, u32);
-mat_type!(Mat3x3u32, Mat3x3, u32);
-mat_type!(Mat3x4u32, Mat3x4, u32);
-mat_type!(Mat4x2u32, Mat4x2, u32);
-mat_type!(Mat4x3u32, Mat4x3, u32);
-mat_type!(Mat4x4u32, Mat4x4, u32);
-mat_type!(Mat2x2f32, Mat2x2, f32);
-mat_type!(Mat2x3f32, Mat2x3, f32);
-mat_type!(Mat2x4f32, Mat2x4, f32);
-mat_type!(Mat3x2f32, Mat3x2, f32);
-mat_type!(Mat3x3f32, Mat3x3, f32);
-mat_type!(Mat3x4f32, Mat3x4, f32);
-mat_type!(Mat4x2f32, Mat4x2, f32);
-mat_type!(Mat4x3f32, Mat4x3, f32);
-mat_type!(Mat4x4f32, Mat4x4, f32);
-mat_type!(Mat2x2f64, Mat2x2, f64);
-mat_type!(Mat2x3f64, Mat2x3, f64);
-mat_type!(Mat2x4f64, Mat2x4, f64);
-mat_type!(Mat3x2f64, Mat3x2, f64);
-mat_type!(Mat3x3f64, Mat3x3, f64);
-mat_type!(Mat3x4f64, Mat3x4, f64);
-mat_type!(Mat4x2f64, Mat4x2, f64);
-mat_type!(Mat4x3f64, Mat4x3, f64);
-mat_type!(Mat4x4f64, Mat4x4, f64);
-
-mat_type!(Mat2i32, Mat2, i32);
-mat_type!(Mat3i32, Mat3, i32);
-mat_type!(Mat4i32, Mat4, i32);
-mat_type!(Mat2u32, Mat2, u32);
-mat_type!(Mat3u32, Mat3, u32);
-mat_type!(Mat4u32, Mat4, u32);
-mat_type!(Mat2f32, Mat2, f32);
-mat_type!(Mat3f32, Mat3, f32);
-mat_type!(Mat4f32, Mat4, f32);
-mat_type!(Mat2f64, Mat2, f64);
-mat_type!(Mat3f64, Mat3, f64);
-mat_type!(Mat4f64, Mat4, f64);
-
-mat_type!(M22i32, Mat2x2, i32);
-mat_type!(M23i32, Mat2x3, i32);
-mat_type!(M24i32, Mat2x4, i32);
-mat_type!(M32i32, Mat3x2, i32);
-mat_type!(M33i32, Mat3x3, i32);
-mat_type!(M34i32, Mat3x4, i32);
-mat_type!(M42i32, Mat4x2, i32);
-mat_type!(M43i32, Mat4x3, i32);
-mat_type!(M44i32, Mat4x4, i32);
-mat_type!(M22u32, Mat2x2, u32);
-mat_type!(M23u32, Mat2x3, u32);
-mat_type!(M24u32, Mat2x4, u32);
-mat_type!(M32u32, Mat3x2, u32);
-mat_type!(M33u32, Mat3x3, u32);
-mat_type!(M34u32, Mat3x4, u32);
-mat_type!(M42u32, Mat4x2, u32);
-mat_type!(M43u32, Mat4x3, u32);
-mat_type!(M44u32, Mat4x4, u32);
-mat_type!(M22f32, Mat2x2, f32);
-mat_type!(M23f32, Mat2x3, f32);
-mat_type!(M24f32, Mat2x4, f32);
-mat_type!(M32f32, Mat3x2, f32);
-mat_type!(M33f32, Mat3x3, f32);
-mat_type!(M34f32, Mat3x4, f32);
-mat_type!(M42f32, Mat4x2, f32);
-mat_type!(M43f32, Mat4x3, f32);
-mat_type!(M44f32, Mat4x4, f32);
-mat_type!(M22f64, Mat2x2, f64);
-mat_type!(M23f64, Mat2x3, f64);
-mat_type!(M24f64, Mat2x4, f64);
-mat_type!(M32f64, Mat3x2, f64);
-mat_type!(M33f64, Mat3x3, f64);
-mat_type!(M34f64, Mat3x4, f64);
-mat_type!(M42f64, Mat4x2, f64);
-mat_type!(M43f64, Mat4x3, f64);
-mat_type!(M44f64, Mat4x4, f64);
-
-mat_type!(M2i32, Mat2, i32);
-mat_type!(M3i32, Mat3, i32);
-mat_type!(M4i32, Mat4, i32);
-mat_type!(M2u32, Mat2, u32);
-mat_type!(M3u32, Mat3, u32);
-mat_type!(M4u32, Mat4, u32);
-mat_type!(M2f32, Mat2, f32);
-mat_type!(M3f32, Mat3, f32);
-mat_type!(M4f32, Mat4, f32);
-mat_type!(M2f64, Mat2, f64);
-mat_type!(M3f64, Mat3, f64);
-mat_type!(M4f64, Mat4, f64);

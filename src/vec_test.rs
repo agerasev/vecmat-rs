@@ -3,12 +3,12 @@ use vec::*;
 
 macro_rules! vec_content_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V { d: [0; $N] };
+		let mut v = $V { data: [0; $N] };
 		for i in 0..$N {
-			v.d[i] = i + 2;
+			v.data[i] = i + 2;
 		}
 		for i in 0..$N {
-			assert_eq!(v.d[i], i + 2);
+			assert_eq!(v.data[i], i + 2);
 		}
 
 		assert_eq!($N*size_of::<usize>(), size_of::<$V<usize>>());
@@ -26,17 +26,17 @@ macro_rules! vec_new_test {
 	($V:ident, $N:expr) => (
 		let v = $V::<i32>::new();
 		for i in 0..$N {
-			assert_eq!(v.d[i], i32::default());
+			assert_eq!(v.data[i], i32::default());
 		}
 
 		let v = $V::from_map(|i| i + 1);
 		for i in 0..$N {
-			assert_eq!(v.d[i], i + 1);
+			assert_eq!(v.data[i], i + 1);
 		}
 
 		let z = $V::from_scalar(5);
 		for i in 0..$N {
-			assert_eq!(z.d[i], 5);
+			assert_eq!(z.data[i], 5);
 		}
 	)
 }
@@ -52,17 +52,17 @@ fn new() {
 fn new_no_gen() {
 	let v = Vec4::<i32>::from(1, 2, 3, 4);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
-	let v = Vec4::<i32>::fromay([1, 2, 3, 4]);
+	let v = Vec4::<i32>::from_array([1, 2, 3, 4]);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
-	let v = Vec4::<i32>::fromay_ref(&[1, 2, 3, 4]);
+	let v = Vec4::<i32>::from_array_ref(&[1, 2, 3, 4]);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
 	let a = [1, 2, 3, 4, 5];
@@ -71,7 +71,7 @@ fn new_no_gen() {
 	assert!(o.is_some());
 	let v = o.unwrap();
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
 	let o = Vec4::<i32>::from_slice(&a[..3]);
@@ -84,19 +84,17 @@ fn new_no_gen() {
 macro_rules! vec_data_test {
 	($V:ident, $N:expr) => (
 		let mut v = $V::from_map(|i| i + 1);
-
 		{
-			let b = v.data_mut();
+			let b = &mut v.data;
 			for i in 0..$N {
 				b[i] = i + 3;
 			}
 		}
 
-		let a = &v.d;
 		{
-			let b = v.data(); 
+			let b = &v.data; 
 			for i in 0..$N {
-				assert_eq!(a[i], b[i]);
+				assert_eq!(v[i], b[i]);
 			}
 		}
 	)
@@ -196,7 +194,7 @@ fn iter() {
 
 #[test]
 fn fmt() {
-	assert_eq!(format!("{}", Vec3::from_map(|i| i + 1)), "Vec3[1, 2, 3]");
+	assert_eq!(format!("{}", Vec3::from_map(|i| i + 1)), "Vec3(1, 2, 3)");
 }
 
 macro_rules! vec_neg_test {
@@ -426,7 +424,9 @@ fn dot() {
 
 macro_rules! vec_norm_test {
 	($V:ident, $N:expr) => (
-		assert_eq!($V::from_scalar(2).abs2(), $N*4);
+		assert_eq!($V::from_scalar(2).sqrlen(), $N*4);
+		assert!($V::from_scalar(1.0).length() - ($N as f64).sqrt() < 1e-8);
+		assert!($V::from_map(|i| (i + 1) as f64).normalize().length() - 1.0 < 1e-8);
 	)
 }
 

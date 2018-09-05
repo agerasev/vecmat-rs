@@ -1,5 +1,5 @@
-pub extern crate num_traits as num;
-pub extern crate num_integer as int;
+pub extern crate num_traits;
+pub extern crate num_integer;
 
 #[macro_use]
 mod macros;
@@ -15,6 +15,3 @@ mod mat_test;
 pub mod map;
 #[cfg(test)]
 mod map_test;
-
-pub use vec::*; // rm
-pub use mat::*; // rm
