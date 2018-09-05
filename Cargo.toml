@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.2.4"
+version = "0.3.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 description = "Lightweight low-dimensional vector and matrix library"
 documentation = "https://nthend.github.io/vecmat-rs/target/doc/vecmat/"
@@ -8,7 +8,7 @@ homepage = "https://github.com/nthend/vecmat-rs"
 repository = "https://github.com/nthend/vecmat-rs"
 readme = "README.md"
 keywords = ["vector", "matrix", "math"]
-categories = ["algorithms", "data-structures"]
+categories = ["algorithms", "data-structures", "science"]
 license = "MIT/Apache-2.0"
 
 [badges]

@@ -18,13 +18,20 @@ macro_rules! affine {
 				Self { linear: m, shift: v }
 			}
 			pub fn inverse(&self) -> Self {
+				let inv = self.linear.inverse();
 				Self {
-					linear: self.linear.inverse(),
-					shift: -self.linear.dot(self.shift),
+					linear: inv,
+					shift: -inv.dot(self.shift),
 				}
 			}
-			pub fn map(&self, v: $Vec<T>) -> $Vec<T> {
-				self.linear.dot(v + self.shift)
+			pub fn map_vec(&self, v: $Vec<T>) -> $Vec<T> {
+				self.linear.dot(v) + self.shift
+			}
+			pub fn map_mat(&self, m: $Mat<T>) -> $Mat<T> {
+				self.linear.dot(m)
+			}
+			pub fn chain(&self, a: &$Map<T>) -> Self {
+				Self::from(self.map_mat(a.linear), self.map_vec(a.shift))
 			}
 		}
 	)

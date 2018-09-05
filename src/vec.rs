@@ -17,7 +17,7 @@ macro_rules! vec_struct {
 	($V:ident, $N:expr) => (
 		#[derive(Clone, Copy, Debug, PartialEq)]
 		pub struct $V<T: Copy> {
-			pub d: [T; $N],
+			pub data: [T; $N],
 		}
 	)
 }
@@ -26,21 +26,17 @@ macro_rules! vec_new {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Default {
 			pub fn new() -> Self {
-				$V { d: [T::default(); $N] }
+				$V { data: [T::default(); $N] }
 			}
 		}
 		
 		impl<T> $V<T> where T: Copy {
 			pub fn from_array(a: [T; $N]) -> Self {
-				$V { d: a }
+				$V { data: a }
 			}
 
 			pub fn from_array_ref(a: &[T; $N]) -> Self {
-				$V { d: a.clone() }
-			}
-
-			pub fn from_arr(a: [T; $N]) -> Self {
-				Self::from_array(a)
+				$V { data: a.clone() }
 			}
 
 			pub fn from_slice(s: &[T]) -> Option<Self> {
@@ -59,11 +55,11 @@ macro_rules! vec_new {
 				for i in 0..$N {
 					arr[i] = f(i);
 				}
-				$V { d: arr }
+				$V { data: arr }
 			}
 
-			pub fn from_scal(v: T) -> Self {
-				$V { d: [v; $N] }
+			pub fn from_scalar(v: T) -> Self {
+				$V { data: [v; $N] }
 			}
 		}
 
@@ -75,34 +71,20 @@ macro_rules! vec_new {
 	)
 }
 
-macro_rules! vec_data {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy {
-			pub fn data(&self) -> &[T; $N] {
-				&self.d
-			}
-
-			pub fn data_mut(&mut self) -> &mut [T; $N] {
-				&mut self.d
-			}
-		}
-	)
-}
-
 macro_rules! vec_index {
 	($V:ident, $N:expr) => (
 		impl<T> Index<usize> for $V<T> where T: Copy {
 			type Output = T;
 			fn index(&self, i: usize) -> &Self::Output {
 				assert!(i < $N);
-				unsafe { self.d.get_unchecked(i) }
+				unsafe { self.data.get_unchecked(i) }
 			}
 		}
 
 		impl<T> IndexMut<usize> for $V<T> where T: Copy {
 			fn index_mut(&mut self, i: usize) -> &mut Self::Output {
 				assert!(i < $N);
-				unsafe { self.d.get_unchecked_mut(i) }
+				unsafe { self.data.get_unchecked_mut(i) }
 			}
 		}
 	)
@@ -122,26 +104,26 @@ macro_rules! vec_iter {
 	($V:ident, $N:expr) => (
 		impl <'a, T> $V<T> where T: Copy {
 			pub fn iter(&'a self) -> slice::Iter<'a, T> {
-				self.d.iter()
+				self.data.iter()
 			}
 		}
 		impl <'a, T> $V<T> where T: Copy {
 			pub fn iter_mut(&'a mut self) -> slice::IterMut<'a, T> {
-				self.d.iter_mut()
+				self.data.iter_mut()
 			}
 		}
 		impl<'a, T> IntoIterator for &'a $V<T> where T: Copy {
 			type Item = &'a T;
 			type IntoIter = slice::Iter<'a, T>;
 			fn into_iter(self) -> Self::IntoIter {
-				self.d.into_iter()
+				self.data.into_iter()
 			}
 		}
 		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
 			type Item = &'a mut T;
 			type IntoIter = slice::IterMut<'a, T>;
 			fn into_iter(self) -> Self::IntoIter {
-				self.d.as_mut().into_iter()
+				self.data.as_mut().into_iter()
 			}
 		}
 	)
@@ -151,11 +133,11 @@ macro_rules! vec_fmt {
 	($V:ident, $N:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
 			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				try!(write!(f, "{}[", stringify!($V)));
+				try!(write!(f, "{}(", stringify!($V)));
 				for i in 0..$N-1 {
 					try!(write!(f, "{}, ", self[i]));
 				}
-				try!(write!(f, "{}]", self[$N-1]));
+				try!(write!(f, "{})", self[$N-1]));
 				Ok(())
 			}
 		}
@@ -277,34 +259,22 @@ macro_rules! vec_dot {
 macro_rules! vec_norm {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Num {
-			pub fn abs2(self) -> T {
+			pub fn sqrlen(self) -> T {
 				let mut out = T::zero();
 				for i in 0..$N {
 					out = out + self[i]*self[i];
 				}
 				out
 			}
-
-			pub fn sqr(self) -> T {
-				self.abs2()
-			}
 		}
 
 		impl<T> $V<T> where T: Copy + Num + Float {
-			pub fn abs(self) -> T {
-				self.abs2().sqrt()
-			}
-
 			pub fn length(self) -> T {
-				self.abs()
-			}
-
-			pub fn norm(self) -> $V<T> {
-				self/self.abs()
+				self.sqrlen().sqrt()
 			}
 
 			pub fn normalize(self) -> $V<T> {
-				self.norm()
+				self/self.length()
 			}
 		}
 	)
@@ -314,7 +284,7 @@ macro_rules! vec_zero {
 	($V:ident, $N:expr) => (
 		impl<T> $V<T> where T: Copy + Zero {
 			pub fn zero() -> Self {
-				$V::from_scal(T::zero())
+				$V::from_scalar(T::zero())
 			}
 
 			pub fn is_zero(&self) -> bool {
@@ -466,7 +436,6 @@ macro_rules! vec_all {
 		vec_struct!($V, $N);
 		vec_index!($V, $N);
 		vec_new!($V, $N);
-		vec_data!($V, $N);
 		vec_iter!($V, $N);
 		vec_fmt!($V, $N);
 		vec_map!($V, $N);
@@ -512,25 +481,27 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
+
 // from args
 
 impl<T> Vec2<T> where T: Copy {
 	pub fn from(v0: T, v1: T) -> Self {
-		Self { d: [v0, v1] }
+		Self { data: [v0, v1] }
 	}
 }
 
 impl<T> Vec3<T> where T: Copy {
 	pub fn from(v0: T, v1: T, v2: T) -> Self {
-		Self { d: [v0, v1, v2] }
+		Self { data: [v0, v1, v2] }
 	}
 }
 
 impl<T> Vec4<T> where T: Copy {
 	pub fn from(v0: T, v1: T, v2: T, v3: T) -> Self {
-		Self { d: [v0, v1, v2, v3] }
+		Self { data: [v0, v1, v2, v3] }
 	}
 }
+
 
 // cross product
 
@@ -544,7 +515,7 @@ impl<T> Vec3<T> where T: Copy + Num {
 	pub fn cross(self, vec: Vec3<T>) -> Vec3<T> {
 		let a = &self;
 		let b = &vec;
-		Vec3::<T> { d: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
+		Vec3::<T> { data: [ a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0] ] }
 	}
 }
 
@@ -566,40 +537,9 @@ cartesian!(
 	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
 );
 
+#[allow(unused_macros)]
 macro_rules! vec_type {
 	($Va:ident, $V:ident, $T:ident) => (
 		pub type $Va = $V<$T>;
 	)
 }
-
-vec_type!(Vec2i32, Vec2, i32);
-vec_type!(Vec3i32, Vec3, i32);
-vec_type!(Vec4i32, Vec4, i32);
-vec_type!(Vec2u32, Vec2, u32);
-vec_type!(Vec3u32, Vec3, u32);
-vec_type!(Vec4u32, Vec4, u32);
-vec_type!(Vec2f32, Vec2, f32);
-vec_type!(Vec3f32, Vec3, f32);
-vec_type!(Vec4f32, Vec4, f32);
-vec_type!(Vec2f64, Vec2, f64);
-vec_type!(Vec3f64, Vec3, f64);
-vec_type!(Vec4f64, Vec4, f64);
-vec_type!(Vec2bool, Vec2, bool);
-vec_type!(Vec3bool, Vec3, bool);
-vec_type!(Vec4bool, Vec4, bool);
-
-vec_type!(V2i32, Vec2, i32);
-vec_type!(V3i32, Vec3, i32);
-vec_type!(V4i32, Vec4, i32);
-vec_type!(V2u32, Vec2, u32);
-vec_type!(V3u32, Vec3, u32);
-vec_type!(V4u32, Vec4, u32);
-vec_type!(V2f32, Vec2, f32);
-vec_type!(V3f32, Vec3, f32);
-vec_type!(V4f32, Vec4, f32);
-vec_type!(V2f64, Vec2, f64);
-vec_type!(V3f64, Vec3, f64);
-vec_type!(V4f64, Vec4, f64);
-vec_type!(V2bool, Vec2, bool);
-vec_type!(V3bool, Vec3, bool);
-vec_type!(V4bool, Vec4, bool);

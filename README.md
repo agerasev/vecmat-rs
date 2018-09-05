@@ -35,7 +35,7 @@ fn main() {
     println!("{}", va.cross(vb)); // cross
 
     // Distance between two vectors
-    println!("{}", (va - vb).abs());
+    println!("{}", (va - vb).length());
 
     // Create matrices
     let mut ma = Mat3::<f64>::one(); // identity 3x3 matrix
@@ -72,8 +72,8 @@ fn main() {
 
 ## Structs:
 
-+ Vectors: `VecN<T>` where `N` is {2, 3, 4}
-+ Matrices: `MatNxM<T>` (or `MatN<T>` for square matrices) where `N` and `M` are {2, 3, 4}
++ Vectors: `VecN<T>` where `N` is 2, 3 or 4
++ Matrices: `MatNxM<T>` (or `MatN<T>` for square matrices) where `N` and `M` are 2, 3 or 4
 + Transformations: `map::AffineN<T>` - affine transformation for vectors
 
 ## Features:

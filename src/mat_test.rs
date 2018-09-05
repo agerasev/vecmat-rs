@@ -22,34 +22,34 @@ fn new() {
 
 #[test]
 fn new_no_gen() {
-	let v = Mat2i32::from(1, 2, 3, 4);
+	let v = Mat2::<i32>::from(1, 2, 3, 4);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
-	let v = Mat2i32::from_array([1, 2, 3, 4]);
+	let v = Mat2::<i32>::from_array([1, 2, 3, 4]);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
-	let v = Mat2i32::from_array_ref(&[1, 2, 3, 4]);
+	let v = Mat2::<i32>::from_array_ref(&[1, 2, 3, 4]);
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
 	let a = [1, 2, 3, 4, 5];
 
-	let o = Mat2i32::from_slice(&a[..4]);
+	let o = Mat2::<i32>::from_slice(&a[..4]);
 	assert!(o.is_some());
 	let v = o.unwrap();
 	for i in 0..4 {
-		assert_eq!(v.d[i], i as i32 + 1);
+		assert_eq!(v.data[i], i as i32 + 1);
 	}
 
-	let o = Mat2i32::from_slice(&a[..3]);
+	let o = Mat2::<i32>::from_slice(&a[..3]);
 	assert!(o.is_none());
 
-	let o = Mat2i32::from_slice(&a[..]);
+	let o = Mat2::<i32>::from_slice(&a[..]);
 	assert!(o.is_none());
 }
 
@@ -59,20 +59,20 @@ macro_rules! mat_content_test {
 		let mut m = $V::from_map(|i, j| i + j);
 		for j in 0..$M {
 			for i in 0..$N {
-				assert_eq!(m.d[i + $N*j], i + j);
+				assert_eq!(m.data[i + $N*j], i + j);
 			}
 		}
 
-		let z = $V::from_scal(0);
+		let z = $V::from_scalar(0);
 		for i in 0..($N*$M) {
-			assert_eq!(z.d[i], 0);
+			assert_eq!(z.data[i], 0);
 		}
 
 		for i in 0..($N*$M) {
-			m.d[i] = i + 2;
+			m.data[i] = i + 2;
 		}
 		for i in 0..($N*$M) {
-			assert_eq!(m.d[i], i + 2);
+			assert_eq!(m.data[i], i + 2);
 		}
 	)
 }
@@ -92,12 +92,13 @@ fn content() {
 
 macro_rules! mat_data_test {
 	($V:ident, $N:expr, $M:expr) => (
-		let v = $V::from_map(|i, j| i + j + 1);
+		let v = $V::from_map(|i, j| i + j*$N + 1);
 
-		let a = &v.d;
-		let b = v.data(); 
-		for i in 0..($N*$M) {
-			assert_eq!(a[i], b[i]);
+		let a = &v.data;
+		for j in 0..$M {
+			for i in 0..$N {
+				assert_eq!(a[j*$N + i], v[(i,j)]);
+			}
 		}
 	)
 }
@@ -195,7 +196,7 @@ macro_rules! mat_iter_test {
 	($V:ident, $N:expr, $M:expr) => (
 		let mut m = $V::from_map(|i, j| i + j*$N + 1);
 		for (i, c) in m.iter().enumerate() {
-			assert_eq!(m.d[i], *c);
+			assert_eq!(m.data[i], *c);
 		}
 		for (i, c) in m.iter_mut().enumerate() {
 			*c = i + 2;
@@ -206,7 +207,7 @@ macro_rules! mat_iter_test {
 			}
 		}
 
-		let mut m = $V::from_scal(0);
+		let mut m = $V::from_scalar(0);
 		for c in &m {
 			assert_eq!(*c, 0);
 		}
@@ -529,11 +530,11 @@ macro_rules! mat_zero_test {
 	($V:ident, $N:expr, $M:expr) => (
 		let z = $V::<i32>::zero();
 		for i in 0..($N*$M) {
-			assert_eq!(z.d[i], 0);
+			assert_eq!(z.data[i], 0);
 		}
 		assert!(z.is_zero());
 		
-		let nz = $V::<i32> { d: [1; ($N*$M)] };
+		let nz = $V::<i32> { data: [1; ($N*$M)] };
 		assert!(!nz.is_zero());
 	)
 }
@@ -623,9 +624,9 @@ fn row_col() {
 
 macro_rules! mat_mul_vec_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let m = $Vnm::from_scal(1 as i32);
-		let v = $Vn::from_scal(1 as i32);
-		assert_eq!(m.dot(v), $Vm::from_scal($N));
+		let m = $Vnm::from_scalar(1 as i32);
+		let v = $Vn::from_scalar(1 as i32);
+		assert_eq!(m.dot(v), $Vm::from_scalar($N));
 	)
 }
 
@@ -644,9 +645,9 @@ fn mul_vec() {
 
 macro_rules! mat_mul_vec_mat_test {
 	($Vnm:ident, $Vn:ident, $Vm:ident, $N:expr, $M:expr) => (
-		let m = $Vnm::from_scal(1 as i32);
-		let v = $Vm::from_scal(1 as i32);
-		assert_eq!(v.dot(m), $Vn::from_scal($M));
+		let m = $Vnm::from_scalar(1 as i32);
+		let v = $Vm::from_scalar(1 as i32);
+		assert_eq!(v.dot(m), $Vn::from_scalar($M));
 	)
 }
 
@@ -665,9 +666,9 @@ fn mul_vec_mat() {
 
 macro_rules! mat_mul_mat_test {
 	($Vnm:ident, $Vln:ident, $Vlm:ident, $N:expr, $M:expr, $L:expr) => (
-		let vnm = $Vnm::from_scal(1 as i32);
-		let vln = $Vln::from_scal(1 as i32);
-		assert_eq!(vnm.dot(vln), $Vlm::from_scal($N as i32));
+		let vnm = $Vnm::from_scalar(1 as i32);
+		let vln = $Vln::from_scalar(1 as i32);
+		assert_eq!(vnm.dot(vln), $Vlm::from_scalar($N as i32));
 	)
 }
 
@@ -722,17 +723,17 @@ fn one() {
 
 #[test]
 fn det() {
-	let m = Mat2::<i32>::from_arr([11, 12, 21, 22]);
+	let m = Mat2::<i32>::from_array([11, 12, 21, 22]);
 	assert_eq!(m.det(), 11*22 - 12*21);
 	
-	let m = Mat3::<i32>::from_arr([11, 12, 13, 21, 22, 23, 31, 32, 33]);
+	let m = Mat3::<i32>::from_array([11, 12, 13, 21, 22, 23, 31, 32, 33]);
 	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
 }
 
 #[test]
 fn inverse() {
-	let m = Mat2::<f64>::from_arr([11.0, 12.0, 21.0, 22.0]).inverse();
-	let im = Mat2::<f64>::from_arr([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
+	let m = Mat2::<f64>::from_array([11.0, 12.0, 21.0, 22.0]).inverse();
+	let im = Mat2::<f64>::from_array([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }
