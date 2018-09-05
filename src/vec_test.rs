@@ -34,7 +34,7 @@ macro_rules! vec_new_test {
 			assert_eq!(v.d[i], i + 1);
 		}
 
-		let z = $V::from_scal(5);
+		let z = $V::from_scalar(5);
 		for i in 0..$N {
 			assert_eq!(z.d[i], 5);
 		}
@@ -50,34 +50,34 @@ fn new() {
 
 #[test]
 fn new_no_gen() {
-	let v = Vec4i32::from(1, 2, 3, 4);
+	let v = Vec4::<i32>::from(1, 2, 3, 4);
 	for i in 0..4 {
 		assert_eq!(v.d[i], i as i32 + 1);
 	}
 
-	let v = Vec4i32::from_array([1, 2, 3, 4]);
+	let v = Vec4::<i32>::fromay([1, 2, 3, 4]);
 	for i in 0..4 {
 		assert_eq!(v.d[i], i as i32 + 1);
 	}
 
-	let v = Vec4i32::from_array_ref(&[1, 2, 3, 4]);
+	let v = Vec4::<i32>::fromay_ref(&[1, 2, 3, 4]);
 	for i in 0..4 {
 		assert_eq!(v.d[i], i as i32 + 1);
 	}
 
 	let a = [1, 2, 3, 4, 5];
 
-	let o = Vec4i32::from_slice(&a[..4]);
+	let o = Vec4::<i32>::from_slice(&a[..4]);
 	assert!(o.is_some());
 	let v = o.unwrap();
 	for i in 0..4 {
 		assert_eq!(v.d[i], i as i32 + 1);
 	}
 
-	let o = Vec4i32::from_slice(&a[..3]);
+	let o = Vec4::<i32>::from_slice(&a[..3]);
 	assert!(o.is_none());
 
-	let o = Vec4i32::from_slice(&a[..]);
+	let o = Vec4::<i32>::from_slice(&a[..]);
 	assert!(o.is_none());
 }
 
@@ -174,7 +174,7 @@ macro_rules! vec_iter_test {
 			assert_eq!(v[i], i + 2);
 		}
 
-		let mut v = $V::from_scal(0);
+		let mut v = $V::from_scalar(0);
 		for c in &v {
 			assert_eq!(*c, 0);
 		}
@@ -403,14 +403,14 @@ fn scal_rem_assign() {
 #[test]
 fn div_mod_floor() {
 	assert_eq!(
-		Vec4::from_arr([-2, -3, -4, -5]).div_mod_floor(Vec4::from_arr([4, 3, 2, 1])), 
-		(Vec4::from_arr([-1, -1, -2, -5]), Vec4::from_arr([2, 0, 0, 0]))
+		Vec4::from(-2, -3, -4, -5).div_mod_floor(Vec4::from(4, 3, 2, 1)), 
+		(Vec4::from(-1, -1, -2, -5), Vec4::from(2, 0, 0, 0))
 		);
 }
 
 macro_rules! vec_dot_test {
 	($V:ident, $N:expr) => (
-		let va = $V::<usize>::from_scal(1);
+		let va = $V::<usize>::from_scalar(1);
 		let vb = $V::<usize>::from_map(|i| i + 1);
 		let c = va.dot(vb);
 		assert_eq!(c, ($N*($N + 1))/2);
@@ -426,7 +426,7 @@ fn dot() {
 
 macro_rules! vec_norm_test {
 	($V:ident, $N:expr) => (
-		assert_eq!($V::from_scal(2).sqr(), $N*4);
+		assert_eq!($V::from_scalar(2).abs2(), $N*4);
 	)
 }
 
@@ -440,10 +440,10 @@ fn norm() {
 macro_rules! vec_zero_test {
 	($V:ident, $N:expr) => (
 		let z = $V::<i32>::zero();
-		assert_eq!(z, $V::from_scal(0));
+		assert_eq!(z, $V::from_scalar(0));
 		assert!(z.is_zero());
 		
-		let nz: $V<i32> = $V::from_scal(1);
+		let nz: $V<i32> = $V::from_scalar(1);
 		assert!(!nz.is_zero());
 	)
 }
@@ -457,7 +457,7 @@ fn zero() {
 
 macro_rules! vec_bool_not_test {
 	($V:ident, $N:expr) => (
-		let z = $V::from_scal(false);
+		let z = $V::from_scalar(false);
 		let nz = !z;
 		for i in 0..$N {
 			assert_eq!(nz[i], !z[i]);
@@ -474,7 +474,7 @@ fn bool_not() {
 
 macro_rules! vec_bool_any_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::from_scal(false);
+		let mut v = $V::from_scalar(false);
 		assert!(!v.any());
 		v[0] = true;
 		assert!(v.any());
@@ -490,7 +490,7 @@ fn bool_any() {
 
 macro_rules! vec_bool_all_test {
 	($V:ident, $N:expr) => (
-		let mut v = $V::from_scal(true);
+		let mut v = $V::from_scalar(true);
 		assert!(v.all());
 		v[0] = false;
 		assert!(!v.all());
@@ -564,8 +564,8 @@ fn vec_vcmp() {
 
 #[test]
 fn cross() {
-	let va = Vec3::<i32>::from_arr([1, 0, 0]);
-	let vb = Vec3::<i32>::from_arr([0, 1, 0]);
+	let va = Vec3::<i32>::from(1, 0, 0);
+	let vb = Vec3::<i32>::from(0, 1, 0);
 	let vc = va.cross(vb);
 	assert_eq!(vc[0], 0);
 	assert_eq!(vc[1], 0);

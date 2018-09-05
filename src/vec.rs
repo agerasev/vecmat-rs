@@ -39,10 +39,6 @@ macro_rules! vec_new {
 				$V { d: a.clone() }
 			}
 
-			pub fn from_arr(a: [T; $N]) -> Self {
-				Self::from_array(a)
-			}
-
 			pub fn from_slice(s: &[T]) -> Option<Self> {
 				match s.len() {
 					$N => {
@@ -62,7 +58,7 @@ macro_rules! vec_new {
 				$V { d: arr }
 			}
 
-			pub fn from_scal(v: T) -> Self {
+			pub fn from_scalar(v: T) -> Self {
 				$V { d: [v; $N] }
 			}
 		}
@@ -151,11 +147,11 @@ macro_rules! vec_fmt {
 	($V:ident, $N:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
 			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				try!(write!(f, "{}[", stringify!($V)));
+				try!(write!(f, "{}(", stringify!($V)));
 				for i in 0..$N-1 {
 					try!(write!(f, "{}, ", self[i]));
 				}
-				try!(write!(f, "{}]", self[$N-1]));
+				try!(write!(f, "{})", self[$N-1]));
 				Ok(())
 			}
 		}
@@ -284,10 +280,6 @@ macro_rules! vec_norm {
 				}
 				out
 			}
-
-			pub fn sqr(self) -> T {
-				self.abs2()
-			}
 		}
 
 		impl<T> $V<T> where T: Copy + Num + Float {
@@ -295,16 +287,8 @@ macro_rules! vec_norm {
 				self.abs2().sqrt()
 			}
 
-			pub fn length(self) -> T {
-				self.abs()
-			}
-
-			pub fn norm(self) -> $V<T> {
-				self/self.abs()
-			}
-
 			pub fn normalize(self) -> $V<T> {
-				self.norm()
+				self/self.abs()
 			}
 		}
 	)
@@ -512,6 +496,7 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
+
 // from args
 
 impl<T> Vec2<T> where T: Copy {
@@ -531,6 +516,7 @@ impl<T> Vec4<T> where T: Copy {
 		Self { d: [v0, v1, v2, v3] }
 	}
 }
+
 
 // cross product
 
@@ -571,35 +557,3 @@ macro_rules! vec_type {
 		pub type $Va = $V<$T>;
 	)
 }
-
-vec_type!(Vec2i32, Vec2, i32);
-vec_type!(Vec3i32, Vec3, i32);
-vec_type!(Vec4i32, Vec4, i32);
-vec_type!(Vec2u32, Vec2, u32);
-vec_type!(Vec3u32, Vec3, u32);
-vec_type!(Vec4u32, Vec4, u32);
-vec_type!(Vec2f32, Vec2, f32);
-vec_type!(Vec3f32, Vec3, f32);
-vec_type!(Vec4f32, Vec4, f32);
-vec_type!(Vec2f64, Vec2, f64);
-vec_type!(Vec3f64, Vec3, f64);
-vec_type!(Vec4f64, Vec4, f64);
-vec_type!(Vec2bool, Vec2, bool);
-vec_type!(Vec3bool, Vec3, bool);
-vec_type!(Vec4bool, Vec4, bool);
-
-vec_type!(V2i32, Vec2, i32);
-vec_type!(V3i32, Vec3, i32);
-vec_type!(V4i32, Vec4, i32);
-vec_type!(V2u32, Vec2, u32);
-vec_type!(V3u32, Vec3, u32);
-vec_type!(V4u32, Vec4, u32);
-vec_type!(V2f32, Vec2, f32);
-vec_type!(V3f32, Vec3, f32);
-vec_type!(V4f32, Vec4, f32);
-vec_type!(V2f64, Vec2, f64);
-vec_type!(V3f64, Vec3, f64);
-vec_type!(V4f64, Vec4, f64);
-vec_type!(V2bool, Vec2, bool);
-vec_type!(V3bool, Vec3, bool);
-vec_type!(V4bool, Vec4, bool);
