@@ -1,5 +1,5 @@
-pub extern crate num_traits;
-pub extern crate num_integer;
+extern crate num_traits;
+extern crate num_integer;
 
 #[macro_use]
 mod macros;
