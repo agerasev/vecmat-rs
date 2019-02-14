@@ -133,11 +133,11 @@ macro_rules! vec_fmt {
 	($V:ident, $N:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
 			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				try!(write!(f, "{}(", stringify!($V)));
+				write!(f, "{}(", stringify!($V))?;
 				for i in 0..$N-1 {
-					try!(write!(f, "{}, ", self[i]));
+					write!(f, "{}, ", self[i])?;
 				}
-				try!(write!(f, "{})", self[$N-1]));
+				write!(f, "{})", self[$N-1])?;
 				Ok(())
 			}
 		}
@@ -542,4 +542,10 @@ macro_rules! vec_type {
 	($Va:ident, $V:ident, $T:ident) => (
 		pub type $Va = $V<$T>;
 	)
+}
+
+#[cfg(test)]
+#[test]
+fn dummy_test() {
+    Vec3::<f64>::new();
 }

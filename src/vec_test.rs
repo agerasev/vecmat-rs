@@ -1,5 +1,5 @@
 use std::mem::size_of;
-use vec::*;
+use crate::vec::*;
 
 macro_rules! vec_content_test {
 	($V:ident, $N:expr) => (

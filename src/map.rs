@@ -1,5 +1,5 @@
-use vec::*;
-use mat::*;
+use crate::vec::*;
+use crate::mat::*;
 use num_traits::{Num, Float, Signed};
 
 macro_rules! affine {
@@ -40,3 +40,10 @@ macro_rules! affine {
 affine!(Affine2, Mat2, Vec2);
 affine!(Affine3, Mat3, Vec3);
 affine!(Affine4, Mat4, Vec4);
+
+
+#[cfg(test)]
+#[test]
+fn dummy_test() {
+    Affine3::<f64>::new();
+}

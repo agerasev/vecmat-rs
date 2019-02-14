@@ -1,5 +1,5 @@
-use mat::*;
-use vec::*;
+use crate::mat::*;
+use crate::vec::*;
 
 macro_rules! mat_new_test {
 	($V:ident, $N:expr, $M:expr) => (

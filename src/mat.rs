@@ -4,8 +4,8 @@ use std::iter::{IntoIterator};
 use std::slice;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use num_traits::{Num, Zero, One, Signed};
-use vec::*;
-pub use vec::Dot;
+use crate::vec::*;
+pub use crate::vec::Dot;
 
 macro_rules! mat_struct {
 	($V:ident, $N:expr, $M:expr) => (
@@ -116,14 +116,14 @@ macro_rules! mat_fmt {
 	($V:ident, $N:expr, $M:expr) => (
 		impl<T> Display for $V<T> where T: Copy + Display {
 			fn fmt(&self, f: &mut Formatter) -> FmtResult {
-				try!(write!(f, "{} [\n", stringify!($V)));
+				write!(f, "{} [\n", stringify!($V))?;
 				for j in 0..$M {
 					for i in 0..$N {
-						try!(write!(f, " {}, ", self[(i, j)]));
+						write!(f, " {}, ", self[(i, j)])?;
 					}
-					try!(write!(f, "\n"));
+					write!(f, "\n")?;
 				}
-				try!(write!(f, "]"));
+				write!(f, "]")?;
 				Ok(())
 			}
 		}
@@ -563,3 +563,11 @@ macro_rules! mat_type {
 		pub type $Va = $V<$T>;
 	)
 }
+
+
+#[cfg(test)]
+#[test]
+fn dummy_test() {
+    Mat3::<f64>::new();
+}
+

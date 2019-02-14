@@ -1,6 +1,6 @@
-use map::*;
-use vec::*;
-use mat::*;
+use crate::map::*;
+use crate::vec::*;
+use crate::mat::*;
 
 macro_rules! affine_new_test {
 	($Map:ident, $Mat:ident, $Vec:ident) => (
