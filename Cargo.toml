@@ -5,7 +5,7 @@ authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
 description = "Lightweight low-dimensional vector and matrix library"
-documentation = "https://nthend.github.io/vecmat-rs/target/doc/vecmat/"
+documentation = "https://docs.rs/vecmat"
 homepage = "https://github.com/nthend/vecmat-rs"
 repository = "https://github.com/nthend/vecmat-rs"
 readme = "README.md"

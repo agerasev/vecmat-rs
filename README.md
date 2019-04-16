@@ -12,7 +12,7 @@
 [travis_badge]: https://api.travis-ci.org/nthend/vecmat-rs.svg
 [appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/nthend/vecmat-rs?branch=master&svg=true
 [codecov_badge]: https://codecov.io/gh/nthend/vecmat-rs/graphs/badge.svg
-[license_badge]: https://img.shields.io/crates/l/ringbuf.svg
+[license_badge]: https://img.shields.io/crates/l/vecmat.svg
 
 [crates]: https://crates.io/crates/vecmat
 [docs]: https://docs.rs/vecmat
@@ -105,13 +105,8 @@ fn main() {
 - [x] Matrix-matrix and matrix-vector multiplication
 - [x] Square matrix `det` and `inverse`
 
-### Complex analysis
-- [ ] Complex numbers
-- [ ] Quaternions
-
 ### Transformations
 - [x] Affine transformations for vector (with `inverse`)
-- [ ] Moebius transformation
 
 ## License
 
