@@ -9,16 +9,16 @@
 
 [crates_badge]: https://img.shields.io/crates/v/vecmat.svg
 [docs_badge]: https://docs.rs/vecmat/badge.svg
-[travis_badge]: https://api.travis-ci.org/nthend/vecmat-rs.svg
-[appveyor_badge]: https://ci.appveyor.com/api/projects/status/github/nthend/vecmat-rs?branch=master&svg=true
-[codecov_badge]: https://codecov.io/gh/nthend/vecmat-rs/graphs/badge.svg
+[travis_badge]: https://api.travis-ci.org/agerasev/vecmat-rs.svg
+[appveyor_badge]: https://ci.appveyor.com/api/projects/status/e43qp5a1alb9ilcp/branch/master?svg=true
+[codecov_badge]: https://codecov.io/gh/agerasev/vecmat-rs/graphs/badge.svg
 [license_badge]: https://img.shields.io/crates/l/vecmat.svg
 
 [crates]: https://crates.io/crates/vecmat
 [docs]: https://docs.rs/vecmat
-[travis]: https://travis-ci.org/nthend/vecmat-rs
-[appveyor]: https://ci.appveyor.com/project/nthend/vecmat-rs
-[codecov]: https://codecov.io/gh/nthend/vecmat-rs
+[travis]: https://travis-ci.org/agerasev/vecmat-rs
+[appveyor]: https://ci.appveyor.com/project/agerasev/vecmat-rs
+[codecov]: https://codecov.io/gh/agerasev/vecmat-rs
 [license]: #license
 
 Low-dimensional vector and matrix structures and common operations for them
@@ -26,7 +26,7 @@ Low-dimensional vector and matrix structures and common operations for them
 ## Documentation
 
 + [`crates.io` version documentation](https://docs.rs/vecmat)
-+ [`master` branch documentation](https://nthend.github.io/vecmat-rs/target/doc/vecmat/index.html)
++ [`master` branch documentation](https://agerasev.github.io/vecmat-rs/target/doc/vecmat/index.html)
 
 ## Usage
 

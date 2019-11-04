@@ -1,13 +1,13 @@
 [package]
 name = "vecmat"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
 description = "Lightweight low-dimensional vector and matrix library"
 documentation = "https://docs.rs/vecmat"
-homepage = "https://github.com/nthend/vecmat-rs"
-repository = "https://github.com/nthend/vecmat-rs"
+homepage = "https://github.com/agerasev/vecmat-rs"
+repository = "https://github.com/agerasev/vecmat-rs"
 readme = "README.md"
 keywords = ["vector", "matrix", "math"]
 categories = ["algorithms", "data-structures", "science"]
