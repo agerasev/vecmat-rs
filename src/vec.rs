@@ -116,7 +116,7 @@ macro_rules! vec_iter {
 			type Item = &'a T;
 			type IntoIter = slice::Iter<'a, T>;
 			fn into_iter(self) -> Self::IntoIter {
-				self.data.into_iter()
+				self.data.iter()
 			}
 		}
 		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
