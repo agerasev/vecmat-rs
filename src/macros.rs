@@ -1,5 +1,6 @@
 #![allow(unused_macros)]
 
+
 macro_rules! cartesian_1 {
 	($m:ident, $x:ident, [$( $y:ident ),*]) => (
 		$(

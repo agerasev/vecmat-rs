@@ -1,79 +1,192 @@
-use std::mem::{MaybeUninit};
-use std::ptr;
-use std::ops::{
-	Index, IndexMut, 
-	Neg, Add, Sub, Mul, Div, Rem, 
-	AddAssign, SubAssign, MulAssign, DivAssign, RemAssign, 
-	Not, BitAnd, BitOr, BitXor,
-	BitAndAssign, BitOrAssign, BitXorAssign,
+use core::{
+	convert::{TryFrom, TryInto},
+	mem::{MaybeUninit},
+	ops::{
+		Deref,
+		Index, IndexMut,
+		Neg, Add, Sub, Mul, Div, Rem,
+		AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
+		Not, BitAnd, BitOr, BitXor,
+		BitAndAssign, BitOrAssign, BitXorAssign,
+	},
+	iter::{IntoIterator},
+	array::{TryFromSliceError},
+	slice,
+	fmt::{Display, Formatter, Result as FmtResult},
 };
-use std::iter::{IntoIterator};
-use std::slice;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-use num_traits::{Num, Zero, Float, Signed};
+use num_traits::{Num, Zero, One, Float, Signed};
 use num_integer::{Integer};
 
 
-macro_rules! vec_struct {
-	($V:ident, $N:expr) => (
-		#[derive(Clone, Copy, Debug, PartialEq)]
-		pub struct $V<T: Copy> {
-			pub data: [T; $N],
+macro_rules! vec_base { ($V:ident, $N:expr) => (
+
+	// Structure
+	#[repr(transparent)]
+	#[derive(Clone, Copy, Debug, PartialEq)]
+	pub struct $V<T> {
+		data: [T; $N],
+	}
+
+	// Constructions
+
+	impl<T> $V<T> {
+		pub fn init<F: FnMut(usize) -> T>(f: F) -> Self {
+			Self { data: array_init(|i| f(i)) }
 		}
-	)
-}
+	}
+	impl<T> Default for $V<T> where T: Default {
+		fn default() -> Self {
+			Self::init(|_| T::default())
+		}
+	}
+	impl<T> $V<T> where T: Default {
+		pub fn new() -> Self {
+			Self::default()
+		}
+	}
 
-macro_rules! vec_new {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Default {
-			pub fn new() -> Self {
-				$V { data: [T::default(); $N] }
+	impl<T> From<[T; $N]> for $V<T> {
+		fn from(a: [T; $N]) -> Self {
+			Self { data: a }
+		}
+	}
+	impl<T> From<&[T; $N]> for $V<T> where T: Clone {
+		fn from(ar: &[T; $N]) -> Self {
+			Self { data: ar.clone() }
+		}
+	}
+
+	impl<T> Into<[T; $N]> for $V<T> {
+		fn into(self) -> [T; $N] {
+			self.data
+		}
+	}
+	impl<'a, T> Into<&'a [T; $N]> for &'a $V<T> {
+		fn into(self) -> &'a [T; $N] {
+			&self.data
+		}
+	}
+	impl<'a, T> Into<&'a mut [T; $N]> for &'a mut $V<T> {
+		fn into(self) -> &'a mut [T; $N] {
+			&mut self.data
+		}
+	}
+
+	impl<T> AsRef<[T; $N]> for $V<T> {
+		fn as_ref(&self) -> &[T; $N] {
+			&self.data
+		}
+	}
+	impl<T> AsMut<[T; $N]> for $V<T> {
+		fn as_mut(&mut self) -> &mut [T; $N] {
+			&mut self.data
+		}
+	}
+
+	impl<'a, T> TryFrom<&'a [T]> for $V<T> where T: Copy {
+		type Error = TryFromSliceError;
+		fn try_from(s: &'a [T]) -> Result<Self, Self::Error> {
+			s.try_into().map(|a| Self { data: a })
+		}
+	}
+
+	// Iteration
+
+	impl <T> $V<T> {
+		pub fn iter(&self) -> impl Iterator<Item=&T> {
+			self.data.iter()
+		}
+		pub fn iter_mut(&mut self) -> impl Iterator<Item=&mut T> {
+			self.data.iter_mut()
+		}
+	}
+
+	impl<'a, T> IntoIterator for &'a $V<T> {
+		type Item = &'a T;
+		type IntoIter = slice::Iter<'a, T>;
+		fn into_iter(self) -> Self::IntoIter {
+			self.data.iter()
+		}
+	}
+	impl<'a, T> IntoIterator for &'a mut $V<T> {
+		type Item = &'a mut T;
+		type IntoIter = slice::IterMut<'a, T>;
+		fn into_iter(self) -> Self::IntoIter {
+			self.data.iter_mut()
+		}
+	}
+
+	impl<T> $V<T> where T: Clone + Zero + One + AddAssign {
+		pub fn range() -> Self {
+			let mut i = T::zero();
+			Self::init(|_| {
+				let j = i.clone();
+				i += T::one();
+				j
+			})
+		}
+	}
+
+	//impl<T> $V<T> {
+	//	pub fn for_each<F: FnMut(T)>(self, f: F) {
+	//		for v in self.iter() {
+	//			f(v);
+	//		}
+	//	}
+	//	pub fn map<U, F: FnMut(T) -> U>(self, f: F) -> Self {
+	//		let mut i = T::zero();
+	//		Self::init(|_| {
+	//			let j = i.clone();
+	//			i += T::one();
+	//			j
+	//		})
+	//	}
+	//}
+
+	/*
+		pub fn from_slice(s: &[T]) -> Option<Self> {
+			match s.len() {
+				$N => {
+					let mut v = Self::new();
+					v.data.copy_from_slice(s);
+					Some(v)
+				},
+				_ => None,
 			}
 		}
-		
-		impl<T> $V<T> where T: Copy {
-			pub fn from_array(a: [T; $N]) -> Self {
-				$V { data: a }
-			}
 
-			pub fn from_array_ref(a: &[T; $N]) -> Self {
-				$V { data: a.clone() }
+		pub fn from_map<F>(f: F) -> Self where F: Fn(usize) -> T {
+			let mut a = [T::default(); $N];
+			for i in 0..$N {
+				(*a.as_mut_ptr())[i] = f(i);
 			}
+			$V { data: a.assume_init() }
+		}
+	}
 
-			pub fn from_slice(s: &[T]) -> Option<Self> {
-				match s.len() {
-					$N => unsafe {
-						let mut a: MaybeUninit<[T; $N]> = MaybeUninit::uninit();
-						ptr::copy_nonoverlapping(s.as_ptr(), (*a.as_mut_ptr()).as_mut_ptr(), $N);
-						Some($V::from_array(a.assume_init()))
-					},
-					_ => None,
-				}
-			}
-
-			pub fn from_map<F>(f: F) -> Self where F: Fn(usize) -> T {
-				unsafe {
-					let mut a: MaybeUninit<[T; $N]> = MaybeUninit::uninit();
-					for i in 0..$N {
-						(*a.as_mut_ptr())[i] = f(i);
-					}
-					$V { data: a.assume_init() }
-				}
-			}
-
-			pub fn from_scalar(v: T) -> Self {
-				$V { data: [v; $N] }
-			}
+	impl<T> $V<T> where T: Copy {
+		pub fn from_array(a: [T; $N]) -> Self {
+			$V { data: a }
 		}
 
-		impl<T> Default for $V<T> where T: Copy + Default {
-			fn default() -> Self {
-				$V::new()
-			}
+		pub fn from_array_ref(a: &[T; $N]) -> Self {
+			$V { data: a.clone() }
 		}
-	)
-}
 
+		pub fn from_scalar(v: T) -> Self {
+			$V { data: [v; $N] }
+		}
+	}
+
+	impl<T> Default for $V<T> where T: Copy + Default {
+		fn default() -> Self {
+			$V::new()
+		}
+	}
+	*/
+)}
+
+/*
 macro_rules! vec_index {
 	($V:ident, $N:expr) => (
 		impl<T> Index<usize> for $V<T> where T: Copy {
@@ -105,30 +218,7 @@ macro_rules! vec_map {
 
 macro_rules! vec_iter {
 	($V:ident, $N:expr) => (
-		impl <'a, T> $V<T> where T: Copy {
-			pub fn iter(&'a self) -> slice::Iter<'a, T> {
-				self.data.iter()
-			}
-		}
-		impl <'a, T> $V<T> where T: Copy {
-			pub fn iter_mut(&'a mut self) -> slice::IterMut<'a, T> {
-				self.data.iter_mut()
-			}
-		}
-		impl<'a, T> IntoIterator for &'a $V<T> where T: Copy {
-			type Item = &'a T;
-			type IntoIter = slice::Iter<'a, T>;
-			fn into_iter(self) -> Self::IntoIter {
-				self.data.iter()
-			}
-		}
-		impl<'a, T> IntoIterator for &'a mut $V<T> where T: Copy {
-			type Item = &'a mut T;
-			type IntoIter = slice::IterMut<'a, T>;
-			fn into_iter(self) -> Self::IntoIter {
-				self.data.as_mut().into_iter()
-			}
-		}
+
 	)
 }
 
@@ -419,7 +509,7 @@ macro_rules! vec_vcmp {
 				}
 				mv
 			}
-			
+
 			pub fn max(&self) -> T {
 				let mut mv = self[0];
 				for i in 1..$N {
@@ -433,50 +523,53 @@ macro_rules! vec_vcmp {
 		}
 	)
 }
+*/
 
 macro_rules! vec_all {
 	($V:ident, $N:expr) => (
-		vec_struct!($V, $N);
-		vec_index!($V, $N);
-		vec_new!($V, $N);
-		vec_iter!($V, $N);
-		vec_fmt!($V, $N);
-		vec_map!($V, $N);
+		vec_base!($V, $N);
 
-		vec_neg!($V, $N);
+		//vec_new!($V, $N);
+		//vec_from!($V, $N);
+		//vec_index!($V, $N);
+		//vec_iter!($V, $N);
+		//vec_fmt!($V, $N);
+		//vec_map!($V, $N);
 
-		vec_op_vec!($V, $N, Add, add, op_add);
-		vec_op_vec!($V, $N, Sub, sub, op_sub);
-		vec_op_vec_assign!($V, $N, AddAssign, Add, add_assign, op_add);
-		vec_op_vec_assign!($V, $N, SubAssign, Sub, sub_assign, op_sub);
-		vec_ops_all!($V, $N, Mul, mul, op_mul);
-		vec_ops_all!($V, $N, Div, div, op_div);
-		vec_ops_all!($V, $N, Rem, rem, op_rem);
-		vec_ops_all_assign!($V, $N, MulAssign, Mul, mul_assign, op_mul);
-		vec_ops_all_assign!($V, $N, DivAssign, Div, div_assign, op_div);
-		vec_ops_all_assign!($V, $N, RemAssign, Rem, rem_assign, op_rem);
-		
-		vec_div_mod_floor!($V, $N);
-		
-		vec_dot!($V, $N);
-		vec_norm!($V, $N);
-		vec_zero!($V, $N);
-		
-		vec_bool_not!($V, $N);
+		//vec_neg!($V, $N);
 
-		vec_bool_op!($V, $N, BitAnd, bitand, op_bit_and);
-		vec_bool_op!($V, $N, BitOr, bitor, op_bit_or);
-		vec_bool_op!($V, $N, BitXor, bitxor, op_bit_xor);
+		//vec_op_vec!($V, $N, Add, add, op_add);
+		//vec_op_vec!($V, $N, Sub, sub, op_sub);
+		//vec_op_vec_assign!($V, $N, AddAssign, Add, add_assign, op_add);
+		//vec_op_vec_assign!($V, $N, SubAssign, Sub, sub_assign, op_sub);
+		//vec_ops_all!($V, $N, Mul, mul, op_mul);
+		//vec_ops_all!($V, $N, Div, div, op_div);
+		//vec_ops_all!($V, $N, Rem, rem, op_rem);
+		//vec_ops_all_assign!($V, $N, MulAssign, Mul, mul_assign, op_mul);
+		//vec_ops_all_assign!($V, $N, DivAssign, Div, div_assign, op_div);
+		//vec_ops_all_assign!($V, $N, RemAssign, Rem, rem_assign, op_rem);
 
-		vec_bool_op_assign!($V, $N, BitAndAssign, bitand_assign, op_bit_and);
-		vec_bool_op_assign!($V, $N, BitOrAssign, bitor_assign, op_bit_or);
-		vec_bool_op_assign!($V, $N, BitXorAssign, bitxor_assign, op_bit_xor);
+		//vec_div_mod_floor!($V, $N);
 
-		vec_bool_any!($V, $N);
-		vec_bool_all!($V, $N);
+		//vec_dot!($V, $N);
+		//vec_norm!($V, $N);
+		//vec_zero!($V, $N);
 
-		vec_veq!($V, $N);
-		vec_vcmp!($V, $N);
+		//vec_bool_not!($V, $N);
+
+		//vec_bool_op!($V, $N, BitAnd, bitand, op_bit_and);
+		//vec_bool_op!($V, $N, BitOr, bitor, op_bit_or);
+		//vec_bool_op!($V, $N, BitXor, bitxor, op_bit_xor);
+
+		//vec_bool_op_assign!($V, $N, BitAndAssign, bitand_assign, op_bit_and);
+		//vec_bool_op_assign!($V, $N, BitOrAssign, bitor_assign, op_bit_or);
+		//vec_bool_op_assign!($V, $N, BitXorAssign, bitxor_assign, op_bit_xor);
+
+		//vec_bool_any!($V, $N);
+		//vec_bool_all!($V, $N);
+
+		//vec_veq!($V, $N);
+		//vec_vcmp!($V, $N);
 	)
 }
 
@@ -484,7 +577,7 @@ vec_all!(Vec2, 2);
 vec_all!(Vec3, 3);
 vec_all!(Vec4, 4);
 
-
+/*
 // from args
 
 impl<T> Vec2<T> where T: Copy {
@@ -546,6 +639,7 @@ macro_rules! vec_type {
 		pub type $Va = $V<$T>;
 	)
 }
+*/
 
 #[cfg(test)]
 #[test]
