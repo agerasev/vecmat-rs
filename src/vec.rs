@@ -1,4 +1,5 @@
-use std::mem;
+use std::mem::{MaybeUninit};
+use std::ptr;
 use std::ops::{
 	Index, IndexMut, 
 	Neg, Add, Sub, Mul, Div, Rem, 
@@ -41,21 +42,23 @@ macro_rules! vec_new {
 
 			pub fn from_slice(s: &[T]) -> Option<Self> {
 				match s.len() {
-					$N => {
-						let mut a: [T; $N] = unsafe { mem::uninitialized() };
-						a.clone_from_slice(s);
-						Some($V::from_array(a))
+					$N => unsafe {
+						let mut a: MaybeUninit<[T; $N]> = MaybeUninit::uninit();
+						ptr::copy_nonoverlapping(s.as_ptr(), (*a.as_mut_ptr()).as_mut_ptr(), $N);
+						Some($V::from_array(a.assume_init()))
 					},
 					_ => None,
 				}
 			}
 
 			pub fn from_map<F>(f: F) -> Self where F: Fn(usize) -> T {
-				let mut arr: [T; $N] = unsafe { mem::uninitialized() };
-				for i in 0..$N {
-					arr[i] = f(i);
+				unsafe {
+					let mut a: MaybeUninit<[T; $N]> = MaybeUninit::uninit();
+					for i in 0..$N {
+						(*a.as_mut_ptr())[i] = f(i);
+					}
+					$V { data: a.assume_init() }
 				}
-				$V { data: arr }
 			}
 
 			pub fn from_scalar(v: T) -> Self {

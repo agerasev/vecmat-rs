@@ -1,4 +1,5 @@
-use std::mem;
+use std::mem::{MaybeUninit};
+use std::ptr;
 use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
 use std::iter::{IntoIterator};
 use std::slice;
@@ -35,22 +36,26 @@ macro_rules! mat_new {
 
 			pub fn from_slice(s: &[T]) -> Option<Self> {
 				if s.len() == $N*$M {
-					let mut a: [T; $N*$M] = unsafe { mem::uninitialized() };
-					a.clone_from_slice(s);
-					Some($V::from_array(a))
+					unsafe {
+						let mut a: MaybeUninit<[T; $N*$M]> = MaybeUninit::uninit();
+						ptr::copy_nonoverlapping(s.as_ptr(), (*a.as_mut_ptr()).as_mut_ptr(), $N*$M);
+						Some($V::from_array(a.assume_init()))
+					}
 				} else {
 					None
 				}
 			}
 
 			pub fn from_map<F>(f: F) -> Self where F: Fn(usize, usize) -> T {
-				let mut arr: [T; $N*$M] = unsafe { mem::uninitialized() };
-				for j in 0..$M {
-					for i in 0..$N {
-						arr[i + j*$N] = f(i, j);
+				unsafe {
+					let mut a: MaybeUninit<[T; $N*$M]> = MaybeUninit::uninit();
+					for j in 0..$M {
+						for i in 0..$N {
+							(*a.as_mut_ptr())[i + j*$N] = f(i, j);
+						}
 					}
+					$V { data: a.assume_init() }
 				}
-				$V { data: arr }
 			}
 
 			pub fn from_scalar(v: T) -> Self {
