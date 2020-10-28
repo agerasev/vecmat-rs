@@ -4,10 +4,13 @@ use core::{
 };
 
 
-macro_rules! array_base { ($N:expr, $I:ident, $IE:ident, $II:ident) => (
+macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
     pub trait $I<T>: From<[T; $N]> + Into<[T; $N]> {
         fn init<F: FnMut() -> T>(f: F) -> Self;
         fn from_iter<I: Iterator<Item=T>>(iter: &mut I) -> Option<Self>;
+        fn into_iter(self) -> $II<T> {
+            $II::new(self.into())
+        }
     }
 
     impl<T> $I<T> for [T; $N] {
@@ -51,24 +54,21 @@ macro_rules! array_base { ($N:expr, $I:ident, $IE:ident, $II:ident) => (
         }
     }
 
-    pub trait $IE<T, U>: $I<T> {
-        type SelfU;
-
-    }
-
     pub struct $II<T> {
         data: [MaybeUninit<T>; $N],
         pos: usize,
     }
     impl<T> $II<T> {
         pub fn new(a: [T; $N]) -> Self {
-            Self {
+            let it = Self {
                 data: unsafe {
                     // unsafe { mem::transmute::<_, [MaybeUninit<T>; $N]>(a) }
                     ptr::read(a.as_ptr() as *const [MaybeUninit<T>; $N])
                 },
                 pos: 0
-            }
+            };
+            mem::forget(a);
+            it
         }
     }
     impl<T> Iterator for $II<T> {
@@ -97,19 +97,71 @@ macro_rules! array_base { ($N:expr, $I:ident, $IE:ident, $II:ident) => (
     }
 )}
 
-array_base!(16, Array16, Array16Ext, Array16IntoIter);
+array_base!(16, Array16Ext, Array16IntoIter);
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::rc::Rc;
+    use std::{
+        rc::Rc,
+        vec::Vec,
+        iter,
+    };
+
 
     #[test]
-    fn init() {
+    fn init_drop() {
         let a = <[Rc<()>; 16]>::init(|| Rc::new(()));
-        for r in a.iter() {
-            assert_eq!(Rc::strong_count(r), 1);
+        let b = a.clone();
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 2);
+        }
+
+        mem::drop(b);
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 1);
+        }
+    }
+
+    #[test]
+    fn into_iter() {
+        let a = <[Rc<()>; 16]>::init(|| Rc::new(()));
+        let b = a.clone();
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 2);
+        }
+
+        let mut c = b.into_iter().skip(8);
+        c.next().unwrap();
+
+        for (i, x) in a.iter().enumerate() {
+            if i < 9 {
+                assert_eq!(Rc::strong_count(x), 1);
+            } else {
+                assert_eq!(Rc::strong_count(x), 2);
+            }
+        }
+
+        mem::drop(c);
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 1);
+        }
+    }
+
+    #[test]
+    fn from_iter() {
+        let v = iter::repeat_with(|| Rc::new(())).take(16).collect::<Vec<_>>();
+        let a = <[Rc<()>; 16]>::from_iter(&mut v.iter().cloned()).unwrap();
+
+        for x in v.iter() {
+            assert_eq!(Rc::strong_count(x), 2);
+        }
+        mem::drop(a);
+
+        assert!(<[Rc<()>; 16]>::from_iter(&mut v.iter().cloned().take(8)).is_none());
+        for x in v.iter() {
+            assert_eq!(Rc::strong_count(x), 1);
         }
     }
 }
