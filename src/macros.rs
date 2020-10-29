@@ -2,16 +2,16 @@
 
 
 macro_rules! cartesian_1 {
-	($m:ident, $x:ident, [$( $y:ident ),*]) => (
+	($m:ident, $x:tt, [$( $y:tt ),*]) => (
 		$(
 			$m!($x, $y);
 		)*
-		
+
 	);
 }
 
 macro_rules! cartesian {
-	($m:ident, [$( $x:ident ),*], $y:tt) => (
+	($m:ident, [$( $x:tt ),*], $y:tt) => (
 		$(
 			cartesian_1!($m, $x, $y);
 		)*

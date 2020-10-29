@@ -1,8 +1,6 @@
-#[macro_use]
 mod base;
 pub use base::*;
 
-#[macro_use]
 mod ops;
 pub use ops::*;
 
@@ -13,32 +11,9 @@ pub use spec::*;
 #[cfg(test)]
 mod tests;
 
-
-use core::{
-	convert::{TryFrom, TryInto},
-	ops::{
-		Index, IndexMut,
-		Neg, Add, Sub, Mul, Div, Rem,
-		AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
-		Not, BitAnd, BitOr, BitXor,
-		BitAndAssign, BitOrAssign, BitXorAssign,
-	},
-	cmp::{PartialOrd},
-	iter::{IntoIterator},
-	array::{TryFromSliceError},
-	slice,
-	fmt::{Display, Formatter, Result as FmtResult},
-};
-use num_traits::{Zero, Float};
-use num_integer::{self as nint, Integer};
-use crate::{traits::*, array::*};
+pub use crate::{Dot};
 
 
-macro_rules! vector_all { ($N:expr, $V:ident, $A:ident) => (
-	vector_base!($N, $V, $A);
-	vector_ops!($N, $V);
-) }
-
-vector_all!(2, Vector2, Array2Ext);
-vector_all!(3, Vector3, Array3Ext);
-vector_all!(4, Vector4, Array4Ext);
+pub type Vector2<T> = Vector<T, 2>;
+pub type Vector3<T> = Vector<T, 3>;
+pub type Vector4<T> = Vector<T, 4>;

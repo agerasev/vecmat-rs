@@ -1,4 +1,6 @@
 #![no_std]
+#![feature(min_const_generics)]
+
 #[cfg(feature = "std")]
 extern crate std;
 

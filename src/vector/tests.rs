@@ -1,6 +1,6 @@
-use std::mem::size_of;
+use std::{mem::size_of, convert::TryFrom, format};
+use num_traits::{Zero};
 use crate::vector::*;
-use std::{format};
 
 
 macro_rules! vec_content_test {
@@ -52,7 +52,7 @@ fn new() {
 
 #[test]
 fn new_no_gen() {
-	let v = Vector4::<i32>::make(1, 2, 3, 4);
+	let v = Vector4::<i32>::from([1, 2, 3, 4]);
 	for i in 0..4 {
 		assert_eq!(v[i], i as i32 + 1);
 	}
@@ -406,9 +406,9 @@ fn scal_rem_assign() {
 #[test]
 fn div_mod_floor() {
 	assert_eq!(
-		Vector4::make(-2, -3, -4, -5).div_mod_floor(Vector4::make(4, 3, 2, 1)),
-		(Vector4::make(-1, -1, -2, -5), Vector4::make(2, 0, 0, 0))
-		);
+		Vector4::from([-2, -3, -4, -5]).div_mod_floor(Vector4::from([4, 3, 2, 1])),
+		(Vector4::from([-1, -1, -2, -5]), Vector4::from([2, 0, 0, 0]))
+	);
 }
 
 macro_rules! vec_dot_test {
@@ -569,8 +569,8 @@ fn vec_vcmp() {
 
 #[test]
 fn cross() {
-	let va = Vector3::<i32>::make(1, 0, 0);
-	let vb = Vector3::<i32>::make(0, 1, 0);
+	let va = Vector3::<i32>::from([1, 0, 0]);
+	let vb = Vector3::<i32>::from([0, 1, 0]);
 	let vc = va.cross(vb);
 	assert_eq!(vc[0], 0);
 	assert_eq!(vc[1], 0);

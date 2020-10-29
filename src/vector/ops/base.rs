@@ -1,105 +1,141 @@
-use core::ops::{Mul};
-use crate::vector::*;
+use core::{
+	ops::{
+		Neg, Add, Sub, Mul, Div, Rem,
+		AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
+	},
+	cmp::{PartialOrd},
+	iter::{IntoIterator},
+};
+use num_traits::{Zero};
+use crate::{vector::*};
 
 
-macro_rules! vector_neg { ($N:expr, $V:ident) => (
-	impl<T> Neg for $V<T> where T: Neg<Output=T> {
-		type Output = $V<T>;
-		fn neg(self) -> Self::Output {
-			self.map(|v| -v)
-		}
+
+impl<T, const N: usize> Neg for Vector<T, N> where T: Neg<Output=T> {
+	type Output = Vector<T, N>;
+	fn neg(self) -> Self::Output {
+		self.map(|v| -v)
 	}
-) }
+}
 
-macro_rules! op_add { ($a:expr, $b:expr) => ({ $a + $b }) }
-macro_rules! op_sub { ($a:expr, $b:expr) => ({ $a - $b }) }
-macro_rules! op_mul { ($a:expr, $b:expr) => ({ $a * $b }) }
-macro_rules! op_div { ($a:expr, $b:expr) => ({ $a / $b }) }
-macro_rules! op_rem { ($a:expr, $b:expr) => ({ $a % $b }) }
-
-macro_rules! op_add_assign { ($a:expr, $b:expr) => ({ $a += $b }) }
-macro_rules! op_sub_assign { ($a:expr, $b:expr) => ({ $a -= $b }) }
-macro_rules! op_mul_assign { ($a:expr, $b:expr) => ({ $a *= $b }) }
-macro_rules! op_div_assign { ($a:expr, $b:expr) => ({ $a /= $b }) }
-macro_rules! op_rem_assign { ($a:expr, $b:expr) => ({ $a %= $b }) }
-
-macro_rules! vector_op_vec { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-	impl<T> $Trait for $V<T> where T: $Trait<Output=T> {
-		type Output = $V<T>;
-		fn $method(self, vec: $V<T>) -> Self::Output {
-			self.zip(vec).map(|(x, y)| $op!(x, y))
-		}
+impl<T, const N: usize> Add for Vector<T, N> where T: Add<Output=T> {
+	type Output = Vector<T, N>;
+	fn add(self, vec: Vector<T, N>) -> Self::Output {
+		self.zip(vec).map(|(x, y)| x + y)
 	}
-) }
-macro_rules! vector_op_scal { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-	impl<T> $Trait<T> for $V<T> where T: $Trait<Output=T> + Clone {
-		type Output = $V<T>;
-		fn $method(self, a: T) -> Self::Output {
-			self.map(|v| $op!(v, a.clone()))
-		}
+}
+impl<T, const N: usize> Sub for Vector<T, N> where T: Sub<Output=T> {
+	type Output = Vector<T, N>;
+	fn sub(self, vec: Vector<T, N>) -> Self::Output {
+		self.zip(vec).map(|(x, y)| x - y)
 	}
-) }
-macro_rules! vector_op_vec_assign { ($N:expr, $V:ident, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-	impl<T> $Trait for $V<T> where T: $Trait {
-		fn $method(&mut self, vec: $V<T>) {
-			self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { $op!(*s, x); })
-		}
+}
+impl<T, const N: usize> Mul for Vector<T, N> where T: Mul<Output=T> {
+	type Output = Vector<T, N>;
+	fn mul(self, vec: Vector<T, N>) -> Self::Output {
+		self.zip(vec).map(|(x, y)| x * y)
 	}
-) }
-macro_rules! vector_op_scal_assign { ($N:expr, $V:ident, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-	impl<T> $Trait<T> for $V<T> where T: $Trait + Clone {
-		fn $method(&mut self, a: T) {
-			self.iter_mut().for_each(|s| { $op!(*s, a.clone()); })
-		}
+}
+impl<T, const N: usize> Div for Vector<T, N> where T: Div<Output=T> {
+	type Output = Vector<T, N>;
+	fn div(self, vec: Vector<T, N>) -> Self::Output {
+		self.zip(vec).map(|(x, y)| x / y)
 	}
-) }
-
-macro_rules! vector_ops_all { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-	vector_op_vec!($N, $V, $Trait, $method, $op);
-	vector_op_scal!($N, $V, $Trait, $method, $op);
-) }
-macro_rules! vector_ops_all_assign { ($N:expr, $V:ident, $Trait:ident, $BaseTrait:ident, $method:ident, $op:ident) => (
-	vector_op_vec_assign!($N, $V, $Trait, $BaseTrait, $method, $op);
-	vector_op_scal_assign!($N, $V, $Trait, $BaseTrait, $method, $op);
-) }
-
-macro_rules! vector_reduce { ($N:expr, $V:ident) => (
-	impl<T> $V<T> {
-		pub fn sum(self) -> T where T: Add<Output=T> {
-			self.fold_first(|x, y| x + y)
-		}
-		pub fn max(self) -> T where T: PartialOrd {
-			self.fold_first(|x, y| if x < y { y } else { x })
-		}
-		pub fn min(self) -> T where T: PartialOrd {
-			self.fold_first(|x, y| if x < y { x } else { y })
-		}
+}
+impl<T, const N: usize> Rem for Vector<T, N> where T: Rem<Output=T> {
+	type Output = Vector<T, N>;
+	fn rem(self, vec: Vector<T, N>) -> Self::Output {
+		self.zip(vec).map(|(x, y)| x % y)
 	}
-) }
+}
 
-macro_rules! vector_ops_base { ($N:expr, $V:ident) => (
-	vector_neg!($N, $V);
+impl<T, const N: usize> Mul<T> for Vector<T, N> where T: Mul<Output=T> + Clone {
+	type Output = Vector<T, N>;
+	fn mul(self, a: T) -> Self::Output {
+		self.map(|v| v * a.clone())
+	}
+}
+impl<T, const N: usize> Div<T> for Vector<T, N> where T: Div<Output=T> + Clone {
+	type Output = Vector<T, N>;
+	fn div(self, a: T) -> Self::Output {
+		self.map(|v| v / a.clone())
+	}
+}
+impl<T, const N: usize> Rem<T> for Vector<T, N> where T: Rem<Output=T> + Clone {
+	type Output = Vector<T, N>;
+	fn rem(self, a: T) -> Self::Output {
+		self.map(|v| v % a.clone())
+	}
+}
 
-	vector_op_vec!($N, $V, Add, add, op_add);
-	vector_op_vec!($N, $V, Sub, sub, op_sub);
-	vector_ops_all!($N, $V, Mul, mul, op_mul);
-	vector_ops_all!($N, $V, Div, div, op_div);
-	vector_ops_all!($N, $V, Rem, rem, op_rem);
+impl<T, const N: usize> AddAssign for Vector<T, N> where T: AddAssign {
+	fn add_assign(&mut self, vec: Vector<T, N>) {
+		self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { *s += x; })
+	}
+}
+impl<T, const N: usize> SubAssign for Vector<T, N> where T: SubAssign {
+	fn sub_assign(&mut self, vec: Vector<T, N>) {
+		self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { *s -= x; })
+	}
+}
+impl<T, const N: usize> MulAssign for Vector<T, N> where T: MulAssign {
+	fn mul_assign(&mut self, vec: Vector<T, N>) {
+		self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { *s *= x; })
+	}
+}
+impl<T, const N: usize> DivAssign for Vector<T, N> where T: DivAssign {
+	fn div_assign(&mut self, vec: Vector<T, N>) {
+		self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { *s /= x; })
+	}
+}
+impl<T, const N: usize> RemAssign for Vector<T, N> where T: RemAssign {
+	fn rem_assign(&mut self, vec: Vector<T, N>) {
+		self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| { *s %= x; })
+	}
+}
 
-	vector_op_vec_assign!($N, $V, AddAssign, Add, add_assign, op_add_assign);
-	vector_op_vec_assign!($N, $V, SubAssign, Sub, sub_assign, op_sub_assign);
-	vector_ops_all_assign!($N, $V, MulAssign, Mul, mul_assign, op_mul_assign);
-	vector_ops_all_assign!($N, $V, DivAssign, Div, div_assign, op_div_assign);
-	vector_ops_all_assign!($N, $V, RemAssign, Rem, rem_assign, op_rem_assign);
+impl<T, const N: usize> MulAssign<T> for Vector<T, N> where T: MulAssign + Clone {
+	fn mul_assign(&mut self, a: T) {
+		self.iter_mut().for_each(|s| { *s *= a.clone(); })
+	}
+}
+impl<T, const N: usize> DivAssign<T> for Vector<T, N> where T: DivAssign + Clone {
+	fn div_assign(&mut self, a: T) {
+		self.iter_mut().for_each(|s| { *s /= a.clone(); })
+	}
+}
+impl<T, const N: usize> RemAssign<T> for Vector<T, N> where T: RemAssign + Clone {
+	fn rem_assign(&mut self, a: T) {
+		self.iter_mut().for_each(|s| { *s %= a.clone(); })
+	}
+}
 
-	vector_reduce!($N, $V);
-) }
+impl<T, const N: usize> Zero for Vector<T, N> where T: Zero {
+	fn zero() -> Self {
+		Self::init(|| T::zero())
+	}
+	fn is_zero(&self) -> bool {
+		self.iter().all(|x| x.is_zero())
+	}
+}
+
+impl<T, const N: usize> Vector<T, N> {
+	pub fn sum(self) -> T where T: Add<Output=T> {
+		self.fold_first(|x, y| x + y)
+	}
+	pub fn max(self) -> T where T: PartialOrd {
+		self.fold_first(|x, y| if x < y { y } else { x })
+	}
+	pub fn min(self) -> T where T: PartialOrd {
+		self.fold_first(|x, y| if x < y { x } else { y })
+	}
+}
 
 
-macro_rules! vec_mul_scal_rev { ($V:ident, $T:ident) => (
-    impl Mul<$V<$T>> for $T {
-        type Output = $V<$T>;
-        fn mul(self, a: $V<$T>) -> Self::Output {
+macro_rules! vec_mul_scal_rev { ($N:expr, $T:ident) => (
+    impl Mul<Vector<$T, $N>> for $T {
+        type Output = Vector<$T, $N>;
+        fn mul(self, a: Vector<$T, $N>) -> Self::Output {
             a * self
         }
     }
@@ -108,6 +144,6 @@ macro_rules! vec_mul_scal_rev { ($V:ident, $T:ident) => (
 // T * VecN<T> workaround
 cartesian!(
 	vec_mul_scal_rev,
-	[Vector2, Vector3, Vector4],
+	[2, 3, 4],
 	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
 );

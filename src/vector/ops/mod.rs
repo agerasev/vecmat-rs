@@ -1,23 +1,14 @@
-#[macro_use]
 mod base;
+pub use base::*;
 
-#[macro_use]
 mod dot;
+pub use dot::*;
 
-#[macro_use]
 mod int;
+pub use int::*;
 
-#[macro_use]
 mod bool_;
+pub use bool_::*;
 
-#[macro_use]
 mod vcmp;
-
-
-macro_rules! vector_ops { ($N:expr, $V:ident) => (
-	vector_ops_base!($N, $V);
-	vector_dot!($N, $V);
-	vector_int!($N, $V);
-	vector_bool!($N, $V);
-	vector_vcmp!($N, $V);
-) }
+pub use vcmp::*;

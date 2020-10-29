@@ -1,71 +1,72 @@
+use core::{
+	ops::{
+		Not, BitAnd, BitOr, BitXor,
+		BitAndAssign, BitOrAssign, BitXorAssign,
+	},
+};
+use crate::vector::*;
 
-macro_rules! vector_bool_not { ($N:expr, $V:ident) => (
-    impl Not for $V<bool> {
-        type Output = $V<bool>;
-        fn not(self) -> Self::Output {
-            self.map(|x| !x)
-        }
+
+impl<const N: usize> Not for Vector<bool, N> {
+    type Output = Vector<bool, N>;
+    fn not(self) -> Self::Output {
+        self.map(|x| !x)
     }
-) }
+}
 
-macro_rules! op_bitand { ($a:expr, $b:expr) => ({ $a & $b }) }
-macro_rules! op_bitor  { ($a:expr, $b:expr) => ({ $a | $b }) }
-macro_rules! op_bitxor { ($a:expr, $b:expr) => ({ $a ^ $b }) }
-
-macro_rules! op_bitand_assign { ($a:expr, $b:expr) => ({ $a &= $b }) }
-macro_rules! op_bitor_assign  { ($a:expr, $b:expr) => ({ $a |= $b }) }
-macro_rules! op_bitxor_assign { ($a:expr, $b:expr) => ({ $a ^= $b }) }
-
-macro_rules! vector_bool_op { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-    impl $Trait for $V<bool> {
-        type Output = $V<bool>;
-        fn $method(self, other: $V<bool>) -> Self::Output {
-            self.zip(other).map(|(x, y)| $op!(x, y))
-        }
+impl<const N: usize> BitAnd for Vector<bool, N> {
+    type Output = Vector<bool, N>;
+    fn bitand(self, other: Vector<bool, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x & y)
     }
-) }
-macro_rules! vector_bool_op_assign { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-    impl $Trait for $V<bool> {
-        fn $method(&mut self, other: $V<bool>) {
-			self.iter_mut().zip(other.into_iter()).for_each(|(s, y)| $op!(*s, y))
-        }
+}
+impl<const N: usize> BitOr for Vector<bool, N> {
+    type Output = Vector<bool, N>;
+    fn bitor(self, other: Vector<bool, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x | y)
     }
-) }
+}
+impl<const N: usize> BitXor for Vector<bool, N> {
+    type Output = Vector<bool, N>;
+    fn bitxor(self, other: Vector<bool, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x ^ y)
+    }
+}
 
-macro_rules! vector_bool_any_all { ($N:expr, $V:ident) => (
-    impl $V<bool> {
-        pub fn any(self) -> bool {
-            for i in 0..$N {
-                if self[i] {
-                    return true;
-                }
+impl<const N: usize> BitAndAssign for Vector<bool, N> {
+    fn bitand_assign(&mut self, other: Vector<bool, N>) {
+        self.iter_mut().zip(other.into_iter()).for_each(|(s, y)| *s &= y)
+    }
+}
+impl<const N: usize> BitOrAssign for Vector<bool, N> {
+    fn bitor_assign(&mut self, other: Vector<bool, N>) {
+        self.iter_mut().zip(other.into_iter()).for_each(|(s, y)| *s |= y)
+    }
+}
+impl<const N: usize> BitXorAssign for Vector<bool, N> {
+    fn bitxor_assign(&mut self, other: Vector<bool, N>) {
+        self.iter_mut().zip(other.into_iter()).for_each(|(s, y)| *s ^= y)
+    }
+}
+
+
+impl<const N: usize> Vector<bool, N> {
+    pub fn any(self) -> bool {
+        for i in 0..N {
+            if self[i] {
+                return true;
             }
-            false
         }
+        false
     }
-    impl $V<bool> {
-        pub fn all(self) -> bool {
-            for i in 0..$N {
-                if !self[i] {
-                    return false;
-                }
+}
+impl<const N: usize> Vector<bool, N> {
+    pub fn all(self) -> bool {
+        for i in 0..N {
+            if !self[i] {
+                return false;
             }
-            true
         }
+        true
     }
-) }
-
-
-macro_rules! vector_bool { ($N:expr, $V:ident) => (
-    vector_bool_not!($N, $V);
-
-	vector_bool_op!($N, $V, BitAnd, bitand, op_bitand);
-	vector_bool_op!($N, $V, BitOr, bitor, op_bitor);
-	vector_bool_op!($N, $V, BitXor, bitxor, op_bitxor);
-
-	vector_bool_op_assign!($N, $V, BitAndAssign, bitand_assign, op_bitand_assign);
-	vector_bool_op_assign!($N, $V, BitOrAssign, bitor_assign, op_bitor_assign);
-	vector_bool_op_assign!($N, $V, BitXorAssign, bitxor_assign, op_bitxor_assign);
-
-	vector_bool_any_all!($N, $V);
-) }
+}
