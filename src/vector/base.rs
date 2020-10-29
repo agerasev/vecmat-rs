@@ -33,6 +33,16 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
 			Self::default()
 		}
 	}
+	impl<T> $V<T> where T: Clone {
+		/// Create vector which elements are filled with scalar value.
+		pub fn fill(v: T) -> Self {
+			Self::init(|| v.clone())
+		}
+		/// Fill with a scalar value reference.
+		pub fn fill_ref(v: &T) -> Self {
+			Self::init(|| v.clone())
+		}
+	}
 
 	impl<T> From<[T; $N]> for $V<T> {
 		fn from(a: [T; $N]) -> Self {
@@ -76,6 +86,11 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
 		type Error = TryFromSliceError;
 		fn try_from(s: &'a [T]) -> Result<Self, Self::Error> {
 			s.try_into().map(|a| Self { data: a })
+		}
+	}
+	impl<T> $V<T> {
+		fn try_from_iter<I>(mut i: I) -> Result<Self, ()> where I: Iterator<Item=T> {
+			<[T; $N]>::from_iter_ext(&mut i).map(|a| a.into()).ok_or(())
 		}
 	}
 ) }
@@ -128,15 +143,10 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
 		}
 	}
 
-	impl<T> $V<T> where T: Clone + Zero + One + AddAssign {
+	impl $V<usize> {
 		/// Create vector which element value equals to its position in vector.
 		pub fn range() -> Self {
-			let mut i = T::zero();
-			Self::init(|| {
-				let j = i.clone();
-				i += T::one();
-				j
-			})
+			Self::try_from_iter(0..$N).unwrap()
 		}
 	}
 

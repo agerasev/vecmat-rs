@@ -1,3 +1,6 @@
+use core::ops::{Mul};
+use crate::vector::*;
+
 
 macro_rules! vector_neg { ($N:expr, $V:ident) => (
 	impl<T> Neg for $V<T> where T: Neg<Output=T> {
@@ -92,9 +95,6 @@ macro_rules! vector_ops_base { ($N:expr, $V:ident) => (
 	vector_reduce!($N, $V);
 ) }
 
-
-use core::ops::{Mul};
-use crate::vector::*;
 
 macro_rules! vec_mul_scal_rev { ($V:ident, $T:ident) => (
     impl Mul<$V<$T>> for $T {

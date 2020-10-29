@@ -62,13 +62,13 @@ impl<T> Vector4<T> {
 }
 
 
-impl<T> Vector2<T> where T: Float + Clone {
+impl<T> Vector2<T> where T: Mul<Output=T> + Sub<Output=T> + Clone {
     /// Pseudo-cross product for 2D vector.
 	pub fn cross(self, other: Vector2<T>) -> T {
 		self.x()*other.y() - self.y()*other.x()
 	}
 }
-impl<T> Vector3<T> where T: Float + Clone {
+impl<T> Vector3<T> where T: Mul<Output=T> + Sub<Output=T> + Clone {
     /// Cross product.
 	pub fn cross(self, other: Vector3<T>) -> Vector3<T> {
 		let (a, b) = (&self, &other);
@@ -79,7 +79,7 @@ impl<T> Vector3<T> where T: Float + Clone {
         )
 	}
 }
-impl<T> Vector4<T> where T: Float + Zero + Clone {
+impl<T> Vector4<T> where T: Mul<Output=T> + Sub<Output=T> + Zero + Clone {
     /// Cross product of first three components, fourth one is set to zero.
 	pub fn cross(self, other: Vector4<T>) -> Vector4<T> {
 		let (a, b) = (&self, &other);

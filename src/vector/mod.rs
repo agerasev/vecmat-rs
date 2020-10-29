@@ -10,6 +10,9 @@ pub use ops::*;
 mod spec;
 pub use spec::*;
 
+#[cfg(test)]
+mod tests;
+
 
 use core::{
 	convert::{TryFrom, TryInto},
@@ -26,7 +29,7 @@ use core::{
 	slice,
 	fmt::{Display, Formatter, Result as FmtResult},
 };
-use num_traits::{Zero, One, Float};
+use num_traits::{Zero, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, array::*};
 
@@ -39,14 +42,3 @@ macro_rules! vector_all { ($N:expr, $V:ident, $A:ident) => (
 vector_all!(2, Vector2, Array2Ext);
 vector_all!(3, Vector3, Array3Ext);
 vector_all!(4, Vector4, Array4Ext);
-
-
-#[cfg(test)]
-#[test]
-fn dummy_test() {
-    Vector3::<f64>::new();
-}
-
-
-//#[cfg(test)]
-//mod tests;

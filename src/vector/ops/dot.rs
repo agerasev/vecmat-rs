@@ -29,10 +29,12 @@ macro_rules! vector_dot { ($N:expr, $V:ident) => (
 			self.zip(other).map(|(x, y)| x * y).sum()
 		}
 	}
-	impl<T> $V<T> where T: Float + Clone {
+	impl<T> $V<T> where T: Add<Output=T> + Mul<Output=T> + Clone {
 		pub fn square_length(self) -> T {
 			self.map(|x| x.clone()*x).sum()
 		}
+	}
+	impl<T> $V<T> where T: Float + Clone {
 		pub fn length(self) -> T {
 			self.square_length().sqrt()
 		}
