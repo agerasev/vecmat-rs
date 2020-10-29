@@ -6,11 +6,14 @@ extern crate std;
 #[macro_use]
 mod macros;
 
-pub mod array;
+pub mod traits;
+pub use traits::*;
 
-//pub mod vector;
-//#[cfg(test)]
-//mod vec_test;
+pub mod array;
+pub use array::*;
+
+pub mod vector;
+pub use vector::*;
 
 //pub mod mat;
 //#[cfg(test)]

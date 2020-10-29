@@ -4,40 +4,36 @@ use core::{
 };
 
 
-macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
+macro_rules! array_base { ($N:expr, $A:ident, $II:ident) => (
     /// Trait that extends array to be constructible element-by-element and iterated.
-    pub trait $I<T>: From<[T; $N]> + Into<[T; $N]> {
+    /// Postfix `_ext` is added to methods to avoid possible future ambiguity.
+    pub trait $A<T>: From<[T; $N]> + Into<[T; $N]> {
+        /// IntoIterator by values for array.
+        type IntoIter_: Iterator<Item=T>;
+
         /// Initializes an array with values from function.
-        fn init_<F: FnMut() -> T>(f: F) -> Self;
+        fn init_ext<F: FnMut() -> T>(f: F) -> Self;
 
         /// Conctructs an array from iterator.
         /// If iterator conatins less items than array, then `None` is returned.
-        fn from_iter_<I: Iterator<Item=T>>(iter: &mut I) -> Option<Self>;
+        fn from_iter_ext<I: Iterator<Item=T>>(iter: &mut I) -> Option<Self>;
 
         /// Converts an array into iterator by values.
-        fn into_iter_(self) -> $II<T> {
-            $II::new(self.into())
-        }
+        fn into_iter_ext(self) -> Self::IntoIter_;
 
-        /// Method similar to `Iterator::for_each` for arrays.
-        /// `_` added to avoid possible future ambiguity.
-        fn for_each_<F: FnMut(T)>(self, f: F);
-
-        /// Method similar to `Iterator::map` for arrays.
-        /// `_` added to avoid possible future ambiguity.
-        fn map_<U, F: FnMut(T) -> U>(self, f: F) -> [U; $N];
-
-        /// Method similar to `Iterator::zip` for arrays.
-        /// `_` added to avoid possible future ambiguity.
-        fn zip_<U>(self, other: [U; $N]) -> [(T, U); $N];
-
-        /// Method similar to `Iterator::unzip` for arrays.
-        /// `_` added to avoid possible future ambiguity.
-        fn unzip_<U, V>(self) -> ([U; $N], [V; $N]) where Self: $I<(U, V)>;
+        fn for_each_ext<F: FnMut(T)>(self, f: F);
+        fn map_ext<U, F: FnMut(T) -> U>(self, f: F) -> [U; $N];
+        fn zip_ext<U>(self, other: [U; $N]) -> [(T, U); $N];
+        fn unzip_ext<U, V>(self) -> ([U; $N], [V; $N]) where Self: $A<(U, V)>;
+        fn fold_ext<S, F: FnMut(S, T) -> S>(self, s: S, f: F) -> S;
+        fn fold_first_ext<F: FnMut(T, T) -> T>(self, f: F) -> T;
+        fn scan_ext<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> [U; $N];
     }
 
-    impl<T> $I<T> for [T; $N] {
-        fn init_<F: FnMut() -> T>(mut f: F) -> Self {
+    impl<T> $A<T> for [T; $N] {
+        type IntoIter_ = $II<T>;
+
+        fn init_ext<F: FnMut() -> T>(mut f: F) -> Self {
             let mut a: [MaybeUninit<T>; $N] = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
@@ -50,7 +46,7 @@ macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
             unsafe { ptr::read(a.as_ptr() as *const [T; $N]) }
         }
 
-        fn from_iter_<I: Iterator<Item=T>>(iter: &mut I) -> Option<Self> {
+        fn from_iter_ext<I: Iterator<Item=T>>(iter: &mut I) -> Option<Self> {
             let mut a: [MaybeUninit<T>; $N] = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
@@ -76,16 +72,20 @@ macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
             }
         }
 
-        fn for_each_<F: FnMut(T)>(self, f: F) {
-            self.into_iter_().for_each(f)
+        fn into_iter_ext(self) -> $II<T> {
+            $II::new(self.into())
         }
-        fn map_<U, F: FnMut(T) -> U>(self, f: F) -> [U; $N] {
-            <[U; $N]>::from_iter_(&mut self.into_iter_().map(f)).unwrap()
+
+        fn for_each_ext<F: FnMut(T)>(self, f: F) {
+            self.into_iter_ext().for_each(f)
         }
-        fn zip_<U>(self, other: [U; $N]) -> [(T, U); $N] {
-            <[(T, U); $N]>::from_iter_(&mut self.into_iter_().zip(other.into_iter_())).unwrap()
+        fn map_ext<U, F: FnMut(T) -> U>(self, f: F) -> [U; $N] {
+            <[U; $N]>::from_iter_ext(&mut self.into_iter_ext().map(f)).unwrap()
         }
-        fn unzip_<U, V>(self) -> ([U; $N], [V; $N]) where Self: $I<(U, V)> {
+        fn zip_ext<U>(self, other: [U; $N]) -> [(T, U); $N] {
+            <[(T, U); $N]>::from_iter_ext(&mut self.into_iter_ext().zip(other.into_iter_ext())).unwrap()
+        }
+        fn unzip_ext<U, V>(self) -> ([U; $N], [V; $N]) where Self: $A<(U, V)> {
             let mut a: [MaybeUninit<U>; $N] = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
@@ -93,7 +93,7 @@ macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
                 MaybeUninit::uninit().assume_init()
             };
 
-            for ((x, y), (u, v)) in self.into_iter_().zip(a.iter_mut().zip(b.iter_mut())) {
+            for ((x, y), (u, v)) in self.into_iter_ext().zip(a.iter_mut().zip(b.iter_mut())) {
                 let _ = mem::replace(u, MaybeUninit::new(x));
                 let _ = mem::replace(v, MaybeUninit::new(y));
             }
@@ -102,6 +102,17 @@ macro_rules! array_base { ($N:expr, $I:ident, $II:ident) => (
                 ptr::read(a.as_ptr() as *const [U; $N]),
                 ptr::read(b.as_ptr() as *const [V; $N]),
             ) }
+        }
+        fn fold_ext<S, F: FnMut(S, T) -> S>(self, s: S, f: F) -> S {
+            self.into_iter_ext().fold(s, f)
+        }
+        fn fold_first_ext<F: FnMut(T, T) -> T>(self, f: F) -> T {
+            let mut t = self.into_iter_ext();
+            let x = t.next().unwrap();
+            t.fold(x, f)
+        }
+        fn scan_ext<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, mut f: F) -> [U; $N] {
+            <[U; $N]>::from_iter_ext(&mut self.into_iter_ext().scan(s, |s, x| Some(f(s, x)))).unwrap()
         }
     }
 
@@ -177,7 +188,7 @@ mod tests {
 
     #[test]
     fn init_drop() {
-        let a = <[_; 16]>::init_(|| Rc::new(()));
+        let a = <[_; 16]>::init_ext(|| Rc::new(()));
         let b = a.clone();
         for x in a.iter() {
             assert_eq!(Rc::strong_count(x), 2);
@@ -191,13 +202,13 @@ mod tests {
 
     #[test]
     fn into_iter() {
-        let a = <[_; 16]>::init_(|| Rc::new(()));
+        let a = <[_; 16]>::init_ext(|| Rc::new(()));
         let b = a.clone();
         for x in a.iter() {
             assert_eq!(Rc::strong_count(x), 2);
         }
 
-        let mut c = b.into_iter_().skip(8);
+        let mut c = b.into_iter_ext().skip(8);
         c.next().unwrap();
 
         for (i, x) in a.iter().enumerate() {
@@ -216,13 +227,13 @@ mod tests {
 
     #[test]
     fn iter_loop() {
-        let a = <[_; 16]>::init_(|| Rc::new(()));
+        let a = <[_; 16]>::init_ext(|| Rc::new(()));
         let b = a.clone();
         for x in a.iter() {
             assert_eq!(Rc::strong_count(x), 2);
         }
 
-        let mut c = b.into_iter_();
+        let mut c = b.into_iter_ext();
         for x in &mut c {
             assert_eq!(Rc::strong_count(&x), 2);
         }
@@ -236,7 +247,7 @@ mod tests {
     #[test]
     fn from_iter() {
         let v = (0..16).map(|i| Rc::new(i)).collect::<Vec<_>>();
-        let a = <[_; 16]>::from_iter_(&mut v.iter().cloned()).unwrap();
+        let a = <[_; 16]>::from_iter_ext(&mut v.iter().cloned()).unwrap();
 
         for (i, x) in v.iter().enumerate() {
             assert_eq!(Rc::strong_count(x), 2);
@@ -244,7 +255,7 @@ mod tests {
         }
         mem::drop(a);
 
-        assert!(<[_; 16]>::from_iter_(&mut v.iter().cloned().take(8)).is_none());
+        assert!(<[_; 16]>::from_iter_ext(&mut v.iter().cloned().take(8)).is_none());
         for x in v.iter() {
             assert_eq!(Rc::strong_count(x), 1);
         }
@@ -252,11 +263,11 @@ mod tests {
 
     #[test]
     fn for_each() {
-        let a = <[_; 16]>::from_iter_(&mut (0..16).map(|i| Rc::new(i))).unwrap();
+        let a = <[_; 16]>::from_iter_ext(&mut (0..16).map(|i| Rc::new(i))).unwrap();
         let b = a.clone();
 
         let mut i = 0;
-        b.for_each_(|x| {
+        b.for_each_ext(|x| {
             assert_eq!(Rc::strong_count(&x), 2);
             assert_eq!(*x, i);
             i += 1;
@@ -269,20 +280,20 @@ mod tests {
 
     #[test]
     fn map() {
-        let a = <[usize; 16]>::from_iter_(&mut (0..16)).unwrap();
+        let a = <[usize; 16]>::from_iter_ext(&mut (0..16)).unwrap();
 
-        for (i, x) in a.map_(|x| 15 - x).iter().enumerate() {
+        for (i, x) in a.map_ext(|x| 15 - x).iter().enumerate() {
             assert_eq!(15 - i, *x);
         }
     }
 
     #[test]
     fn zip() {
-        let a = <[i32; 16]>::from_iter_(&mut (0..16)).unwrap();
-        let b = <[i8; 16]>::from_iter_(&mut (-16..0)).unwrap();
-        let c = a.clone().zip_(b.clone());
+        let a = <[i32; 16]>::from_iter_ext(&mut (0..16)).unwrap();
+        let b = <[i8; 16]>::from_iter_ext(&mut (-16..0)).unwrap();
+        let c = a.clone().zip_ext(b.clone());
 
-        for ((x, y), (a, b)) in c.into_iter_().zip(a.iter().zip(b.iter())) {
+        for ((x, y), (a, b)) in c.into_iter_ext().zip(a.iter().zip(b.iter())) {
             assert_eq!(x, *a);
             assert_eq!(y, *b);
         }
@@ -290,10 +301,10 @@ mod tests {
 
     #[test]
     fn unzip() {
-        let c = <[_; 16]>::from_iter_(&mut (0i32..16).zip(-16..0i8)).unwrap();
-        let (a, b) = c.clone().unzip_();
+        let c = <[_; 16]>::from_iter_ext(&mut (0i32..16).zip(-16..0i8)).unwrap();
+        let (a, b) = c.clone().unzip_ext();
 
-        for ((x, y), (a, b)) in c.into_iter_().zip(a.iter().zip(b.iter())) {
+        for ((x, y), (a, b)) in c.into_iter_ext().zip(a.iter().zip(b.iter())) {
             assert_eq!(x, *a);
             assert_eq!(y, *b);
         }
