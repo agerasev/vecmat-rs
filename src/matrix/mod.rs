@@ -41,7 +41,7 @@ use core::{
 };
 use num_traits::{Zero, One, Signed, Float};
 use num_integer::{self as nint, Integer};
-use crate::{array::*, vector::*};
+use crate::{traits::*, array::*, vector::*};
 
 pub use crate::traits::{Dot, Outer};
 

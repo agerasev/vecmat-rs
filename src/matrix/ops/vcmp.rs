@@ -1,5 +1,5 @@
 
-macro_rules! vector_vcmp { ($N:expr, $V:ident) => (
+macro_rules! matrix_vcmp { ($M:expr, $N:expr, $V:ident) => (
 	impl<T> $V<T> where T: PartialEq {
 		pub fn veq(self, other: $V<T>) -> $V<bool> {
 			self.zip(other).map(|(x, y)| x == y)

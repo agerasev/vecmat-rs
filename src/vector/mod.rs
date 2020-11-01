@@ -33,7 +33,7 @@ use core::{
 	slice,
 	fmt::{Display, Formatter, Result as FmtResult},
 };
-use num_traits::{Zero, Float};
+use num_traits::{Zero, Signed, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, array::*};
 

@@ -1,6 +1,3 @@
-use core::ops::{Mul};
-use crate::matrix::*;
-
 
 macro_rules! matrix_neg { ($M:expr, $N:expr, $W:ident) => (
 	impl<T> Neg for $W<T> where T: Neg<Output=T> {
@@ -72,6 +69,11 @@ macro_rules! matrix_zero { ($M:expr, $N:expr, $W:ident) => (
 			self.iter().all(|x| x.is_zero())
 		}
 	}
+	impl<T> $W<T> where T: PartialOrd + Zero + Neg<Output=T> {
+		fn abs(self) -> Self {
+			self.map(|x| if x < T::zero() { -x } else { x })
+		}
+	}
 ) }
 
 macro_rules! matrix_reduce { ($M:expr, $N:expr, $W:ident) => (
@@ -84,6 +86,27 @@ macro_rules! matrix_reduce { ($M:expr, $N:expr, $W:ident) => (
 		}
 		pub fn min(self) -> T where T: PartialOrd {
 			self.fold_first(|x, y| if x < y { x } else { y })
+		}
+	}
+) }
+
+macro_rules! matrix_norm { ($M:expr, $N:expr, $W:ident) => (
+	impl<T> NormL1 for $W<T> where T: Signed + PartialOrd {
+		type Output = T;
+		fn norm_l1(self) -> T {
+			self.abs().sum()
+		}
+	}
+	impl<T> NormL2 for $W<T> where T: Float {
+		type Output = T;
+		fn norm_l2(self) -> T {
+			self.map(|x| x*x).sum().sqrt()
+		}
+	}
+	impl<T> NormLInf for $W<T> where T: Signed + PartialOrd {
+		type Output = T;
+		fn norm_l_inf(self) -> T {
+			self.abs().max()
 		}
 	}
 ) }
@@ -105,4 +128,5 @@ macro_rules! matrix_ops_base { ($M:expr, $N:expr, $W:ident) => (
 
 	matrix_zero!($M, $N, $W);
 	matrix_reduce!($M, $N, $W);
+	matrix_norm!($M, $N, $W);
 ) }

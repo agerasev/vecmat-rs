@@ -35,22 +35,12 @@ macro_rules! vector_bool_op_assign { ($N:expr, $V:ident, $Trait:ident, $method:i
 macro_rules! vector_bool_any_all { ($N:expr, $V:ident) => (
     impl $V<bool> {
         pub fn any(self) -> bool {
-            for i in 0..$N {
-                if self[i] {
-                    return true;
-                }
-            }
-            false
+            self.into_iter().any(|x| x)
         }
     }
     impl $V<bool> {
         pub fn all(self) -> bool {
-            for i in 0..$N {
-                if !self[i] {
-                    return false;
-                }
-            }
-            true
+            self.into_iter().all(|x| x)
         }
     }
 ) }

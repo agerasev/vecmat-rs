@@ -1,6 +1,3 @@
-use core::ops::{Mul};
-use crate::vector::*;
-
 
 macro_rules! vector_neg { ($N:expr, $V:ident) => (
 	impl<T> Neg for $V<T> where T: Neg<Output=T> {
@@ -72,6 +69,11 @@ macro_rules! vector_zero { ($N:expr, $V:ident) => (
 			self.iter().all(|x| x.is_zero())
 		}
 	}
+	impl<T> $V<T> where T: PartialOrd + Zero + Neg<Output=T> {
+		fn abs(self) -> Self {
+			self.map(|x| if x < T::zero() { -x } else { x })
+		}
+	}
 ) }
 
 macro_rules! vector_reduce { ($N:expr, $V:ident) => (
@@ -84,6 +86,28 @@ macro_rules! vector_reduce { ($N:expr, $V:ident) => (
 		}
 		pub fn min(self) -> T where T: PartialOrd {
 			self.fold_first(|x, y| if x < y { x } else { y })
+		}
+	}
+) }
+
+
+macro_rules! vector_norm { ($N:expr, $V:ident) => (
+	impl<T> NormL1 for $V<T> where T: Signed + PartialOrd {
+		type Output = T;
+		fn norm_l1(self) -> T {
+			self.abs().sum()
+		}
+	}
+	impl<T> NormL2 for $V<T> where T: Float {
+		type Output = T;
+		fn norm_l2(self) -> T {
+			self.map(|x| x*x).sum().sqrt()
+		}
+	}
+	impl<T> NormLInf for $V<T> where T: Signed + PartialOrd {
+		type Output = T;
+		fn norm_l_inf(self) -> T {
+			self.abs().max()
 		}
 	}
 ) }
@@ -105,4 +129,5 @@ macro_rules! vector_ops_base { ($N:expr, $V:ident) => (
 
 	vector_zero!($N, $V);
 	vector_reduce!($N, $V);
+	vector_norm!($N, $V);
 ) }
