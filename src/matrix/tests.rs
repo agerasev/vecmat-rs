@@ -587,85 +587,84 @@ fn row_col() {
 	mat_row_col_test!(4, 3, Matrix4x3, Vector4, Vector3);
 	mat_row_col_test!(4, 4, Matrix4x4, Vector4, Vector4);
 }
-/*
-macro_rules! mat_mul_vec_test {
-	($M:expr, $N:expr, $Wnm:ident, $Wn:ident, $Wm:ident) => (
-		let m = $Wnm::fill(1 as i32);
-		let v = $Wn::fill(1 as i32);
-		assert_eq!(m.dot(v), $Wm::fill($N));
+
+macro_rules! mat_mul_mv_test {
+	($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
+		let m = $W::fill(1 as i32);
+		let u = $U::fill(1 as i32);
+		assert_eq!(m.dot(u), $V::fill($N));
 	)
 }
 #[test]
-fn mul_vec() {
-	mat_mul_vec_test!(Matrix2x2, Vector2, Vector2, 2, 2);
-	mat_mul_vec_test!(Matrix2x3, Vector2, Vector3, 2, 3);
-	mat_mul_vec_test!(Matrix2x4, Vector2, Vector4, 2, 4);
-	mat_mul_vec_test!(Matrix3x2, Vector3, Vector2, 3, 2);
-	mat_mul_vec_test!(Matrix3x3, Vector3, Vector3, 3, 3);
-	mat_mul_vec_test!(Matrix3x4, Vector3, Vector4, 3, 4);
-	mat_mul_vec_test!(Matrix4x2, Vector4, Vector2, 4, 2);
-	mat_mul_vec_test!(Matrix4x3, Vector4, Vector3, 4, 3);
-	mat_mul_vec_test!(Matrix4x4, Vector4, Vector4, 4, 4);
+fn mul_mv() {
+	mat_mul_mv_test!(2, 2, Matrix2x2, Vector2, Vector2);
+	mat_mul_mv_test!(2, 3, Matrix2x3, Vector2, Vector3);
+	mat_mul_mv_test!(2, 4, Matrix2x4, Vector2, Vector4);
+	mat_mul_mv_test!(3, 2, Matrix3x2, Vector3, Vector2);
+	mat_mul_mv_test!(3, 3, Matrix3x3, Vector3, Vector3);
+	mat_mul_mv_test!(3, 4, Matrix3x4, Vector3, Vector4);
+	mat_mul_mv_test!(4, 2, Matrix4x2, Vector4, Vector2);
+	mat_mul_mv_test!(4, 3, Matrix4x3, Vector4, Vector3);
+	mat_mul_mv_test!(4, 4, Matrix4x4, Vector4, Vector4);
 }
 
-macro_rules! mat_mul_vec_mat_test {
-	($M:expr, $N:expr, $Wnm:ident, $Wn:ident, $Wm:ident) => (
-		let m = $Wnm::fill(1 as i32);
-		let v = $Wm::fill(1 as i32);
-		assert_eq!(v.dot(m), $Wn::fill($M));
+macro_rules! mat_mul_vm_test {
+	($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
+		let m = $W::fill(1 as i32);
+		let v = $V::fill(1 as i32);
+		assert_eq!(v.dot(m), $U::fill($M));
 	)
 }
 #[test]
-fn mul_vec_mat() {
-	mat_mul_vec_mat_test!(Matrix2x2, Vector2, Vector2, 2, 2);
-	mat_mul_vec_mat_test!(Matrix2x3, Vector2, Vector3, 2, 3);
-	mat_mul_vec_mat_test!(Matrix2x4, Vector2, Vector4, 2, 4);
-	mat_mul_vec_mat_test!(Matrix3x2, Vector3, Vector2, 3, 2);
-	mat_mul_vec_mat_test!(Matrix3x3, Vector3, Vector3, 3, 3);
-	mat_mul_vec_mat_test!(Matrix3x4, Vector3, Vector4, 3, 4);
-	mat_mul_vec_mat_test!(Matrix4x2, Vector4, Vector2, 4, 2);
-	mat_mul_vec_mat_test!(Matrix4x3, Vector4, Vector3, 4, 3);
-	mat_mul_vec_mat_test!(Matrix4x4, Vector4, Vector4, 4, 4);
+fn mul_vm() {
+	mat_mul_vm_test!(2, 2, Matrix2x2, Vector2, Vector2);
+	mat_mul_vm_test!(2, 3, Matrix2x3, Vector2, Vector3);
+	mat_mul_vm_test!(2, 4, Matrix2x4, Vector2, Vector4);
+	mat_mul_vm_test!(3, 2, Matrix3x2, Vector3, Vector2);
+	mat_mul_vm_test!(3, 3, Matrix3x3, Vector3, Vector3);
+	mat_mul_vm_test!(3, 4, Matrix3x4, Vector3, Vector4);
+	mat_mul_vm_test!(4, 2, Matrix4x2, Vector4, Vector2);
+	mat_mul_vm_test!(4, 3, Matrix4x3, Vector4, Vector3);
+	mat_mul_vm_test!(4, 4, Matrix4x4, Vector4, Vector4);
 }
 
-macro_rules! mat_mul_mat_test {
-	($M:expr, $N:expr, $Wnm:ident, $Wln:ident, $Wlm:ident, $L:expr) => (
-		let vnm = $Wnm::fill(1 as i32);
-		let vln = $Wln::fill(1 as i32);
-		assert_eq!(vnm.dot(vln), $Wlm::fill($N as i32));
+macro_rules! mat_mul_mm_test {
+	($L:expr, $M:expr, $N:expr, $Wlm:ident, $Wmn:ident, $Wln:ident) => (
+		let wlm = $Wlm::fill(1 as i32);
+		let wmn = $Wmn::fill(1 as i32);
+		assert_eq!(wlm.dot(wmn), $Wln::fill($M as i32));
 	)
 }
 #[test]
-fn mul_mat() {
-	mat_mul_mat_test!(Matrix2x2, Matrix2x2, Matrix2x2, 2, 2, 2);
-	mat_mul_mat_test!(Matrix2x2, Matrix3x2, Matrix3x2, 2, 2, 3);
-	mat_mul_mat_test!(Matrix2x2, Matrix4x2, Matrix4x2, 2, 2, 4);
-	mat_mul_mat_test!(Matrix2x3, Matrix2x2, Matrix2x3, 2, 3, 2);
-	mat_mul_mat_test!(Matrix2x3, Matrix3x2, Matrix3x3, 2, 3, 3);
-	mat_mul_mat_test!(Matrix2x3, Matrix4x2, Matrix4x3, 2, 3, 4);
-	mat_mul_mat_test!(Matrix2x4, Matrix2x2, Matrix2x4, 2, 4, 2);
-	mat_mul_mat_test!(Matrix2x4, Matrix3x2, Matrix3x4, 2, 4, 3);
-	mat_mul_mat_test!(Matrix2x4, Matrix4x2, Matrix4x4, 2, 4, 4);
-	mat_mul_mat_test!(Matrix3x2, Matrix2x3, Matrix2x2, 3, 2, 2);
-	mat_mul_mat_test!(Matrix3x2, Matrix3x3, Matrix3x2, 3, 2, 3);
-	mat_mul_mat_test!(Matrix3x2, Matrix4x3, Matrix4x2, 3, 2, 4);
-	mat_mul_mat_test!(Matrix3x3, Matrix2x3, Matrix2x3, 3, 3, 2);
-	mat_mul_mat_test!(Matrix3x3, Matrix3x3, Matrix3x3, 3, 3, 3);
-	mat_mul_mat_test!(Matrix3x3, Matrix4x3, Matrix4x3, 3, 3, 4);
-	mat_mul_mat_test!(Matrix3x4, Matrix2x3, Matrix2x4, 3, 4, 2);
-	mat_mul_mat_test!(Matrix3x4, Matrix3x3, Matrix3x4, 3, 4, 3);
-	mat_mul_mat_test!(Matrix3x4, Matrix4x3, Matrix4x4, 3, 4, 4);
-	mat_mul_mat_test!(Matrix4x2, Matrix2x4, Matrix2x2, 4, 2, 2);
-	mat_mul_mat_test!(Matrix4x2, Matrix3x4, Matrix3x2, 4, 2, 3);
-	mat_mul_mat_test!(Matrix4x2, Matrix4x4, Matrix4x2, 4, 2, 4);
-	mat_mul_mat_test!(Matrix4x3, Matrix2x4, Matrix2x3, 4, 3, 2);
-	mat_mul_mat_test!(Matrix4x3, Matrix3x4, Matrix3x3, 4, 3, 3);
-	mat_mul_mat_test!(Matrix4x3, Matrix4x4, Matrix4x3, 4, 3, 4);
-	mat_mul_mat_test!(Matrix4x4, Matrix2x4, Matrix2x4, 4, 4, 2);
-	mat_mul_mat_test!(Matrix4x4, Matrix3x4, Matrix3x4, 4, 4, 3);
-	mat_mul_mat_test!(Matrix4x4, Matrix4x4, Matrix4x4, 4, 4, 4);
+fn mul_mm() {
+	mat_mul_mm_test!(2, 2, 2, Matrix2x2, Matrix2x2, Matrix2x2);
+	mat_mul_mm_test!(2, 2, 3, Matrix2x2, Matrix2x3, Matrix2x3);
+	mat_mul_mm_test!(2, 2, 4, Matrix2x2, Matrix2x4, Matrix2x4);
+	mat_mul_mm_test!(2, 3, 2, Matrix2x3, Matrix3x2, Matrix2x2);
+	mat_mul_mm_test!(2, 3, 3, Matrix2x3, Matrix3x3, Matrix2x3);
+	mat_mul_mm_test!(2, 3, 4, Matrix2x3, Matrix3x4, Matrix2x4);
+	mat_mul_mm_test!(2, 4, 2, Matrix2x4, Matrix4x2, Matrix2x2);
+	mat_mul_mm_test!(2, 4, 3, Matrix2x4, Matrix4x3, Matrix2x3);
+	mat_mul_mm_test!(2, 4, 4, Matrix2x4, Matrix4x4, Matrix2x4);
+	mat_mul_mm_test!(3, 2, 2, Matrix3x2, Matrix2x2, Matrix3x2);
+	mat_mul_mm_test!(3, 2, 3, Matrix3x2, Matrix2x3, Matrix3x3);
+	mat_mul_mm_test!(3, 2, 4, Matrix3x2, Matrix2x4, Matrix3x4);
+	mat_mul_mm_test!(3, 3, 2, Matrix3x3, Matrix3x2, Matrix3x2);
+	mat_mul_mm_test!(3, 3, 3, Matrix3x3, Matrix3x3, Matrix3x3);
+	mat_mul_mm_test!(3, 3, 4, Matrix3x3, Matrix3x4, Matrix3x4);
+	mat_mul_mm_test!(3, 4, 2, Matrix3x4, Matrix4x2, Matrix3x2);
+	mat_mul_mm_test!(3, 4, 3, Matrix3x4, Matrix4x3, Matrix3x3);
+	mat_mul_mm_test!(3, 4, 4, Matrix3x4, Matrix4x4, Matrix3x4);
+	mat_mul_mm_test!(4, 2, 2, Matrix4x2, Matrix2x2, Matrix4x2);
+	mat_mul_mm_test!(4, 2, 3, Matrix4x2, Matrix2x3, Matrix4x3);
+	mat_mul_mm_test!(4, 2, 4, Matrix4x2, Matrix2x4, Matrix4x4);
+	mat_mul_mm_test!(4, 3, 2, Matrix4x3, Matrix3x2, Matrix4x2);
+	mat_mul_mm_test!(4, 3, 3, Matrix4x3, Matrix3x3, Matrix4x3);
+	mat_mul_mm_test!(4, 3, 4, Matrix4x3, Matrix3x4, Matrix4x4);
+	mat_mul_mm_test!(4, 4, 2, Matrix4x4, Matrix4x2, Matrix4x2);
+	mat_mul_mm_test!(4, 4, 3, Matrix4x4, Matrix4x3, Matrix4x3);
+	mat_mul_mm_test!(4, 4, 4, Matrix4x4, Matrix4x4, Matrix4x4);
 }
-*/
 /*
 macro_rules! mat_one_test {
 	($W:ident, $N:expr) => (
