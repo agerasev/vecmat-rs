@@ -33,6 +33,7 @@ use num_traits::{Zero, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, array::*};
 
+pub use crate::traits::Dot;
 
 macro_rules! vector_all { ($N:expr, $V:ident, $A:ident) => (
 	vector_base!($N, $V, $A);
@@ -42,3 +43,15 @@ macro_rules! vector_all { ($N:expr, $V:ident, $A:ident) => (
 vector_all!(2, Vector2, Array2Ext);
 vector_all!(3, Vector3, Array3Ext);
 vector_all!(4, Vector4, Array4Ext);
+vector_all!(5, Vector5, Array5Ext);
+vector_all!(6, Vector6, Array6Ext);
+vector_all!(7, Vector7, Array7Ext);
+vector_all!(8, Vector8, Array8Ext);
+vector_all!(9, Vector9, Array9Ext);
+vector_all!(10, Vector10, Array10Ext);
+vector_all!(11, Vector11, Array11Ext);
+vector_all!(12, Vector12, Array12Ext);
+vector_all!(13, Vector13, Array13Ext);
+vector_all!(14, Vector14, Array14Ext);
+vector_all!(15, Vector15, Array15Ext);
+vector_all!(16, Vector16, Array16Ext);

@@ -63,6 +63,17 @@ macro_rules! vector_ops_all_assign { ($N:expr, $V:ident, $Trait:ident, $BaseTrai
 	vector_op_scal_assign!($N, $V, $Trait, $BaseTrait, $method, $op);
 ) }
 
+macro_rules! vector_zero { ($N:expr, $V:ident) => (
+	impl<T> Zero for $V<T> where T: Zero {
+		fn zero() -> Self {
+			Self::init(|| T::zero())
+		}
+		fn is_zero(&self) -> bool {
+			self.iter().all(|x| x.is_zero())
+		}
+	}
+) }
+
 macro_rules! vector_reduce { ($N:expr, $V:ident) => (
 	impl<T> $V<T> {
 		pub fn sum(self) -> T where T: Add<Output=T> {
@@ -92,6 +103,7 @@ macro_rules! vector_ops_base { ($N:expr, $V:ident) => (
 	vector_ops_all_assign!($N, $V, DivAssign, Div, div_assign, op_div_assign);
 	vector_ops_all_assign!($N, $V, RemAssign, Rem, rem_assign, op_rem_assign);
 
+	vector_zero!($N, $V);
 	vector_reduce!($N, $V);
 ) }
 

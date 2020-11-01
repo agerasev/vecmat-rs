@@ -1,5 +1,5 @@
 
-macro_rules! vector_init { ($N:expr, $V:ident) => (
+macro_rules! matrix_init { ($M:expr, $N:expr, $V:ident) => (
 	/// Vector of fixed-size.
 	#[repr(transparent)]
 	#[derive(Clone, Copy, Debug, PartialEq)]
@@ -87,7 +87,7 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
 	}
 ) }
 
-macro_rules! vector_index { ($N:expr, $V:ident) => (
+macro_rules! matrix_index { ($M:expr, $N:expr, $V:ident) => (
 	impl<T> Index<usize> for $V<T> {
 		type Output = T;
 		fn index(&self, i: usize) -> &T {
@@ -101,7 +101,7 @@ macro_rules! vector_index { ($N:expr, $V:ident) => (
 	}
 ) }
 
-macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
+macro_rules! matrix_iter { ($M:expr, $N:expr, $V:ident, $A:ident) => (
 	impl <T> $V<T> {
 		/// Returns iterator over vector element refrences.
 		pub fn iter(&self) -> impl Iterator<Item=&T> {
@@ -137,7 +137,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
 
 	impl $V<usize> {
 		/// Create vector which element value equals to its position in vector.
-		pub fn indices() -> Self {
+		pub fn range() -> Self {
 			Self::try_from_iter(0..$N).unwrap()
 		}
 	}
@@ -176,7 +176,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
 	}
 ) }
 
-macro_rules! vector_display { ($N:expr, $V:ident) => (
+macro_rules! matrix_display { ($M:expr, $N:expr, $V:ident) => (
 	impl<T> Display for $V<T> where T: Display {
 		fn fmt(&self, f: &mut Formatter) -> FmtResult {
 			write!(f, "{}(", stringify!($V))?;
@@ -189,9 +189,9 @@ macro_rules! vector_display { ($N:expr, $V:ident) => (
 	}
 ) }
 
-macro_rules! vector_base { ($N:expr, $V:ident, $A:ident) => (
-	vector_init!($N, $V);
-	vector_index!($N, $V);
-	vector_iter!($N, $V, $A);
-	vector_display!($N, $V);
+macro_rules! matrix_base { ($M:expr, $N:expr, $V:ident, $A:ident) => (
+	matrix_init!($M, $N, $V);
+	//matrix_index!($M, $N, $V);
+	//matrix_iter!($M, $N, $V, $A);
+	//matrix_display!($M, $N, $V);
 ) }

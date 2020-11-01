@@ -1,12 +1,14 @@
-use std::mem::{MaybeUninit};
-use std::ptr;
-use std::ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign};
-use std::iter::{IntoIterator};
-use std::slice;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use core::{
+	mem::{MaybeUninit},
+	ptr,
+	ops::{Index, IndexMut, Neg, Add, Sub, Mul, Div, Rem, AddAssign, SubAssign, MulAssign, DivAssign, RemAssign},
+	iter::{IntoIterator},
+	slice,
+	fmt::{Display, Formatter, Result as FmtResult},
+}
 use num_traits::{Num, Zero, One, Signed};
-use crate::vec::*;
-pub use crate::vec::Dot;
+use crate::vector::*;
+
 
 macro_rules! mat_struct {
 	($V:ident, $N:expr, $M:expr) => (
@@ -242,9 +244,9 @@ macro_rules! mat_all {
 		mat_fmt!($V, $N, $M);
 		mat_index!($V, $N, $M);
 		mat_map!($V, $N, $M);
-		
+
 		mat_neg!($V, $N, $M);
-		
+
 		mat_op_mat!($V, $N, $M, Add, add, op_add);
 		mat_op_mat!($V, $N, $M, Sub, sub, op_sub);
 		mat_op_mat!($V, $N, $M, Mul, mul, op_mul);
@@ -253,7 +255,7 @@ macro_rules! mat_all {
 		mat_op_scal!($V, $N, $M, Mul, mul, op_mul);
 		mat_op_scal!($V, $N, $M, Div, div, op_div);
 		mat_op_scal!($V, $N, $M, Rem, rem, op_rem);
-		
+
 		mat_op_mat_assign!($V, $N, $M, AddAssign, Add, add_assign, op_add);
 		mat_op_mat_assign!($V, $N, $M, SubAssign, Sub, sub_assign, op_sub);
 		mat_op_mat_assign!($V, $N, $M, MulAssign, Mul, mul_assign, op_mul);
@@ -262,7 +264,7 @@ macro_rules! mat_all {
 		mat_op_scal_assign!($V, $N, $M, MulAssign, Mul, mul_assign, op_mul);
 		mat_op_scal_assign!($V, $N, $M, DivAssign, Div, div_assign, op_div);
 		mat_op_scal_assign!($V, $N, $M, RemAssign, Rem, rem_assign, op_rem);
-		
+
 		mat_zero!($V, $N, $M);
 	)
 }
