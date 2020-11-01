@@ -6,9 +6,8 @@ use core::{
 	cmp::{PartialOrd},
 	iter::{IntoIterator},
 };
-use num_traits::{Zero};
-use crate::{vector::*};
-
+use num_traits::{Zero, Signed, Float};
+use crate::{traits::*, vector::*};
 
 
 impl<T, const N: usize> Neg for Vector<T, N> where T: Neg<Output=T> {
@@ -119,6 +118,31 @@ impl<T, const N: usize> Zero for Vector<T, N> where T: Zero {
 	}
 }
 
+impl<T, const N: usize> Vector<T, N> where T: PartialOrd + Zero + Neg<Output=T> {
+	fn abs(self) -> Self {
+		self.map(|x| if x < T::zero() { -x } else { x })
+	}
+}
+
+impl<T, const N: usize> NormL1 for Vector<T, N> where T: Signed + PartialOrd {
+	type Output = T;
+	fn norm_l1(self) -> T {
+		self.abs().sum()
+	}
+}
+impl<T, const N: usize> NormL2 for Vector<T, N> where T: Float {
+	type Output = T;
+	fn norm_l2(self) -> T {
+		self.map(|x| x*x).sum().sqrt()
+	}
+}
+impl<T, const N: usize> NormLInf for Vector<T, N> where T: Signed + PartialOrd {
+	type Output = T;
+	fn norm_l_inf(self) -> T {
+		self.abs().max()
+	}
+}
+
 impl<T, const N: usize> Vector<T, N> {
 	pub fn sum(self) -> T where T: Add<Output=T> {
 		self.fold_first(|x, y| x + y)
@@ -130,20 +154,3 @@ impl<T, const N: usize> Vector<T, N> {
 		self.fold_first(|x, y| if x < y { x } else { y })
 	}
 }
-
-
-macro_rules! vec_mul_scal_rev { ($N:expr, $T:ident) => (
-    impl Mul<Vector<$T, $N>> for $T {
-        type Output = Vector<$T, $N>;
-        fn mul(self, a: Vector<$T, $N>) -> Self::Output {
-            a * self
-        }
-    }
-) }
-
-// T * VecN<T> workaround
-cartesian!(
-	vec_mul_scal_rev,
-	[2, 3, 4],
-	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
-);

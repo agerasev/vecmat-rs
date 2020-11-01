@@ -49,24 +49,13 @@ impl<const N: usize> BitXorAssign for Vector<bool, N> {
     }
 }
 
-
 impl<const N: usize> Vector<bool, N> {
     pub fn any(self) -> bool {
-        for i in 0..N {
-            if self[i] {
-                return true;
-            }
-        }
-        false
+        self.into_iter().any(|x| x)
     }
 }
 impl<const N: usize> Vector<bool, N> {
     pub fn all(self) -> bool {
-        for i in 0..N {
-            if !self[i] {
-                return false;
-            }
-        }
-        true
+        self.into_iter().all(|x| x)
     }
 }

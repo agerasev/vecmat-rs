@@ -1,9 +1,6 @@
 mod base;
 pub use base::*;
 
-mod dot;
-pub use dot::*;
-
 mod int;
 pub use int::*;
 

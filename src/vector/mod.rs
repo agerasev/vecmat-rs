@@ -5,6 +5,10 @@ mod ops;
 pub use ops::*;
 
 #[macro_use]
+mod dot;
+pub use dot::*;
+
+#[macro_use]
 mod spec;
 pub use spec::*;
 
@@ -12,7 +16,6 @@ pub use spec::*;
 mod tests;
 
 pub use crate::{Dot};
-
 
 pub type Vector2<T> = Vector<T, 2>;
 pub type Vector3<T> = Vector<T, 3>;

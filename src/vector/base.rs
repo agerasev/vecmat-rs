@@ -110,11 +110,11 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, N> {
 
 
 impl<T, const N: usize> Vector<T, N> {
-	/// Returns iterator over vector element refrences.
+	/// Returns iterator over vector element references.
 	pub fn iter(&self) -> impl Iterator<Item=&T> {
 		self.data.iter()
 	}
-	/// Returns iterator over vector element mutable refrences.
+	/// Returns iterator over vector element mutable references.
 	pub fn iter_mut(&mut self) -> impl Iterator<Item=&mut T> {
 		self.data.iter_mut()
 	}
@@ -144,7 +144,7 @@ impl<'a, T, const N: usize> IntoIterator for &'a mut Vector<T, N> {
 
 impl<const N: usize> Vector<usize, N> {
 	/// Create vector which element value equals to its position in vector.
-	pub fn range() -> Self {
+	pub fn indices() -> Self {
 		Self::try_from_iter(0..N).unwrap()
 	}
 }
@@ -162,6 +162,10 @@ impl<T, const N: usize> Vector<T, N> {
 	pub fn zip<U>(self, other: Vector<U, N>) -> Vector<(T, U), N> {
 		self.data.zip_ext(other.data).into()
 	}
+	/// Enumerate vector elements.
+	pub fn enumerate(self) -> Vector<(usize, T), N> {
+		Vector::indices().zip(self)
+	}
 }
 impl<T, U, const N: usize> Vector<(T, U), N> {
 	/// Unzip vector of tuples into two vectors.
@@ -177,7 +181,7 @@ impl<T, const N: usize> Vector<T, N> {
 	pub fn fold_first<F: FnMut(T, T) -> T>(self, f: F) -> T {
 		self.data.fold_first_ext(f)
 	}
-	pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> [U; N] {
+	pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> Vector<U, N> {
 		self.data.scan_ext(s, f).into()
 	}
 }
