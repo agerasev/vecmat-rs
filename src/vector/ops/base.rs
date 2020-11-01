@@ -106,20 +106,3 @@ macro_rules! vector_ops_base { ($N:expr, $V:ident) => (
 	vector_zero!($N, $V);
 	vector_reduce!($N, $V);
 ) }
-
-
-macro_rules! vec_mul_scal_rev { ($V:ident, $T:ident) => (
-    impl Mul<$V<$T>> for $T {
-        type Output = $V<$T>;
-        fn mul(self, a: $V<$T>) -> Self::Output {
-            a * self
-        }
-    }
-) }
-
-// T * VecN<T> workaround
-cartesian!(
-	vec_mul_scal_rev,
-	[Vector2, Vector3, Vector4],
-	[i8, u8, i16, u16, i32, u32, i64, u64, f32, f64]
-);

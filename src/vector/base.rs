@@ -170,7 +170,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
         pub fn fold_first<F: FnMut(T, T) -> T>(self, f: F) -> T {
 			self.data.fold_first_ext(f)
 		}
-        pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> [U; $N] {
+        pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> $V<U> {
 			self.data.scan_ext(s, f).into()
 		}
 	}

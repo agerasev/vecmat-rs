@@ -30,3 +30,11 @@ pub trait Dot<V=Self> {
     /// Perform dot product.
 	fn dot(self, other: V) -> Self::Output;
 }
+
+/// Outer product trait.
+pub trait Outer<V> {
+    /// Outer product output type.
+	type Output;
+    /// Perform outer product.
+	fn outer(self, other: V) -> Self::Output;
+}

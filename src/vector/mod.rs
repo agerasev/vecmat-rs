@@ -7,6 +7,10 @@ mod ops;
 pub use ops::*;
 
 #[macro_use]
+mod dot;
+pub use dot::*;
+
+#[macro_use]
 mod spec;
 pub use spec::*;
 
@@ -38,6 +42,7 @@ pub use crate::traits::Dot;
 macro_rules! vector_all { ($N:expr, $V:ident, $A:ident) => (
 	vector_base!($N, $V, $A);
 	vector_ops!($N, $V);
+	vector_dot!($N, $V);
 ) }
 
 vector_all!(2, Vector2, Array2Ext);

@@ -16,7 +16,6 @@ macro_rules! vec_content_test {
 		assert_eq!($N*size_of::<usize>(), size_of::<$V<usize>>());
 	)
 }
-
 #[test]
 fn content() {
 	vec_content_test!(2, Vector2);
@@ -42,14 +41,12 @@ macro_rules! vec_new_test {
 		}
 	)
 }
-
 #[test]
 fn new() {
 	vec_new_test!(2, Vector2);
 	vec_new_test!(3, Vector3);
 	vec_new_test!(4, Vector4);
 }
-
 #[test]
 fn new_no_gen() {
 	let v = Vector4::<i32>::from([1, 2, 3, 4]);
@@ -96,7 +93,6 @@ macro_rules! vec_data_test {
 		}
 	)
 }
-
 #[test]
 fn data() {
 	vec_data_test!(2, Vector2);
@@ -111,7 +107,6 @@ macro_rules! vec_eq_test {
 		assert_eq!(va, vb);
 	)
 }
-
 #[test]
 fn eq() {
 	vec_eq_test!(2, Vector2);
@@ -126,7 +121,6 @@ macro_rules! vec_copy_test {
 		assert_eq!(cv, v);
 	)
 }
-
 #[test]
 fn copy() {
 	vec_copy_test!(2, Vector2);
@@ -148,7 +142,6 @@ macro_rules! vec_index_test {
 		}
 	)
 }
-
 #[test]
 fn index() {
 	vec_index_test!(2, Vector2);
@@ -184,14 +177,12 @@ macro_rules! vec_iter_test {
 		}
 	)
 }
-
 #[test]
 fn iter() {
 	vec_iter_test!(2, Vector2);
 	vec_iter_test!(3, Vector3);
 	vec_iter_test!(4, Vector4);
 }
-
 #[test]
 fn fmt() {
 	assert_eq!(format!("{}", Vector3::indices().map(|i| i + 1)), "Vector3(1, 2, 3)");
@@ -206,7 +197,6 @@ macro_rules! vec_neg_test {
 		}
 	)
 }
-
 #[test]
 fn neg() {
 	vec_neg_test!(2, Vector2);
@@ -230,35 +220,30 @@ macro_rules! vec_op_vec_test {
 		}
 	)
 }
-
 #[test]
 fn vec_add() {
 	vec_op_vec_test!(2, Vector2, op_add);
 	vec_op_vec_test!(3, Vector3, op_add);
 	vec_op_vec_test!(4, Vector4, op_add);
 }
-
 #[test]
 fn vec_sub() {
 	vec_op_vec_test!(2, Vector2, op_sub);
 	vec_op_vec_test!(3, Vector3, op_sub);
 	vec_op_vec_test!(4, Vector4, op_sub);
 }
-
 #[test]
 fn vec_mul() {
 	vec_op_vec_test!(2, Vector2, op_mul);
 	vec_op_vec_test!(3, Vector3, op_mul);
 	vec_op_vec_test!(4, Vector4, op_mul);
 }
-
 #[test]
 fn vec_div() {
 	vec_op_vec_test!(2, Vector2, op_div);
 	vec_op_vec_test!(3, Vector3, op_div);
 	vec_op_vec_test!(4, Vector4, op_div);
 }
-
 #[test]
 fn vec_rem() {
 	vec_op_vec_test!(2, Vector2, op_rem);
@@ -276,44 +261,23 @@ macro_rules! vec_op_scal_test {
 		}
 	)
 }
-
 #[test]
 fn scal_mul() {
 	vec_op_scal_test!(2, Vector2, op_mul);
 	vec_op_scal_test!(3, Vector3, op_mul);
 	vec_op_scal_test!(4, Vector4, op_mul);
 }
-
 #[test]
 fn scal_div() {
 	vec_op_scal_test!(2, Vector2, op_div);
 	vec_op_scal_test!(3, Vector3, op_div);
 	vec_op_scal_test!(4, Vector4, op_div);
 }
-
 #[test]
 fn scal_rem() {
 	vec_op_scal_test!(2, Vector2, op_rem);
 	vec_op_scal_test!(3, Vector3, op_rem);
 	vec_op_scal_test!(4, Vector4, op_rem);
-}
-
-macro_rules! vec_mul_scal_rev_test {
-	($N:expr, $V:ident) => (
-		let v = $V::indices().map(|i| (2*i + 1) as i32);
-		let a: i32 = 3;
-		let va = a*v;
-		for i in 0..$N {
-			assert_eq!(va[i], a*v[i]);
-		}
-	)
-}
-
-#[test]
-fn scal_mul_rev() {
-	vec_mul_scal_rev_test!(2, Vector2);
-	vec_mul_scal_rev_test!(3, Vector3);
-	vec_mul_scal_rev_test!(4, Vector4);
 }
 
 macro_rules! op_add_assign { ($a:expr, $b:expr) => ({ $a += $b }) }
@@ -331,35 +295,30 @@ macro_rules! vec_op_vec_assign_test {
 		assert_eq!(vc, $op!(va, vb));
 	)
 }
-
 #[test]
 fn vec_add_assign() {
 	vec_op_vec_assign_test!(2, Vector2, op_add_assign, op_add);
 	vec_op_vec_assign_test!(3, Vector3, op_add_assign, op_add);
 	vec_op_vec_assign_test!(4, Vector4, op_add_assign, op_add);
 }
-
 #[test]
 fn vec_sub_assign() {
 	vec_op_vec_assign_test!(2, Vector2, op_sub_assign, op_sub);
 	vec_op_vec_assign_test!(3, Vector3, op_sub_assign, op_sub);
 	vec_op_vec_assign_test!(4, Vector4, op_sub_assign, op_sub);
 }
-
 #[test]
 fn vec_mul_assign() {
 	vec_op_vec_assign_test!(2, Vector2, op_mul_assign, op_mul);
 	vec_op_vec_assign_test!(3, Vector3, op_mul_assign, op_mul);
 	vec_op_vec_assign_test!(4, Vector4, op_mul_assign, op_mul);
 }
-
 #[test]
 fn vec_div_assign() {
 	vec_op_vec_assign_test!(2, Vector2, op_div_assign, op_div);
 	vec_op_vec_assign_test!(3, Vector3, op_div_assign, op_div);
 	vec_op_vec_assign_test!(4, Vector4, op_div_assign, op_div);
 }
-
 #[test]
 fn vec_rem_assign() {
 	vec_op_vec_assign_test!(2, Vector2, op_rem_assign, op_rem);
@@ -376,28 +335,24 @@ macro_rules! vec_op_scal_assign_test {
 		assert_eq!(va, $op!(v, a));
 	)
 }
-
 #[test]
 fn scal_mul_assign() {
 	vec_op_scal_assign_test!(2, Vector2, op_mul_assign, op_mul);
 	vec_op_scal_assign_test!(3, Vector3, op_mul_assign, op_mul);
 	vec_op_scal_assign_test!(4, Vector4, op_mul_assign, op_mul);
 }
-
 #[test]
 fn scal_div_assign() {
 	vec_op_scal_assign_test!(2, Vector2, op_div_assign, op_div);
 	vec_op_scal_assign_test!(3, Vector3, op_div_assign, op_div);
 	vec_op_scal_assign_test!(4, Vector4, op_div_assign, op_div);
 }
-
 #[test]
 fn scal_rem_assign() {
 	vec_op_scal_assign_test!(2, Vector2, op_rem_assign, op_rem);
 	vec_op_scal_assign_test!(3, Vector3, op_rem_assign, op_rem);
 	vec_op_scal_assign_test!(4, Vector4, op_rem_assign, op_rem);
 }
-
 #[test]
 fn div_mod_floor() {
 	assert_eq!(
@@ -414,7 +369,6 @@ macro_rules! vec_dot_test {
 		assert_eq!(c, ($N*($N + 1))/2);
 	)
 }
-
 #[test]
 fn dot() {
 	vec_dot_test!(2, Vector2);
@@ -429,7 +383,6 @@ macro_rules! vec_norm_test {
 		assert!($V::indices().map(|i| (i + 1) as f64).normalize().length() - 1.0 < 1e-8);
 	)
 }
-
 #[test]
 fn norm() {
 	vec_norm_test!(2, Vector2);
@@ -447,7 +400,6 @@ macro_rules! vec_zero_test {
 		assert!(!nz.is_zero());
 	)
 }
-
 #[test]
 fn zero() {
 	vec_zero_test!(2, Vector2);
@@ -464,7 +416,6 @@ macro_rules! vec_bool_not_test {
 		}
 	)
 }
-
 #[test]
 fn bool_not() {
 	vec_bool_not_test!(2, Vector2);
@@ -480,7 +431,6 @@ macro_rules! vec_bool_any_test {
 		assert!(v.any());
 	)
 }
-
 #[test]
 fn bool_any() {
 	vec_bool_any_test!(2, Vector2);
@@ -496,7 +446,6 @@ macro_rules! vec_bool_all_test {
 		assert!(!v.all());
 	)
 }
-
 #[test]
 fn bool_all() {
 	vec_bool_all_test!(2, Vector2);
@@ -520,7 +469,6 @@ macro_rules! vec_veq_test {
 		}
 	)
 }
-
 #[test]
 fn vec_eq() {
 	vec_veq_test!(2, Vector2);
@@ -554,14 +502,12 @@ macro_rules! vec_vcmp_test {
 		}
 	)
 }
-
 #[test]
 fn vec_vcmp() {
 	vec_vcmp_test!(2, Vector2);
 	vec_vcmp_test!(3, Vector3);
 	vec_vcmp_test!(4, Vector4);
 }
-
 #[test]
 fn cross() {
 	let va = Vector3::<i32>::from([1, 0, 0]);
