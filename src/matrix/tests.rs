@@ -665,7 +665,7 @@ fn mul_mm() {
 	mat_mul_mm_test!(4, 4, 3, Matrix4x4, Matrix4x3, Matrix4x3);
 	mat_mul_mm_test!(4, 4, 4, Matrix4x4, Matrix4x4, Matrix4x4);
 }
-/*
+
 macro_rules! mat_one_test {
 	($W:ident, $N:expr) => (
 		let o = $W::<i32>::one();
@@ -687,7 +687,7 @@ fn det() {
 	let m = Matrix2x2::<i32>::from([11, 12, 21, 22]);
 	assert_eq!(m.det(), 11*22 - 12*21);
 
-	let m = Mat3::<i32>::from([11, 12, 13, 21, 22, 23, 31, 32, 33]);
+	let m = Matrix3x3::<i32>::from([11, 12, 13, 21, 22, 23, 31, 32, 33]);
 	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
 }
 #[test]
@@ -697,4 +697,3 @@ fn inverse() {
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }
-*/

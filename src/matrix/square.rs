@@ -1,124 +1,97 @@
+use crate::matrix::*;
 
-macro_rules! mat_one {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + One + Zero {
-			pub fn one() -> Self {
-				$V::from_map(|i, j| if i == j { T::one() } else { T::zero() })
-			}
+
+macro_rules! matrix_one { ($N:expr, $W:ident) => (
+	impl<T> One for $W<T> where T: One + Zero {
+		/// Create identity matrix.
+		fn one() -> Self {
+			$W::indices().map(|(i, j)| if i == j { T::one() } else { T::zero() })
 		}
+	}
+) }
+matrix_one!(2, Matrix2x2);
+matrix_one!(3, Matrix3x3);
+matrix_one!(4, Matrix4x4);
 
-		impl<T> One for $V<T> where T: Copy + Num + One + Zero {
-			fn one() -> Self {
-				$V::one()
-			}
+macro_rules! matrix_submatrix { ($N:expr, $W:ident, $V:ident) => (
+	impl<T> $W<T> where T: Clone {
+		/// Take submatrix from original matrix.
+		pub fn submatrix(&self, y: usize, x: usize) -> $V<T> {
+			$V::indices().map(|(i, j)| self[(i + (i >= y) as usize, j + (j >= x) as usize)].clone())
 		}
-	)
-}
-
-mat_one!(Mat2x2, 2);
-mat_one!(Mat3x3, 3);
-mat_one!(Mat4x4, 4);
-
-macro_rules! mat_submatrix {
-	($Vs:ident, $Vr:ident, $N:expr) => (
-		impl<T> $Vs<T> where T: Copy {
-			pub fn submatrix(self, x: usize, y: usize) -> $Vr<T> {
-				$Vr::from_map(|i, j| self[(i + (i >= x) as usize, j + (j >= y) as usize)])
-			}
-		}
-	)
-}
-
-impl<T> Mat2x2<T> where T: Copy {
-	pub fn submatrix(self, x:usize, y:usize) -> T {
-		self[(1 - x, 1 - y)]
+	}
+) }
+matrix_submatrix!(4, Matrix4x4, Matrix3x3);
+matrix_submatrix!(3, Matrix3x3, Matrix2x2);
+impl<T> Matrix2x2<T> where T: Clone {
+	/// Take submatrix from original matrix.
+	pub fn submatrix(&self, y: usize, x: usize) -> T {
+		self[(1 - y, 1 - x)].clone()
 	}
 }
 
-mat_submatrix!(Mat4x4, Mat3x3, 4);
-mat_submatrix!(Mat3x3, Mat2x2, 3);
-
-macro_rules! mat_cofactor {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Num + Signed {
-			pub fn cofactor(self, x: usize, y: usize) -> T {
-				(if (x + y) % 2 == 0 { T::one() } else { -T::one() })*self.submatrix(x,y).det()
-			}
+macro_rules! matrix_cofactor { ($N:expr, $W:ident) => (
+	impl<T> $W<T> where T: Signed + Clone {
+		/// Find a cofactor of the matrix.
+		pub fn cofactor(&self, y: usize, x: usize) -> T {
+			(if (x + y) % 2 == 0 {
+				T::one()
+			} else {
+				-T::one()
+			}) * self.submatrix(y, x).det()
 		}
-	)
-}
-
-impl<T> Mat2x2<T> where T: Copy + Num + Signed {
-	pub fn cofactor(self, x: usize, y: usize) -> T {
-		(if (x + y) % 2 == 0 { T::one() } else { -T::one() })*self.submatrix(x,y)
+	}
+) }
+matrix_cofactor!(4, Matrix4x4);
+matrix_cofactor!(3, Matrix3x3);
+impl<T> Matrix2x2<T> where T: Signed + Clone {
+	/// Find a cofactor of the matrix.
+	pub fn cofactor(&self, y: usize, x: usize) -> T {
+		(if (x + y) % 2 == 0 { T::one() } else { -T::one() }) * self.submatrix(y, x)
 	}
 }
 
-mat_cofactor!(Mat4x4, 4);
-mat_cofactor!(Mat3x3, 3);
-
-/// Determinant
-macro_rules! mat_det {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Num + Signed {
-			pub fn det(self) -> T {
-				let mut tmp = T::zero();
-				let j = 0;
-				for i in 0..$N {
-					tmp = tmp + self[(i, j)]*self.cofactor(i, j);
-				}
-				tmp
-			}
+macro_rules! matrix_det { ($N:expr, $W:ident) => (
+	impl<T> $W<T> where T: Signed + Clone {
+		/// Find a determinant of the matrix.
+		pub fn det(&self) -> T {
+			let i = 0;
+			self.row(i).enumerate()
+			.map(|(j, x)| x * self.cofactor(i, j))
+			.sum()
 		}
-	)
-}
-
-impl<T> Mat2x2<T> where T: Copy + Num + Signed {
-	pub fn det(self) -> T {
-		self[(0, 0)]*self[(1, 1)] - self[(1, 0)]*self[(0, 1)]
+	}
+) }
+matrix_det!(4, Matrix4x4);
+matrix_det!(3, Matrix3x3);
+impl<T> Matrix2x2<T> where T: Signed + Clone {
+	/// Find a determinant of the matrix.
+	pub fn det(&self) -> T {
+		self[(0, 0)].clone()*self[(1, 1)].clone() -
+		self[(0, 1)].clone()*self[(1, 0)].clone()
 	}
 }
 
-mat_det!(Mat4x4, 4);
-mat_det!(Mat3x3, 3);
-
-/// Adjugate matrix
-macro_rules! mat_adj {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Num + Signed {
-			pub fn adj(self) -> $V<T> {
-				$V::from_map(|i, j| self.cofactor(j, i))
-			}
+macro_rules! matrix_adj { ($N:expr, $W:ident) => (
+	impl<T> $W<T> where T: Signed + Clone {
+		/// Find an adjugate matrix.
+		pub fn adj(&self) -> $W<T> {
+			$W::indices().map(|(i, j)| self.cofactor(j, i))
 		}
-	)
-}
+	}
+) }
+matrix_adj!(4, Matrix4x4);
+matrix_adj!(3, Matrix3x3);
+matrix_adj!(2, Matrix2x2);
 
-mat_adj!(Mat4x4, 4);
-mat_adj!(Mat3x3, 3);
-mat_adj!(Mat2x2, 2);
-
-/// Inverse matrix
-macro_rules! mat_inverse {
-	($V:ident, $N:expr) => (
-		impl<T> $V<T> where T: Copy + Num + Signed {
-			pub fn inverse(self) -> $V<T> {
-				self.adj()/self.det()
-			}
+macro_rules! matrix_inverse { ($N:expr, $W:ident) => (
+	impl<T> $W<T> where T: Signed + Clone {
+		/// Find an inverse matrix.
+		pub fn inverse(&self) -> $W<T> {
+			self.adj() / self.det()
 		}
-	)
-}
-
-mat_inverse!(Mat4x4, 4);
-mat_inverse!(Mat3x3, 3);
-mat_inverse!(Mat2x2, 2);
-
-macro_rules! mat_mul_scal_rev {
-	($V:ident, $T:ident) => (
-		impl Mul<$V<$T>> for $T {
-			type Output = $V<$T>;
-			fn mul(self, a: $V<$T>) -> Self::Output {
-				a*self
-			}
-		}
-	)
-}
+	}
+) }
+matrix_inverse!(4, Matrix4x4);
+matrix_inverse!(3, Matrix3x3);
+matrix_inverse!(2, Matrix2x2);

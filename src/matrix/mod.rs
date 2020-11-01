@@ -14,19 +14,17 @@ pub use transpose::*;
 mod product;
 pub use product::*;
 
-//#[macro_use]
-//mod square;
-//pub use square::*;
+#[macro_use]
+mod square;
+pub use square::*;
 
 #[cfg(test)]
 mod tests;
 
 
 use core::{
-    mem::{self, MaybeUninit},
-    ptr,
-};
-use core::{
+	mem::{self, MaybeUninit},
+	ptr,
 	convert::{TryFrom, TryInto},
 	ops::{
 		Index, IndexMut,
@@ -41,9 +39,9 @@ use core::{
 	slice,
 	fmt::{Display, Formatter, Result as FmtResult},
 };
-use num_traits::{Zero, Float};
+use num_traits::{Zero, One, Signed, Float};
 use num_integer::{self as nint, Integer};
-use crate::{traits::*, array::*, vector::*};
+use crate::{array::*, vector::*};
 
 pub use crate::traits::{Dot, Outer};
 
@@ -110,5 +108,3 @@ matrix_dot!(4, 3, 4, Matrix4x3, Matrix3x4, Matrix4x4);
 matrix_dot!(4, 4, 2, Matrix4x4, Matrix4x2, Matrix4x2);
 matrix_dot!(4, 4, 3, Matrix4x4, Matrix4x3, Matrix4x3);
 matrix_dot!(4, 4, 4, Matrix4x4, Matrix4x4, Matrix4x4);
-
-//matrix_square!(2, 2, Matrix2x2);

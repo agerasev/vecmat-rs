@@ -155,6 +155,10 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $A:ident) => (
 		pub fn zip<U>(self, other: $V<U>) -> $V<(T, U)> {
 			self.data.zip_ext(other.data).into()
 		}
+		/// Enumerate vector elements.
+		pub fn enumerate(self) -> $V<(usize, T)> {
+			$V::indices().zip(self)
+		}
 	}
 	impl<T, U> $V<(T, U)> {
 		/// Unzip vector of tuples into two vectors.
