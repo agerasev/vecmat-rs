@@ -25,7 +25,7 @@ mod tests;
 use core::{
 	mem::{self, MaybeUninit},
 	ptr,
-	convert::{TryFrom, TryInto},
+	convert::{TryFrom},
 	ops::{
 		Index, IndexMut,
 		Neg, Add, Sub, Mul, Div, Rem,
@@ -35,41 +35,40 @@ use core::{
 	},
 	cmp::{PartialOrd},
 	iter::{IntoIterator},
-	array::{TryFromSliceError},
 	slice,
 	fmt::{Display, Formatter, Result as FmtResult},
 };
 use num_traits::{Zero, One, Signed, Float};
 use num_integer::{self as nint, Integer};
-use crate::{traits::*, array::*, vector::*};
+use crate::{traits::*, vector::*};
 
 pub use crate::traits::{Dot, Outer};
 
 
-macro_rules! matrix_all { ($M:expr, $N:expr, $V:ident, $A:ident) => (
-	matrix_base!($M, $N, $V, $A);
-	matrix_ops!($M, $N, $V);
+macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
+	matrix_base!($M, $N, $W, $V, $U, $GI);
+	matrix_ops!($M, $N, $W);
 ) }
 
-matrix_all!(2, 2, Matrix2x2, Array4Ext);
-matrix_all!(2, 3, Matrix2x3, Array6Ext);
-matrix_all!(2, 4, Matrix2x4, Array8Ext);
-matrix_all!(3, 2, Matrix3x2, Array6Ext);
-matrix_all!(3, 3, Matrix3x3, Array9Ext);
-matrix_all!(3, 4, Matrix3x4, Array12Ext);
-matrix_all!(4, 2, Matrix4x2, Array8Ext);
-matrix_all!(4, 3, Matrix4x3, Array12Ext);
-matrix_all!(4, 4, Matrix4x4, Array16Ext);
+matrix_all!(2, 2, Matrix2x2, Vector2, Vector2, GroupIter2);
+matrix_all!(2, 3, Matrix2x3, Vector2, Vector3, GroupIter3);
+matrix_all!(2, 4, Matrix2x4, Vector2, Vector4, GroupIter4);
+matrix_all!(3, 2, Matrix3x2, Vector3, Vector2, GroupIter2);
+matrix_all!(3, 3, Matrix3x3, Vector3, Vector3, GroupIter3);
+matrix_all!(3, 4, Matrix3x4, Vector3, Vector4, GroupIter4);
+matrix_all!(4, 2, Matrix4x2, Vector4, Vector2, GroupIter2);
+matrix_all!(4, 3, Matrix4x3, Vector4, Vector3, GroupIter3);
+matrix_all!(4, 4, Matrix4x4, Vector4, Vector4, GroupIter4);
 
-matrix_transpose!(2, 2, Matrix2x2, Matrix2x2);
-matrix_transpose!(2, 3, Matrix2x3, Matrix3x2);
-matrix_transpose!(2, 4, Matrix2x4, Matrix4x2);
-matrix_transpose!(3, 2, Matrix3x2, Matrix2x3);
-matrix_transpose!(3, 3, Matrix3x3, Matrix3x3);
-matrix_transpose!(3, 4, Matrix3x4, Matrix4x3);
-matrix_transpose!(4, 2, Matrix4x2, Matrix2x4);
-matrix_transpose!(4, 3, Matrix4x3, Matrix3x4);
-matrix_transpose!(4, 4, Matrix4x4, Matrix4x4);
+matrix_transpose!(2, 2, Matrix2x2, Matrix2x2, Vector2, Vector2);
+matrix_transpose!(2, 3, Matrix2x3, Matrix3x2, Vector2, Vector3);
+matrix_transpose!(2, 4, Matrix2x4, Matrix4x2, Vector2, Vector4);
+matrix_transpose!(3, 2, Matrix3x2, Matrix2x3, Vector3, Vector2);
+matrix_transpose!(3, 3, Matrix3x3, Matrix3x3, Vector3, Vector3);
+matrix_transpose!(3, 4, Matrix3x4, Matrix4x3, Vector3, Vector4);
+matrix_transpose!(4, 2, Matrix4x2, Matrix2x4, Vector4, Vector2);
+matrix_transpose!(4, 3, Matrix4x3, Matrix3x4, Vector4, Vector3);
+matrix_transpose!(4, 4, Matrix4x4, Matrix4x4, Vector4, Vector4);
 
 matrix_product_vec!(2, 2, Matrix2x2, Vector2, Vector2);
 matrix_product_vec!(2, 3, Matrix2x3, Vector2, Vector3);

@@ -2,12 +2,12 @@ use std::{
     rc::Rc,
     vec::Vec,
 };
-use crate::array::*;
+use crate::vector::*;
 
 
 #[test]
 fn init_drop() {
-    let a = <[_; 16]>::init_ext(|| Rc::new(()));
+    let a = <Vector16<_>>::init(|| Rc::new(()));
     let b = a.clone();
     for x in a.iter() {
         assert_eq!(Rc::strong_count(x), 2);
@@ -21,13 +21,13 @@ fn init_drop() {
 
 #[test]
 fn into_iter() {
-    let a = <[_; 16]>::init_ext(|| Rc::new(()));
+    let a = <Vector16<_>>::init(|| Rc::new(()));
     let b = a.clone();
     for x in a.iter() {
         assert_eq!(Rc::strong_count(x), 2);
     }
 
-    let mut c = b.into_iter_ext().skip(8);
+    let mut c = b.into_iter().skip(8);
     c.next().unwrap();
 
     for (i, x) in a.iter().enumerate() {
@@ -46,13 +46,13 @@ fn into_iter() {
 
 #[test]
 fn iter_loop() {
-    let a = <[_; 16]>::init_ext(|| Rc::new(()));
+    let a = <Vector16<_>>::init(|| Rc::new(()));
     let b = a.clone();
     for x in a.iter() {
         assert_eq!(Rc::strong_count(x), 2);
     }
 
-    let mut c = b.into_iter_ext();
+    let mut c = b.into_iter();
     for x in &mut c {
         assert_eq!(Rc::strong_count(&x), 2);
     }
@@ -64,9 +64,9 @@ fn iter_loop() {
 }
 
 #[test]
-fn from_iter() {
+fn try_from_iter() {
     let v = (0..16).map(|i| Rc::new(i)).collect::<Vec<_>>();
-    let a = <[_; 16]>::from_iter_ext(&mut v.iter().cloned()).unwrap();
+    let a = <Vector16<_>>::try_from_iter(&mut v.iter().cloned()).unwrap();
 
     for (i, x) in v.iter().enumerate() {
         assert_eq!(Rc::strong_count(x), 2);
@@ -74,7 +74,7 @@ fn from_iter() {
     }
     mem::drop(a);
 
-    assert!(<[_; 16]>::from_iter_ext(&mut v.iter().cloned().take(8)).is_none());
+    assert!(<Vector16<_>>::try_from_iter(&mut v.iter().cloned().take(8)).is_err());
     for x in v.iter() {
         assert_eq!(Rc::strong_count(x), 1);
     }
@@ -82,11 +82,11 @@ fn from_iter() {
 
 #[test]
 fn for_each() {
-    let a = <[_; 16]>::from_iter_ext(&mut (0..16).map(|i| Rc::new(i))).unwrap();
+    let a = <Vector16<_>>::try_from_iter(&mut (0..16).map(|i| Rc::new(i))).unwrap();
     let b = a.clone();
 
     let mut i = 0;
-    b.for_each_ext(|x| {
+    b.for_each(|x| {
         assert_eq!(Rc::strong_count(&x), 2);
         assert_eq!(*x, i);
         i += 1;
@@ -99,20 +99,20 @@ fn for_each() {
 
 #[test]
 fn map() {
-    let a = <[usize; 16]>::from_iter_ext(&mut (0..16)).unwrap();
+    let a = <Vector16<usize>>::try_from_iter(&mut (0..16)).unwrap();
 
-    for (i, x) in a.map_ext(|x| 15 - x).iter().enumerate() {
+    for (i, x) in a.map(|x| 15 - x).iter().enumerate() {
         assert_eq!(15 - i, *x);
     }
 }
 
 #[test]
 fn zip() {
-    let a = <[i32; 16]>::from_iter_ext(&mut (0..16)).unwrap();
-    let b = <[i8; 16]>::from_iter_ext(&mut (-16..0)).unwrap();
-    let c = a.clone().zip_ext(b.clone());
+    let a = <Vector16<i32>>::try_from_iter(&mut (0..16)).unwrap();
+    let b = <Vector16<i8>>::try_from_iter(&mut (-16..0)).unwrap();
+    let c = a.clone().zip(b.clone());
 
-    for ((x, y), (a, b)) in c.into_iter_ext().zip(a.iter().zip(b.iter())) {
+    for ((x, y), (a, b)) in c.into_iter().zip(a.iter().zip(b.iter())) {
         assert_eq!(x, *a);
         assert_eq!(y, *b);
     }
@@ -120,10 +120,10 @@ fn zip() {
 
 #[test]
 fn unzip() {
-    let c = <[_; 16]>::from_iter_ext(&mut (0i32..16).zip(-16..0i8)).unwrap();
-    let (a, b) = c.clone().unzip_ext();
+    let c = <Vector16<_>>::try_from_iter(&mut (0i32..16).zip(-16..0i8)).unwrap();
+    let (a, b) = c.clone().unzip();
 
-    for ((x, y), (a, b)) in c.into_iter_ext().zip(a.iter().zip(b.iter())) {
+    for ((x, y), (a, b)) in c.into_iter().zip(a.iter().zip(b.iter())) {
         assert_eq!(x, *a);
         assert_eq!(y, *b);
     }

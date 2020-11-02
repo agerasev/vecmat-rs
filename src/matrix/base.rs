@@ -1,16 +1,16 @@
 
-macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident) => (
+macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
 	/// Matrix with fixed dimensions.
 	#[repr(transparent)]
 	#[derive(Clone, Copy, Debug, PartialEq)]
 	pub struct $W<T> {
-		data: [T; $M*$N],
+		data: $V<$U<T>>,
 	}
 
 	impl<T> $W<T> {
 		/// Initialize matrix by closure.
-		pub fn init<F: FnMut() -> T>(f: F) -> Self {
-			Self { data: <[T; $M*$N]>::init_ext(f) }
+		pub fn init<F: FnMut() -> T>(mut f: F) -> Self {
+			Self { data: $V::init(|| $U::init(&mut f)) }
 		}
 	}
 	impl<T> Default for $W<T> where T: Default {
@@ -36,53 +36,92 @@ macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident) => (
 		}
 	}
 
-	impl<T> From<[T; $M*$N]> for $W<T> {
-		fn from(a: [T; $M*$N]) -> Self {
+	impl<T> From<$V<$U<T>>> for $W<T> {
+		fn from(a: $V<$U<T>>) -> Self {
 			Self { data: a }
 		}
 	}
-	impl<T> From<&[T; $M*$N]> for $W<T> where T: Clone {
-		fn from(ar: &[T; $M*$N]) -> Self {
-			Self { data: ar.clone() }
+	impl<T> From<&$V<$U<T>>> for $W<T> where T: Clone {
+		fn from(ar: &$V<$U<T>>) -> Self {
+			$W::from(ar.clone())
+		}
+	}
+	impl<T> From<[[T; $N]; $M]> for $W<T> {
+		fn from(a: [[T; $N]; $M]) -> Self {
+			$W::from($V::from(a).map(|b| $U::from(b)))
+		}
+	}
+	impl<T> From<&[[T; $N]; $M]> for $W<T> where T: Clone {
+		fn from(ar: &[[T; $N]; $M]) -> Self {
+			$W::from(ar.clone())
 		}
 	}
 
-	impl<T> Into<[T; $M*$N]> for $W<T> {
-		fn into(self) -> [T; $M*$N] {
+	impl<T> Into<$V<$U<T>>> for $W<T> {
+		fn into(self) -> $V<$U<T>> {
 			self.data
 		}
 	}
-	impl<'a, T> Into<&'a [T; $M*$N]> for &'a $W<T> {
-		fn into(self) -> &'a [T; $M*$N] {
-			&self.data
-		}
-	}
-	impl<'a, T> Into<&'a mut [T; $M*$N]> for &'a mut $W<T> {
-		fn into(self) -> &'a mut [T; $M*$N] {
-			&mut self.data
+	impl<T> Into<[[T; $N]; $M]> for $W<T> {
+		fn into(self) -> [[T; $N]; $M] {
+			self.data.map(|a| a.into()).into()
 		}
 	}
 
-	impl<T> AsRef<[T; $M*$N]> for $W<T> {
-		fn as_ref(&self) -> &[T; $M*$N] {
+	impl<T> AsRef<$V<$U<T>>> for $W<T> {
+		fn as_ref(&self) -> &$V<$U<T>> {
 			&self.data
 		}
 	}
-	impl<T> AsMut<[T; $M*$N]> for $W<T> {
-		fn as_mut(&mut self) -> &mut [T; $M*$N] {
+	impl<T> AsMut<$V<$U<T>>> for $W<T> {
+		fn as_mut(&mut self) -> &mut $V<$U<T>> {
 			&mut self.data
+		}
+	}
+	impl<T> $W<T> {
+		pub fn as_array(&self) -> &[[T; $N]; $M] {
+			unsafe { (self as *const _ as *const [[T; $N]; $M]).as_ref().unwrap() }
+		}
+		pub fn as_mut_array(&mut self) -> &mut [[T; $N]; $M] {
+			unsafe { (self as *mut _ as *mut [[T; $N]; $M]).as_mut().unwrap() }
+		}
+	}
+
+	impl<'a, T> Into<&'a $V<$U<T>>> for &'a $W<T> {
+		fn into(self) -> &'a $V<$U<T>> {
+			self.as_ref()
+		}
+	}
+	impl<'a, T> Into<&'a mut $V<$U<T>>> for &'a mut $W<T> {
+		fn into(self) -> &'a mut $V<$U<T>> {
+			self.as_mut()
+		}
+	}
+	impl<'a, T> Into<&'a [[T; $N]; $M]> for &'a $W<T> {
+		fn into(self) -> &'a [[T; $N]; $M] {
+			self.as_array()
+		}
+	}
+	impl<'a, T> Into<&'a mut [[T; $N]; $M]> for &'a mut $W<T> {
+		fn into(self) -> &'a mut [[T; $N]; $M] {
+			self.as_mut_array()
 		}
 	}
 
 	impl<'a, T> TryFrom<&'a [T]> for $W<T> where T: Copy {
-		type Error = TryFromSliceError;
-		fn try_from(s: &'a [T]) -> Result<Self, Self::Error> {
-			s.try_into().map(|a| Self { data: a })
+		type Error = ();
+		fn try_from(s: &'a [T]) -> Result<Self, ()> {
+			if s.len() == $M*$N {
+				Ok($W::try_from_iter(s.iter().cloned()).unwrap())
+			} else {
+				Err(())
+			}
 		}
 	}
 	impl<T> $W<T> {
-		fn try_from_iter<I>(mut i: I) -> Result<Self, ()> where I: Iterator<Item=T> {
-			<[T; $M*$N]>::from_iter_ext(&mut i).map(|a| a.into()).ok_or(())
+		fn try_from_iter<I>(i: I) -> Result<Self, ()> where I: Iterator<Item=T> {
+			<$V<$U<T>>>::try_from_iter(&mut $GI::new(i)).map(|a| a.into())
+			.map(|a| Self { data: a })
 		}
 	}
 ) }
@@ -91,49 +130,47 @@ macro_rules! matrix_index { ($M:expr, $N:expr, $W:ident) => (
 	impl<T> Index<(usize, usize)> for $W<T> {
 		type Output = T;
 		fn index(&self, (j, i): (usize, usize)) -> &T {
-			assert!(j < $M && i < $N);
-			unsafe { self.data.get_unchecked(j*$N + i) }
+			&self.data[j][i]
 		}
 	}
 	impl<T> IndexMut<(usize, usize)> for $W<T> {
 		fn index_mut(&mut self, (j, i): (usize, usize)) -> &mut T {
-			assert!(j < $M && i < $N);
-			unsafe { self.data.get_unchecked_mut(j*$N + i) }
+			&mut self.data[j][i]
 		}
 	}
 ) }
 
-macro_rules! matrix_iter { ($M:expr, $N:expr, $W:ident, $A:ident) => (
+macro_rules! matrix_iter { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
 	impl <T> $W<T> {
 		/// Returns iterator over matrix element refrences.
 		pub fn iter(&self) -> impl Iterator<Item=&T> {
-			self.data.iter()
+			FlatIter::new(self.data.iter()).unwrap()
 		}
 		/// Returns iterator over matrix element mutable refrences.
 		pub fn iter_mut(&mut self) -> impl Iterator<Item=&mut T> {
-			self.data.iter_mut()
+			FlatIter::new(self.data.iter_mut()).unwrap()
 		}
 	}
 
 	impl<T> IntoIterator for $W<T> {
 		type Item = T;
-		type IntoIter = <[T; $M*$N] as $A<T>>::IntoIter_;
+		type IntoIter = FlatIter<<$V<$U<T>> as IntoIterator>::IntoIter, $U<T>, <$U<T> as IntoIterator>::IntoIter>;
 		fn into_iter(self) -> Self::IntoIter {
-			self.data.into_iter_ext()
+			Self::IntoIter::new(self.data.into_iter()).unwrap()
 		}
 	}
 	impl<'a, T> IntoIterator for &'a $W<T> {
 		type Item = &'a T;
-		type IntoIter = slice::Iter<'a, T>;
+		type IntoIter = FlatIter<slice::Iter<'a, $U<T>>, &'a $U<T>, slice::Iter<'a, T>>;
 		fn into_iter(self) -> Self::IntoIter {
-			self.data.iter()
+			Self::IntoIter::new(self.data.iter()).unwrap()
 		}
 	}
 	impl<'a, T> IntoIterator for &'a mut $W<T> {
 		type Item = &'a mut T;
-		type IntoIter = slice::IterMut<'a, T>;
+		type IntoIter = FlatIter<slice::IterMut<'a, $U<T>>, &'a mut $U<T>, slice::IterMut<'a, T>>;
 		fn into_iter(self) -> Self::IntoIter {
-			self.data.iter_mut()
+			Self::IntoIter::new(self.data.iter_mut()).unwrap()
 		}
 	}
 
@@ -146,34 +183,48 @@ macro_rules! matrix_iter { ($M:expr, $N:expr, $W:ident, $A:ident) => (
 
 	impl<T> $W<T> {
 		/// Call closure for each element of the matrix passing it by value.
-		pub fn for_each<F: FnMut(T)>(self, f: F) {
-			self.data.for_each_ext(f)
+		pub fn for_each<F: FnMut(T)>(self, mut f: F) {
+			self.data.for_each(|a| a.for_each(&mut f))
 		}
 		/// Map matrix elements.
-		pub fn map<U, F: FnMut(T) -> U>(self, f: F) -> $W<U> {
-			self.data.map_ext(f).into()
+		pub fn map<U, F: FnMut(T) -> U>(self, mut f: F) -> $W<U> {
+			self.data.map(|a| a.map(&mut f)).into()
 		}
 		/// Zip two matrices into one.
 		pub fn zip<U>(self, other: $W<U>) -> $W<(T, U)> {
-			self.data.zip_ext(other.data).into()
+			self.data.zip(other.data).map(|(a, b)| a.zip(b)).into()
 		}
 	}
 	impl<T, U> $W<(T, U)> {
 		/// Unzip matrix of tuples into two matrices.
 		pub fn unzip(self) -> ($W<T>, $W<U>) {
-			let z = self.data.unzip_ext();
+			let z = self.data.map(|a| a.unzip()).unzip();
 			(z.0.into(), z.1.into())
 		}
 	}
 	impl<T> $W<T> {
-		pub fn fold<S, F: FnMut(S, T) -> S>(self, s: S, f: F) -> S {
-			self.data.fold_ext(s, f)
+		pub fn fold<S, F: Fn(S, T) -> S>(self, s: S, mut f: F) -> S {
+			self.data.fold(s, |t, a| a.fold(t, &mut f))
 		}
-        pub fn fold_first<F: FnMut(T, T) -> T>(self, f: F) -> T {
-			self.data.fold_first_ext(f)
+        pub fn fold_first<F: FnMut(T, T) -> T>(self, mut f: F) -> T {
+			let mut iter = self.data.into_iter();
+			let s = iter.next().unwrap().fold_first(&mut f);
+			iter.fold(s, |t, a| a.fold(t, &mut f))
 		}
-        pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, s: S, f: F) -> $W<U> {
-			self.data.scan_ext(s, f).into()
+        pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, mut s: S, mut f: F) -> $W<U> {
+			self.data.scan(&mut s, |r, a| a.scan(r, |r, x| f(*r, x))).into()
+		}
+	}
+
+	impl<T> $W<T> {
+		pub fn into_inner(self) -> $V<$U<T>> {
+			self.into()
+		}
+		pub unsafe fn get_unchecked(&self, i: usize, j: usize) -> &T {
+			self.as_ref().get_unchecked(i).get_unchecked(j)
+		}
+		pub unsafe fn get_unchecked_mut(&mut self, i: usize, j: usize) -> &mut T {
+			self.as_mut().get_unchecked_mut(i).get_unchecked_mut(j)
 		}
 	}
 ) }
@@ -196,9 +247,9 @@ macro_rules! matrix_display { ($M:expr, $N:expr, $W:ident) => (
 	}
 ) }
 
-macro_rules! matrix_base { ($M:expr, $N:expr, $W:ident, $A:ident) => (
-	matrix_init!($M, $N, $W);
+macro_rules! matrix_base { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
+	matrix_init!($M, $N, $W, $V, $U, $GI);
 	matrix_index!($M, $N, $W);
-	matrix_iter!($M, $N, $W, $A);
+	matrix_iter!($M, $N, $W, $V, $U);
 	matrix_display!($M, $N, $W);
 ) }

@@ -11,9 +11,17 @@ macro_rules! matrix_outer { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => 
 ) }
 
 macro_rules! matrix_row_col { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
+    impl<T> $W<T> {
+        pub fn row_ref(&self, i: usize) -> &$U<T> {
+            &self.as_ref()[i]
+        }
+        pub fn row_mut(&mut self, i: usize) -> &mut $U<T> {
+            &mut self.as_mut()[i]
+        }
+    }
     impl<T> $W<T> where T: Clone {
         pub fn row(&self, i: usize) -> $U<T> {
-            $U::indices().map(|j| self[(i, j)].clone())
+            self.row_ref(i).clone()
         }
         pub fn col(&self, j: usize) -> $V<T> {
             $V::indices().map(|i| self[(i, j)].clone())

@@ -1,25 +1,24 @@
 
-macro_rules! matrix_transpose { ($M:expr, $N:expr, $V:ident, $W:ident) => (
-    impl<T> $V<T> {
-        pub fn transpose(self) -> $W<T> {
-            let a: [T; $M*$N] = self.into();
-            let mut s = unsafe { ptr::read(a.as_ptr() as *const [MaybeUninit<T>; $M*$N]) };
-            mem::forget(a);
+macro_rules! matrix_transpose { ($M:expr, $N:expr, $W:ident, $R:ident, $V:ident, $U:ident) => (
+    impl<T> $W<T> {
+        pub fn transpose(self) -> $R<T> {
+            let mut s = unsafe { ptr::read(&self as *const _ as *const $W<MaybeUninit<T>>) };
+            mem::forget(self);
 
-            let mut d: [MaybeUninit<T>; $N*$M] = unsafe {
+            let mut d: $R<MaybeUninit<T>> = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
 
             for i in 0..$M {
                 for j in 0..$N {
                     unsafe { mem::swap(
-                        d.get_unchecked_mut(j*$M + i),
-                        s.get_unchecked_mut(i*$N + j),
+                        d.get_unchecked_mut(j, i),
+                        s.get_unchecked_mut(i, j),
                     ); }
                 }
             }
 
-            unsafe { ptr::read(d.as_ptr() as *const [T; $N*$M]) }.into()
+            unsafe { ptr::read(&d as *const _ as *const $R<T>) }
         }
     }
 ) }
