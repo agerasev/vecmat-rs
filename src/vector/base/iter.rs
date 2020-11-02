@@ -1,5 +1,5 @@
 
-macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident) => (
+macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	/// Iterator by values for array.
     pub struct $II<T> {
         data: [MaybeUninit<T>; $N],
@@ -45,11 +45,11 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident) => (
 
 	impl <T> $V<T> {
 		/// Returns iterator over vector element refrences.
-		pub fn iter(&self) -> impl Iterator<Item=&T> {
+		pub fn iter(&self) -> slice::Iter<'_, T> {
 			self.data.iter()
 		}
 		/// Returns iterator over vector element mutable refrences.
-		pub fn iter_mut(&mut self) -> impl Iterator<Item=&mut T> {
+		pub fn iter_mut(&mut self) -> slice::IterMut<'_, T> {
 			self.data.iter_mut()
 		}
 	}
@@ -135,4 +135,40 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident) => (
 			$V::try_from_iter(&mut self.into_iter().scan(s, |s, x| Some(f(s, x)))).unwrap()
 		}
 	}
+
+	pub struct $GI<I: Iterator> {
+        iter: I,
+    }
+    impl<I> $GI<I> where I: Iterator {
+        pub fn new(iter: I) -> Self {
+            Self { iter }
+        }
+    }
+    impl<I> Iterator for $GI<I> where I: Iterator {
+        type Item = $V<I::Item>;
+        fn next(&mut self) -> Option<Self::Item> {
+            <Self::Item>::try_from_iter(&mut self.iter).ok()
+        }
+    }
 ) }
+
+pub struct FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+	iter: I,
+	subiter: II,
+}
+impl<I, IT, II> FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+	pub fn new(mut iter: I) -> Option<Self> {
+		iter.next().map(|a| Self { iter, subiter: a.into_iter() })
+	}
+}
+impl<I, IT, II> Iterator for FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+	type Item = II::Item;
+	fn next(&mut self) -> Option<Self::Item> {
+		self.subiter.next().or_else(|| {
+			self.iter.next().and_then(|a| {
+				self.subiter = a.into_iter();
+				self.subiter.next()
+			})
+		})
+	}
+}

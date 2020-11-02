@@ -40,24 +40,24 @@ use crate::{traits::*};
 
 pub use crate::traits::Dot;
 
-macro_rules! vector_all { ($N:expr, $V:ident, $II:ident) => (
-	vector_base!($N, $V, $II);
+macro_rules! vector_all { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
+	vector_base!($N, $V, $II, $GI);
 	vector_ops!($N, $V);
 	vector_dot!($N, $V);
 ) }
 
-vector_all!(2, Vector2, IntoIter2);
-vector_all!(3, Vector3, IntoIter3);
-vector_all!(4, Vector4, IntoIter4);
-vector_all!(5, Vector5, IntoIter5);
-vector_all!(6, Vector6, IntoIter6);
-vector_all!(7, Vector7, IntoIter7);
-vector_all!(8, Vector8, IntoIter8);
-vector_all!(9, Vector9, IntoIter9);
-vector_all!(10, Vector10, IntoIter10);
-vector_all!(11, Vector11, IntoIter11);
-vector_all!(12, Vector12, IntoIter12);
-vector_all!(13, Vector13, IntoIter13);
-vector_all!(14, Vector14, IntoIter14);
-vector_all!(15, Vector15, IntoIter15);
-vector_all!(16, Vector16, IntoIter16);
+vector_all!(2, Vector2, IntoIter2, GroupIter2);
+vector_all!(3, Vector3, IntoIter3, GroupIter3);
+vector_all!(4, Vector4, IntoIter4, GroupIter4);
+vector_all!(5, Vector5, IntoIter5, GroupIter5);
+vector_all!(6, Vector6, IntoIter6, GroupIter6);
+vector_all!(7, Vector7, IntoIter7, GroupIter7);
+vector_all!(8, Vector8, IntoIter8, GroupIter8);
+vector_all!(9, Vector9, IntoIter9, GroupIter9);
+vector_all!(10, Vector10, IntoIter10, GroupIter10);
+vector_all!(11, Vector11, IntoIter11, GroupIter11);
+vector_all!(12, Vector12, IntoIter12, GroupIter12);
+vector_all!(13, Vector13, IntoIter13, GroupIter13);
+vector_all!(14, Vector14, IntoIter14, GroupIter14);
+vector_all!(15, Vector15, IntoIter15, GroupIter15);
+vector_all!(16, Vector16, IntoIter16, GroupIter16);

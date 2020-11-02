@@ -95,7 +95,7 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
         /// If iterator conatins less items than vector, then `Err` is returned.
 		///
 		/// *FIXME: Implement `TryFrom` without conflict.*
-		fn try_from_iter<I>(iter: I) -> Result<Self, ()> where I: Iterator<Item=T> {
+		pub fn try_from_iter<I>(iter: I) -> Result<Self, ()> where I: Iterator<Item=T> {
 			let mut a: [MaybeUninit<T>; $N] = unsafe {
                 MaybeUninit::uninit().assume_init()
             };

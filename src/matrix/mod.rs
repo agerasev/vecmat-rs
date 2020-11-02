@@ -45,20 +45,20 @@ use crate::{traits::*, vector::*};
 pub use crate::traits::{Dot, Outer};
 
 
-macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
-	matrix_base!($M, $N, $W, $V, $U);
+macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
+	matrix_base!($M, $N, $W, $V, $U, $GI);
 	//matrix_ops!($M, $N, $W);
 ) }
 
-matrix_all!(2, 2, Matrix2x2, Vector2, Vector2);
-//matrix_all!(2, 3, Matrix2x3, Vector2, Vector3);
-//matrix_all!(2, 4, Matrix2x4, Vector2, Vector4);
-//matrix_all!(3, 2, Matrix3x2, Vector3, Vector2);
-//matrix_all!(3, 3, Matrix3x3, Vector3, Vector3);
-//matrix_all!(3, 4, Matrix3x4, Vector3, Vector4);
-//matrix_all!(4, 2, Matrix4x2, Vector4, Vector2);
-//matrix_all!(4, 3, Matrix4x3, Vector4, Vector3);
-//matrix_all!(4, 4, Matrix4x4, Vector4, Vector4);
+matrix_all!(2, 2, Matrix2x2, Vector2, Vector2, GroupIter2);
+//matrix_all!(2, 3, Matrix2x3, Vector2, Vector3, GroupIter3);
+//matrix_all!(2, 4, Matrix2x4, Vector2, Vector4, GroupIter4);
+//matrix_all!(3, 2, Matrix3x2, Vector3, Vector2, GroupIter2);
+//matrix_all!(3, 3, Matrix3x3, Vector3, Vector3, GroupIter3);
+//matrix_all!(3, 4, Matrix3x4, Vector3, Vector4, GroupIter4);
+//matrix_all!(4, 2, Matrix4x2, Vector4, Vector2, GroupIter2);
+//matrix_all!(4, 3, Matrix4x3, Vector4, Vector3, GroupIter3);
+//matrix_all!(4, 4, Matrix4x4, Vector4, Vector4, GroupIter4);
 //
 //matrix_transpose!(2, 2, Matrix2x2, Matrix2x2);
 //matrix_transpose!(2, 3, Matrix2x3, Matrix3x2);

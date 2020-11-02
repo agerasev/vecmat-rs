@@ -24,8 +24,8 @@ macro_rules! vector_display { ($N:expr, $V:ident) => (
 ) }
 
 
-macro_rules! vector_base { ($N:expr, $V:ident, $II:ident) => (
+macro_rules! vector_base { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	vector_init!($N, $V);
-	vector_iter!($N, $V, $II);
+	vector_iter!($N, $V, $II, $GI);
 	vector_display!($N, $V);
 ) }
