@@ -141,7 +141,7 @@ macro_rules! matrix_index { ($M:expr, $N:expr, $W:ident) => (
 ) }
 
 macro_rules! matrix_iter { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
-	impl <T> $W<T> {
+	impl<T> $W<T> {
 		/// Returns iterator over matrix element refrences.
 		pub fn iter(&self) -> impl Iterator<Item=&T> {
 			FlatIter::new(self.data.iter()).unwrap()

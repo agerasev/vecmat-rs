@@ -43,7 +43,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
         }
     }
 
-	impl <T> $V<T> {
+	impl<T> $V<T> {
 		/// Returns iterator over vector element refrences.
 		pub fn iter(&self) -> slice::Iter<'_, T> {
 			self.data.iter()
@@ -104,10 +104,10 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	impl<T, U> $V<(T, U)> {
 		/// Unzip vector of tuples into two vectors.
 		pub fn unzip(self) -> ($V<T>, $V<U>) {
-			let mut a: [MaybeUninit<T>; $N] = unsafe {
+			let mut a: $V<MaybeUninit<T>> = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
-            let mut b: [MaybeUninit<U>; $N] = unsafe {
+            let mut b: $V<MaybeUninit<U>> = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
 
@@ -117,8 +117,8 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
             }
 
             unsafe { (
-                $V { data: ptr::read(&a as *const _ as *const [T; $N]) },
-                $V { data: ptr::read(&b as *const _ as *const [U; $N]) },
+                ptr::read(&a as *const _ as *const $V<T>),
+                ptr::read(&b as *const _ as *const $V<U>),
             ) }
 		}
 	}
@@ -136,10 +136,12 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 		}
 	}
 
+	/// Iterator that groups each N elements in original sequence into N-dimensional vector and yields it.
 	pub struct $GI<I: Iterator> {
         iter: I,
     }
     impl<I> $GI<I> where I: Iterator {
+		/// Create `GroupIter` from sequence.
         pub fn new(iter: I) -> Self {
             Self { iter }
         }
@@ -152,11 +154,13 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
     }
 ) }
 
+/// Iterator that iterates over flattened sequence of `IntoIterator`s.
 pub struct FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II, Item=II::Item>, II: Iterator {
 	iter: I,
 	subiter: II,
 }
 impl<I, IT, II> FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II, Item=II::Item>, II: Iterator {
+	/// Create `FlatIter` from sequence of `IntoIterator`s.
 	pub fn new(mut iter: I) -> Option<Self> {
 		iter.next().map(|a| Self { iter, subiter: a.into_iter() })
 	}
