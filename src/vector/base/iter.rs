@@ -152,16 +152,16 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
     }
 ) }
 
-pub struct FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+pub struct FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II, Item=II::Item>, II: Iterator {
 	iter: I,
 	subiter: II,
 }
-impl<I, IT, II> FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+impl<I, IT, II> FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II, Item=II::Item>, II: Iterator {
 	pub fn new(mut iter: I) -> Option<Self> {
 		iter.next().map(|a| Self { iter, subiter: a.into_iter() })
 	}
 }
-impl<I, IT, II> Iterator for FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II>, II: Iterator {
+impl<I, IT, II> Iterator for FlatIter<I, IT, II> where I: Iterator<Item=IT>, IT: IntoIterator<IntoIter=II, Item=II::Item>, II: Iterator {
 	type Item = II::Item;
 	fn next(&mut self) -> Option<Self::Item> {
 		self.subiter.next().or_else(|| {
