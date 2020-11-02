@@ -5,14 +5,14 @@ extern crate std;
 pub mod traits;
 pub use traits::*;
 
-pub mod array;
-pub use array::*;
+//pub mod array;
+//pub use array::*;
 
 pub mod vector;
 pub use vector::*;
 
-pub mod matrix;
-pub use matrix::*;
+//pub mod matrix;
+//pub use matrix::*;
 
 //pub mod map;
 //#[cfg(test)]

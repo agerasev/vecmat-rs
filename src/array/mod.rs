@@ -2,6 +2,10 @@
 mod base;
 pub use base::*;
 
+#[macro_use]
+mod iter;
+pub use iter::*;
+
 #[cfg(test)]
 mod tests;
 
@@ -32,3 +36,7 @@ array_all!(13, Array13Ext, Array13IntoIter);
 array_all!(14, Array14Ext, Array14IntoIter);
 array_all!(15, Array15Ext, Array15IntoIter);
 array_all!(16, Array16Ext, Array16IntoIter);
+
+array_iter_mod!(2, Array2Ext, Array2GroupIter, Array2FlatIter);
+array_iter_mod!(3, Array3Ext, Array3GroupIter, Array3FlatIter);
+array_iter_mod!(4, Array4Ext, Array4GroupIter, Array4FlatIter);
