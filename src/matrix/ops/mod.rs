@@ -5,7 +5,7 @@ mod base;
 mod int;
 
 #[macro_use]
-mod bool_;
+mod bit;
 
 #[macro_use]
 mod vcmp;
@@ -14,6 +14,6 @@ mod vcmp;
 macro_rules! matrix_ops { ($M:expr, $N:expr, $W:ident) => (
 	matrix_ops_base!($M, $N, $W);
 	matrix_int!($M, $N, $W);
-	matrix_bool!($M, $N, $W);
+	matrix_bit!($M, $N, $W);
 	matrix_vcmp!($M, $N, $W);
 ) }
