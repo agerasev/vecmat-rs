@@ -10,8 +10,8 @@ pub use traits::*;
 pub mod vector;
 pub use vector::*;
 
-//pub mod matrix;
-//pub use matrix::*;
+pub mod matrix;
+pub use matrix::*;
 
 //pub mod map;
 //#[cfg(test)]

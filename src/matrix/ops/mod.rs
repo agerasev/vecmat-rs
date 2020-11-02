@@ -1,19 +1,11 @@
-#[macro_use]
 mod base;
+pub use base::*;
 
-#[macro_use]
 mod int;
+pub use int::*;
 
-#[macro_use]
 mod bool_;
+pub use bool_::*;
 
-#[macro_use]
 mod vcmp;
-
-
-macro_rules! matrix_ops { ($M:expr, $N:expr, $W:ident) => (
-	matrix_ops_base!($M, $N, $W);
-	matrix_int!($M, $N, $W);
-	matrix_bool!($M, $N, $W);
-	matrix_vcmp!($M, $N, $W);
-) }
+pub use vcmp::*;

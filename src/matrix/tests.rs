@@ -1,5 +1,7 @@
-use crate::matrix::*;
-use crate::vector::*;
+use std::convert::TryFrom;
+use num_traits::{Zero, One};
+use crate::{matrix::*, vector::*};
+
 
 macro_rules! mat_new_test {
 	($M:expr, $N:expr, $W:ident) => (
