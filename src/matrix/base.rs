@@ -43,7 +43,17 @@ macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:
 	}
 	impl<T> From<&$V<$U<T>>> for $W<T> where T: Clone {
 		fn from(ar: &$V<$U<T>>) -> Self {
-			Self { data: ar.clone() }
+			$W::from(ar.clone())
+		}
+	}
+	impl<T> From<[[T; $N]; $M]> for $W<T> {
+		fn from(a: [[T; $N]; $M]) -> Self {
+			$W::from($V::from(a).map(|b| $U::from(b)))
+		}
+	}
+	impl<T> From<&[[T; $N]; $M]> for $W<T> where T: Clone {
+		fn from(ar: &[[T; $N]; $M]) -> Self {
+			$W::from(ar.clone())
 		}
 	}
 
@@ -52,14 +62,9 @@ macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:
 			self.data
 		}
 	}
-	impl<'a, T> Into<&'a $V<$U<T>>> for &'a $W<T> {
-		fn into(self) -> &'a $V<$U<T>> {
-			&self.data
-		}
-	}
-	impl<'a, T> Into<&'a mut $V<$U<T>>> for &'a mut $W<T> {
-		fn into(self) -> &'a mut $V<$U<T>> {
-			&mut self.data
+	impl<T> Into<[[T; $N]; $M]> for $W<T> {
+		fn into(self) -> [[T; $N]; $M] {
+			self.data.map(|a| a.into()).into()
 		}
 	}
 
@@ -73,11 +78,44 @@ macro_rules! matrix_init { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:
 			&mut self.data
 		}
 	}
+	impl<T> $W<T> {
+		pub fn as_array(&self) -> &[[T; $N]; $M] {
+			unsafe { (self as *const _ as *const [[T; $N]; $M]).as_ref().unwrap() }
+		}
+		pub fn as_mut_array(&mut self) -> &mut [[T; $N]; $M] {
+			unsafe { (self as *mut _ as *mut [[T; $N]; $M]).as_mut().unwrap() }
+		}
+	}
+
+	impl<'a, T> Into<&'a $V<$U<T>>> for &'a $W<T> {
+		fn into(self) -> &'a $V<$U<T>> {
+			self.as_ref()
+		}
+	}
+	impl<'a, T> Into<&'a mut $V<$U<T>>> for &'a mut $W<T> {
+		fn into(self) -> &'a mut $V<$U<T>> {
+			self.as_mut()
+		}
+	}
+	impl<'a, T> Into<&'a [[T; $N]; $M]> for &'a $W<T> {
+		fn into(self) -> &'a [[T; $N]; $M] {
+			self.as_array()
+		}
+	}
+	impl<'a, T> Into<&'a mut [[T; $N]; $M]> for &'a mut $W<T> {
+		fn into(self) -> &'a mut [[T; $N]; $M] {
+			self.as_mut_array()
+		}
+	}
 
 	impl<'a, T> TryFrom<&'a [T]> for $W<T> where T: Copy {
 		type Error = ();
 		fn try_from(s: &'a [T]) -> Result<Self, ()> {
-			$W::try_from_iter(s.iter().cloned())
+			if s.len() == $M*$N {
+				Ok($W::try_from_iter(s.iter().cloned()).unwrap())
+			} else {
+				Err(())
+			}
 		}
 	}
 	impl<T> $W<T> {
@@ -175,6 +213,18 @@ macro_rules! matrix_iter { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident) => (
 		}
         pub fn scan<S, U, F: FnMut(&mut S, T) -> U>(self, mut s: S, mut f: F) -> $W<U> {
 			self.data.scan(&mut s, |r, a| a.scan(r, |r, x| f(*r, x))).into()
+		}
+	}
+
+	impl<T> $W<T> {
+		pub fn into_inner(self) -> $V<$U<T>> {
+			self.into()
+		}
+		pub unsafe fn get_unchecked(&self, i: usize, j: usize) -> &T {
+			self.as_ref().get_unchecked(i).get_unchecked(j)
+		}
+		pub unsafe fn get_unchecked_mut(&mut self, i: usize, j: usize) -> &mut T {
+			self.as_mut().get_unchecked_mut(i).get_unchecked_mut(j)
 		}
 	}
 ) }

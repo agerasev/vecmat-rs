@@ -19,7 +19,7 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
             }
 
             // unsafe { mem::transmute::<_, [T; $N]>(a) }
-			Self { data: unsafe { ptr::read(a.as_ptr() as *const [T; $N]) } }
+			Self { data: unsafe { ptr::read(&a as *const _ as *const [T; $N]) } }
 		}
 	}
 
@@ -96,7 +96,7 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
 		///
 		/// *FIXME: Implement `TryFrom` without conflict.*
 		pub fn try_from_iter<I>(iter: I) -> Result<Self, ()> where I: Iterator<Item=T> {
-			let mut a: [MaybeUninit<T>; $N] = unsafe {
+			let mut a: $V<MaybeUninit<T>> = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
 
@@ -109,11 +109,11 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
             if pos > $N {
                 unreachable!();
             } else if pos == $N {
-                Ok(Self { data: unsafe { ptr::read(a.as_ptr() as *const [T; $N]) } })
+                Ok(unsafe { ptr::read(&a as *const _ as *const $V<T>) })
             } else {
                 // Drop loaded items
                 unsafe {
-                    for x in a.get_unchecked_mut(0..pos) {
+                    for x in a.as_mut().get_unchecked_mut(0..pos) {
                         mem::replace(x, MaybeUninit::uninit()).assume_init();
                     }
                 }
@@ -131,6 +131,24 @@ macro_rules! vector_init { ($N:expr, $V:ident) => (
 	impl<T> IndexMut<usize> for $V<T> {
 		fn index_mut(&mut self, i: usize) -> &mut T {
 			&mut self.data[i]
+		}
+	}
+
+	impl<T> $V<T> {
+		pub fn into_inner(self) -> [T; $N] {
+			self.into()
+		}
+		pub fn as_ptr(&self) -> *const T {
+			self.as_ref().as_ptr()
+		}
+		pub fn as_mut_ptr(&mut self) -> *mut T {
+			self.as_mut().as_mut_ptr()
+		}
+		pub unsafe fn get_unchecked(&self, i: usize) -> &T {
+			self.as_ref().get_unchecked(i)
+		}
+		pub unsafe fn get_unchecked_mut(&mut self, i: usize) -> &mut T {
+			self.as_mut().get_unchecked_mut(i)
 		}
 	}
 ) }

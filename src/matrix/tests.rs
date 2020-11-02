@@ -20,14 +20,18 @@ fn new() {
 }
 #[test]
 fn new_no_gen() {
-	let v = Matrix2x2::<i32>::from([1, 2, 3, 4]);
-	for i in 0..4 {
-		assert_eq!(v.as_ref()[i], i as i32 + 1);
+	let v = Matrix2x2::<i32>::from([[1, 2], [3, 4]]);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_eq!(v.as_ref()[i][j], (2*i + j + 1) as i32);
+		}
 	}
 
-	let v = Matrix2x2::<i32>::from(&[1, 2, 3, 4]);
-	for i in 0..4 {
-		assert_eq!(v.as_ref()[i], i as i32 + 1);
+	let v = Matrix2x2::<i32>::from(&[[1, 2], [3, 4]]);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_eq!(v.as_ref()[i][j], (2*i + j + 1) as i32);
+		}
 	}
 
 	let a = [1, 2, 3, 4, 5];
@@ -35,8 +39,10 @@ fn new_no_gen() {
 	let o = Matrix2x2::<i32>::try_from(&a[..4]);
 	assert!(o.is_ok());
 	let v = o.unwrap();
-	for i in 0..4 {
-		assert_eq!(v.as_ref()[i], i as i32 + 1);
+	for i in 0..2 {
+		for j in 0..2 {
+			assert_eq!(v.as_ref()[i][j], (2*i + j + 1) as i32);
+		}
 	}
 
 	let o = Matrix2x2::<i32>::try_from(&a[..3]);
@@ -52,20 +58,26 @@ macro_rules! mat_content_test {
 		let mut m = $W::indices().map(|(i, j)| i + j);
 		for i in 0..$M {
 			for j in 0..$N {
-				assert_eq!(m.as_ref()[i*$N + j], i + j);
+				assert_eq!(m.as_ref()[i][j], i + j);
 			}
 		}
 
 		let z = $W::fill(0);
-		for i in 0..($N*$M) {
-			assert_eq!(z.as_ref()[i], 0);
+		for i in 0..$M {
+			for j in 0..$N {
+				assert_eq!(z.as_ref()[i][j], 0);
+			}
 		}
 
-		for i in 0..($N*$M) {
-			m.as_mut()[i] = i + 2;
+		for i in 0..$M {
+			for j in 0..$N {
+				m.as_mut()[i][j] = i + 2;
+			}
 		}
-		for i in 0..($N*$M) {
-			assert_eq!(m.as_ref()[i], i + 2);
+		for i in 0..$M {
+			for j in 0..$N {
+				assert_eq!(m.as_ref()[i][j], i + 2);
+			}
 		}
 	)
 }
@@ -89,7 +101,7 @@ macro_rules! mat_data_test {
 		let a = v.as_ref();
 		for i in 0..$M {
 			for j in 0..$N {
-				assert_eq!(a[i*$N + j], v[(i, j)]);
+				assert_eq!(a.as_ref()[i][j], v[(i, j)]);
 			}
 		}
 	)
@@ -184,7 +196,7 @@ macro_rules! mat_iter_test {
 	($M:expr, $N:expr, $W:ident) => (
 		let mut m = $W::indices().map(|(i, j)| i*$N + j + 1);
 		for (i, c) in m.iter().enumerate() {
-			assert_eq!(m.as_ref()[i], *c);
+			assert_eq!(m.as_ref()[i / $N][i % $N], *c);
 		}
 		for (i, c) in m.iter_mut().enumerate() {
 			*c = i + 2;
@@ -499,12 +511,14 @@ fn scal_rem_assign() {
 macro_rules! mat_zero_test {
 	($M:expr, $N:expr, $W:ident) => (
 		let z = $W::<i32>::zero();
-		for i in 0..($N*$M) {
-			assert_eq!(z.as_ref()[i], 0);
+		for i in 0..$M {
+			for j in 0..$N {
+				assert_eq!(z.as_ref()[i][j], 0);
+			}
 		}
 		assert!(z.is_zero());
 
-		let nz = $W::<i32> { data: [1; ($N*$M)] };
+		let nz = $W::<i32>::fill(1);
 		assert!(!nz.is_zero());
 	)
 }
@@ -684,16 +698,16 @@ fn one() {
 }
 #[test]
 fn det() {
-	let m = Matrix2x2::<i32>::from([11, 12, 21, 22]);
+	let m = Matrix2x2::<i32>::from([[11, 12], [21, 22]]);
 	assert_eq!(m.det(), 11*22 - 12*21);
 
-	let m = Matrix3x3::<i32>::from([11, 12, 13, 21, 22, 23, 31, 32, 33]);
+	let m = Matrix3x3::<i32>::from([[11, 12, 13], [21, 22, 23], [31, 32, 33]]);
 	assert_eq!(m.det(), 11*(22*33 - 23*32) + 12*(23*31 - 21*33) + 13*(21*32 - 22*31));
 }
 #[test]
 fn inverse() {
-	let m = Matrix2x2::<f64>::from([11.0, 12.0, 21.0, 22.0]).inverse();
-	let im = Matrix2x2::<f64>::from([22.0, -12.0, -21.0, 11.0])/(11.0*22.0 - 12.0*21.0);
+	let m = Matrix2x2::<f64>::from([[11.0, 12.0], [21.0, 22.0]]).inverse();
+	let im = Matrix2x2::<f64>::from([[22.0, -12.0], [-21.0, 11.0]])/(11.0*22.0 - 12.0*21.0);
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }

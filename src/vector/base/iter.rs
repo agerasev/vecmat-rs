@@ -2,15 +2,15 @@
 macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	/// Iterator by values for array.
     pub struct $II<T> {
-        data: [MaybeUninit<T>; $N],
+        data: $V<MaybeUninit<T>>,
         pos: usize,
     }
     impl<T> $II<T> {
-        pub fn new(a: [T; $N]) -> Self {
+        pub fn new(a: $V<T>) -> Self {
             let it = Self {
                 data: unsafe {
                     // unsafe { mem::transmute::<_, [MaybeUninit<T>; $N]>(a) }
-                    ptr::read(a.as_ptr() as *const [MaybeUninit<T>; $N])
+                    ptr::read(&a as *const _ as *const $V<MaybeUninit<T>>)
                 },
                 pos: 0
             };
@@ -36,7 +36,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
     impl<T> Drop for $II<T> {
         fn drop(&mut self) {
             unsafe {
-                for x in self.data.get_unchecked_mut(self.pos..$N) {
+                for x in self.data.as_mut().get_unchecked_mut(self.pos..$N) {
                     mem::replace(x, MaybeUninit::uninit()).assume_init();
                 }
             }
@@ -58,7 +58,7 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 		type Item = T;
 		type IntoIter = $II<T>;
 		fn into_iter(self) -> Self::IntoIter {
-			$II::new(self.data)
+			$II::new(self)
 		}
 	}
 	impl<'a, T> IntoIterator for &'a $V<T> {
@@ -117,8 +117,8 @@ macro_rules! vector_iter { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
             }
 
             unsafe { (
-                $V { data: ptr::read(a.as_ptr() as *const [T; $N]) },
-                $V { data: ptr::read(b.as_ptr() as *const [U; $N]) },
+                $V { data: ptr::read(&a as *const _ as *const [T; $N]) },
+                $V { data: ptr::read(&b as *const _ as *const [U; $N]) },
             ) }
 		}
 	}
