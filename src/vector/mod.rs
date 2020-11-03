@@ -14,6 +14,10 @@ pub use dot::*;
 mod spec;
 pub use spec::*;
 
+#[macro_use]
+mod approx;
+pub use self::approx::*;
+
 #[cfg(test)]
 mod tests;
 
@@ -37,13 +41,18 @@ use core::{
 use num_traits::{Zero, Signed, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*};
+#[cfg(test)]
+use ::approx::*;
+
 
 pub use crate::traits::Dot;
+
 
 macro_rules! vector_all { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	vector_base!($N, $V, $II, $GI);
 	vector_ops!($N, $V);
 	vector_dot!($N, $V);
+	vector_approx!($N, $V);
 ) }
 
 vector_all!(2, Vector2, IntoIter2, GroupIter2);

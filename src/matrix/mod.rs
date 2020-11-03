@@ -18,6 +18,10 @@ pub use product::*;
 mod square;
 pub use square::*;
 
+#[macro_use]
+mod approx;
+pub use self::approx::*;
+
 #[cfg(test)]
 mod tests;
 
@@ -41,6 +45,9 @@ use core::{
 use num_traits::{Zero, One, Signed, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, vector::*};
+#[cfg(test)]
+use ::approx::*;
+
 
 pub use crate::traits::{Dot, Outer};
 
@@ -48,6 +55,7 @@ pub use crate::traits::{Dot, Outer};
 macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
 	matrix_base!($M, $N, $W, $V, $U, $GI);
 	matrix_ops!($M, $N, $W);
+	matrix_approx!($M, $N, $W);
 ) }
 
 matrix_all!(2, 2, Matrix2x2, Vector2, Vector2, GroupIter2);
