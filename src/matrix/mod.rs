@@ -42,7 +42,7 @@ use core::{
 	slice,
 	fmt::{Display, Formatter, Result as FmtResult},
 };
-use num_traits::{Zero, One, Signed, Float};
+use num_traits::{Zero, One, Num, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, vector::*};
 #[cfg(test)]

@@ -69,11 +69,6 @@ macro_rules! matrix_zero { ($M:expr, $N:expr, $W:ident) => (
 			self.iter().all(|x| x.is_zero())
 		}
 	}
-	impl<T> $W<T> where T: PartialOrd + Zero + Neg<Output=T> {
-		fn abs(self) -> Self {
-			self.map(|x| if x < T::zero() { -x } else { x })
-		}
-	}
 ) }
 
 macro_rules! matrix_reduce { ($M:expr, $N:expr, $W:ident) => (
@@ -91,10 +86,10 @@ macro_rules! matrix_reduce { ($M:expr, $N:expr, $W:ident) => (
 ) }
 
 macro_rules! matrix_norm { ($M:expr, $N:expr, $W:ident) => (
-	impl<T> NormL1 for $W<T> where T: Signed + PartialOrd {
+	impl<T> NormL1 for $W<T> where T: NormL1<Output=T> + Add<Output=T> {
 		type Output = T;
 		fn norm_l1(self) -> T {
-			self.abs().sum()
+			self.map(|x| x.norm_l1()).sum()
 		}
 	}
 	impl<T> NormL2 for $W<T> where T: Float {
@@ -103,10 +98,10 @@ macro_rules! matrix_norm { ($M:expr, $N:expr, $W:ident) => (
 			self.map(|x| x*x).sum().sqrt()
 		}
 	}
-	impl<T> NormLInf for $W<T> where T: Signed + PartialOrd {
+	impl<T> NormLInf for $W<T> where T: NormLInf<Output=T> + PartialOrd {
 		type Output = T;
 		fn norm_l_inf(self) -> T {
-			self.abs().max()
+			self.map(|x| x.norm_l_inf()).max()
 		}
 	}
 ) }

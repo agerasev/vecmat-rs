@@ -1,5 +1,6 @@
+use core::ops::{Neg};
+use num_traits::{Zero, Num};
 use crate::{vector::*, transform::*};
-use num_traits::{Zero, Signed};
 
 
 macro_rules! shift { ($Z:ident, $X:ident, $V:ident) => (
@@ -21,7 +22,7 @@ macro_rules! shift { ($Z:ident, $X:ident, $V:ident) => (
 		}
 	}
 
-	impl<T> $X<T> for $Z<T> where T: Signed + Zero {
+	impl<T> $X<T> for $Z<T> where T: Neg<Output=T> + Num + Clone {
 		fn identity() -> Self {
 			Self { pos: $V::zero() }
 		}

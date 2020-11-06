@@ -69,11 +69,6 @@ macro_rules! vector_zero { ($N:expr, $V:ident) => (
 			self.iter().all(|x| x.is_zero())
 		}
 	}
-	impl<T> $V<T> where T: PartialOrd + Zero + Neg<Output=T> {
-		fn abs(self) -> Self {
-			self.map(|x| if x < T::zero() { -x } else { x })
-		}
-	}
 ) }
 
 macro_rules! vector_reduce { ($N:expr, $V:ident) => (
@@ -92,10 +87,10 @@ macro_rules! vector_reduce { ($N:expr, $V:ident) => (
 
 
 macro_rules! vector_norm { ($N:expr, $V:ident) => (
-	impl<T> NormL1 for $V<T> where T: Signed + PartialOrd {
+	impl<T> NormL1 for $V<T> where T: NormL1<Output=T> + Add<Output=T> {
 		type Output = T;
 		fn norm_l1(self) -> T {
-			self.abs().sum()
+			self.map(|x| x.norm_l1()).sum()
 		}
 	}
 	impl<T> NormL2 for $V<T> where T: Float {
@@ -104,10 +99,10 @@ macro_rules! vector_norm { ($N:expr, $V:ident) => (
 			self.map(|x| x*x).sum().sqrt()
 		}
 	}
-	impl<T> NormLInf for $V<T> where T: Signed + PartialOrd {
+	impl<T> NormLInf for $V<T> where T: NormLInf<Output=T> + PartialOrd {
 		type Output = T;
 		fn norm_l_inf(self) -> T {
-			self.abs().max()
+			self.map(|x| x.norm_l_inf()).max()
 		}
 	}
 ) }

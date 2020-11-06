@@ -31,7 +31,7 @@ impl<T> Matrix2x2<T> where T: Clone {
 }
 
 macro_rules! matrix_cofactor { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Signed + Clone {
+	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
 		/// Find a cofactor of the matrix.
 		pub fn cofactor(&self, y: usize, x: usize) -> T {
 			(if (x + y) % 2 == 0 {
@@ -44,7 +44,7 @@ macro_rules! matrix_cofactor { ($N:expr, $W:ident) => (
 ) }
 matrix_cofactor!(4, Matrix4x4);
 matrix_cofactor!(3, Matrix3x3);
-impl<T> Matrix2x2<T> where T: Signed + Clone {
+impl<T> Matrix2x2<T> where T: Neg<Output=T> + Num + Clone {
 	/// Find a cofactor of the matrix.
 	pub fn cofactor(&self, y: usize, x: usize) -> T {
 		(if (x + y) % 2 == 0 { T::one() } else { -T::one() }) * self.submatrix(y, x)
@@ -52,7 +52,7 @@ impl<T> Matrix2x2<T> where T: Signed + Clone {
 }
 
 macro_rules! matrix_det { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Signed + Clone {
+	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
 		/// Find a determinant of the matrix.
 		pub fn det(&self) -> T {
 			let i = 0;
@@ -64,7 +64,7 @@ macro_rules! matrix_det { ($N:expr, $W:ident) => (
 ) }
 matrix_det!(4, Matrix4x4);
 matrix_det!(3, Matrix3x3);
-impl<T> Matrix2x2<T> where T: Signed + Clone {
+impl<T> Matrix2x2<T> where T: Neg<Output=T> + Num + Clone {
 	/// Find a determinant of the matrix.
 	pub fn det(&self) -> T {
 		self[(0, 0)].clone()*self[(1, 1)].clone() -
@@ -73,7 +73,7 @@ impl<T> Matrix2x2<T> where T: Signed + Clone {
 }
 
 macro_rules! matrix_adj { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Signed + Clone {
+	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
 		/// Find an adjugate matrix.
 		pub fn adj(&self) -> $W<T> {
 			$W::indices().map(|(i, j)| self.cofactor(j, i))
@@ -85,7 +85,7 @@ matrix_adj!(3, Matrix3x3);
 matrix_adj!(2, Matrix2x2);
 
 macro_rules! matrix_inverse { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Signed + Clone {
+	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
 		/// Find an inverse matrix.
 		pub fn inverse(&self) -> $W<T> {
 			self.adj() / self.det()

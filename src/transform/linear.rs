@@ -1,5 +1,6 @@
+use core::ops::{Neg};
+use num_traits::{One, Num};
 use crate::*;
-use num_traits::{Zero, One, Signed};
 
 
 macro_rules! linear { ($Z:ident, $X:ident, $W:ident, $V:ident) => (
@@ -21,7 +22,7 @@ macro_rules! linear { ($Z:ident, $X:ident, $W:ident, $V:ident) => (
 		}
 	}
 
-	impl<T> $X<T> for $Z<T> where T: Signed + Zero + One + Clone {
+	impl<T> $X<T> for $Z<T> where T: Neg<Output=T> + Num + Clone {
 		fn identity() -> Self {
 			Self { lin: $W::one() }
 		}
