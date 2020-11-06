@@ -6,7 +6,7 @@ pub use init::*;
 mod iter;
 pub use iter::*;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests;
 
 

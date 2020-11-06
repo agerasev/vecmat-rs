@@ -1,5 +1,7 @@
-use std::mem::size_of;
+use core::mem::size_of;
 use crate::vector::*;
+
+#[cfg(feature = "std")]
 use std::{format};
 
 
@@ -177,12 +179,15 @@ macro_rules! vec_iter_test {
 		}
 	)
 }
+
 #[test]
 fn iter() {
 	vec_iter_test!(2, Vector2);
 	vec_iter_test!(3, Vector3);
 	vec_iter_test!(4, Vector4);
 }
+
+#[cfg(feature = "std")]
 #[test]
 fn fmt() {
 	assert_eq!(format!("{}", Vector3::indices().map(|i| i + 1)), "Vector3(1, 2, 3)");
