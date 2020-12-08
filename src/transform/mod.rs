@@ -7,6 +7,9 @@ pub use linear::*;
 mod affine;
 pub use affine::*;
 
+//mod rotation;
+//pub use rotation::*;
+
 #[cfg(test)]
 mod tests;
 

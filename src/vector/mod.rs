@@ -36,7 +36,7 @@ use core::{
 	cmp::{PartialOrd},
 	iter::{IntoIterator},
 	slice,
-	fmt::{Display, Formatter, Result as FmtResult},
+	fmt::{Debug, Display, Formatter, Result as FmtResult},
 };
 use num_traits::{Zero, Float};
 use num_integer::{self as nint, Integer};

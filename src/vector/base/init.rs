@@ -2,7 +2,7 @@
 macro_rules! vector_init { ($N:expr, $V:ident) => (
 	/// Vector of fixed-size.
 	#[repr(transparent)]
-	#[derive(Clone, Copy, Debug, PartialEq)]
+	#[derive(Clone, Copy, PartialEq)]
 	pub struct $V<T> {
 		data: [T; $N],
 	}

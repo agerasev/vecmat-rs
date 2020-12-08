@@ -42,6 +42,39 @@ impl<T> Vector4<T> {
     pub fn w_mut(&mut self) -> &mut T { unsafe { self.data.get_unchecked_mut(3) } }
 }
 
+impl<T> From<(T, T)> for Vector2<T> {
+    fn from((x, y): (T, T)) -> Self {
+        Self::from([x, y])
+    }
+}
+impl<T> Into<(T, T)> for Vector2<T> {
+    fn into(self) -> (T, T) {
+        let mut it = self.into_iter();
+        (it.next().unwrap(), it.next().unwrap())
+    }
+}
+impl<T> From<(T, T, T)> for Vector3<T> {
+    fn from((x, y, z): (T, T, T)) -> Self {
+        Self::from([x, y, z])
+    }
+}
+impl<T> Into<(T, T, T)> for Vector3<T> {
+    fn into(self) -> (T, T, T) {
+        let mut it = self.into_iter();
+        (it.next().unwrap(), it.next().unwrap(), it.next().unwrap())
+    }
+}
+impl<T> From<(T, T, T, T)> for Vector4<T> {
+    fn from((x, y, z, w): (T, T, T, T)) -> Self {
+        Self::from([x, y, z, w])
+    }
+}
+impl<T> Into<(T, T, T, T)> for Vector4<T> {
+    fn into(self) -> (T, T, T, T) {
+        let mut it = self.into_iter();
+        (it.next().unwrap(), it.next().unwrap(), it.next().unwrap(), it.next().unwrap())
+    }
+}
 
 impl<T> Vector2<T> where T: Mul<Output=T> + Sub<Output=T> + Clone {
     /// Pseudo-cross product for 2D vector.

@@ -6,26 +6,16 @@ pub use init::*;
 mod iter;
 pub use iter::*;
 
+#[macro_use]
+mod format;
+pub use format::*;
+
 #[cfg(all(test, feature = "std"))]
 mod tests;
-
-
-macro_rules! vector_display { ($N:expr, $V:ident) => (
-	impl<T> Display for $V<T> where T: Display {
-		fn fmt(&self, f: &mut Formatter) -> FmtResult {
-			write!(f, "{}(", stringify!($V))?;
-			for i in 0..$N-1 {
-				write!(f, "{}, ", self[i])?;
-			}
-			write!(f, "{})", self[$N-1])?;
-			Ok(())
-		}
-	}
-) }
 
 
 macro_rules! vector_base { ($N:expr, $V:ident, $II:ident, $GI:ident) => (
 	vector_init!($N, $V);
 	vector_iter!($N, $V, $II, $GI);
-	vector_display!($N, $V);
+	vector_format!($N, $V);
 ) }
