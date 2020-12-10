@@ -3,8 +3,8 @@ pub use num_complex::*;
 mod quaternion;
 pub use quaternion::*;
 
-//mod random;
-//pub use random::*;
+mod random;
+pub use random::*;
 
 mod format;
 

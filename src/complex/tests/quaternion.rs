@@ -1,7 +1,7 @@
 use rand::{prelude::*};
 use rand_xorshift::XorShiftRng;
 use ::approx::*;
-use crate::{prelude::*, *, random::*};
+use crate::complex::*;
 
 
 #[cfg(feature = "std")]
@@ -44,7 +44,11 @@ fn law_of_cosines() {
         let mut rng = XorShiftRng::seed_from_u64(0xFEED1);
         let a: Qf = rng.sample(&StandardNormal);
         let b: Qf = rng.sample(&StandardNormal);
-        assert_abs_diff_eq!(a.norm_sqr() + b.norm_sqr() + 2.0*a.dot(b), (a + b).norm_sqr());
+        assert_abs_diff_eq!(
+            a.norm_sqr() + b.norm_sqr() + 2.0*a.dot(b),
+            (a + b).norm_sqr(),
+            epsilon=1e-14,
+        );
     }
 }
 

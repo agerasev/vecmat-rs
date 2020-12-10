@@ -5,7 +5,7 @@ pub use core::ops::{
 };
 pub use num_traits::{Zero, One, Num, Float};
 pub use num_complex::{Complex};
-pub use crate::{Vector4, Vector3};
+pub use crate::{Vector4, Vector3, Dot};
 
 
 /// Quaternion.
@@ -305,11 +305,18 @@ impl<T> Div<T> for Quaternion<T> where T: Div<Output=T> + Clone {
         (self.vec / other).into()
     }
 }
+
+impl<T> Quaternion<T> where T: Float + Clone {
+    pub fn normalize(self) -> Self {
+        self.clone() / self.norm()
+    }
+}
 impl<T> Quaternion<T> where T: Neg<Output=T> + Num + Clone {
     pub fn inv(self) -> Self {
         self.clone().conj() / self.norm_sqr()
     }
 }
+
 impl<T> Div for Quaternion<T> where T: Neg<Output=T> + Num + Clone {
     type Output = Self;
     fn div(self, other: Self) -> Self {
@@ -361,3 +368,11 @@ macro_rules! reverse_mul_div { ($T:ident) => (
 
 reverse_mul_div!(f32);
 reverse_mul_div!(f64);
+
+
+impl<T> Dot for Quaternion<T> where T: Add<Output=T> + Mul<Output=T> {
+    type Output = T;
+    fn dot(self, other: Self) -> T {
+        self.vec.dot(other.vec).into()
+    }
+}

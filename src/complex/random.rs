@@ -1,4 +1,4 @@
-use core::ops::{Div};
+use std::marker::PhantomData;
 use num_traits::Float;
 use rand::Rng;
 use rand_distr::Distribution;
@@ -14,31 +14,27 @@ pub struct NonZero;
 /// where N is the number of dimensions of a specified hypercomplex number.
 pub struct Unit;
 
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct QuaternionDistribution<T, D: Distribution<T>> {
-    distribution: D,
+    pub inner: D,
+    phantom: PhantomData<T>,
 }
 
 impl<T, D: Distribution<T>> QuaternionDistribution<T, D> {
-    fn new(distribution: D) -> Self {
-        Self { distribution }
+    fn new(inner: D) -> Self {
+        Self { inner, phantom: PhantomData }
     }
 }
 
-impl<T, D: Distribution<T>> Distribution<Quaternion<T>> for QuaternionDistribution<T, D> {
+impl<T, D: Distribution<T> + Clone> Distribution<Quaternion<T>> for QuaternionDistribution<T, D> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        Quaternion::new(rng.sample(self), rng.sample(self), rng.sample(self), rng.sample(self))
+        Vector4::init(|| rng.sample(self.inner.clone())).into()
     }
 }
 
-impl<T> Distribution<Quaternion<T>> for StandardNormal where StandardNormal: Distribution<U> {
+impl<T> Distribution<Quaternion<T>> for StandardNormal where StandardNormal: Distribution<T> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        Quaternion::new(rng.sample(Self), rng.sample(Self))
-    }
-}
-
-impl<T> Distribution<Quaternion<T>> for StandardNormal where StandardNormal: Distribution<U> {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        Quaternion::new(rng.sample(Self), rng.sample(Self))
+        QuaternionDistribution::<T, StandardNormal>::new(Self).sample(rng)
     }
 }
 
