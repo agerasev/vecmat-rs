@@ -3,13 +3,15 @@ pub use num_complex::*;
 mod quaternion;
 pub use quaternion::*;
 
+#[cfg(feature = "random")]
 mod random;
+#[cfg(feature = "random")]
 pub use random::*;
+
+#[cfg(feature = "approx")]
+mod approx;
 
 mod format;
 
-#[cfg(test)]
-mod approx;
-
-#[cfg(test)]
+#[cfg(all(test, feature = "approx"))]
 mod tests;

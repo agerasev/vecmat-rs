@@ -1,6 +1,5 @@
 
 macro_rules! matrix_approx { ($M:expr, $N:expr, $W:ident) => (
-	#[cfg(test)]
 	impl<T> AbsDiffEq for $W<T> where T: AbsDiffEq<Epsilon=T> + Clone {
 		type Epsilon = T;
 		fn default_epsilon() -> Self::Epsilon {

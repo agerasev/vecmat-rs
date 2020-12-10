@@ -16,3 +16,6 @@ pub use complex::*;
 
 pub mod transform;
 pub use transform::*;
+
+#[cfg(feature = "random")]
+pub mod distributions;

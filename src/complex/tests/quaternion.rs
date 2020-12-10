@@ -1,7 +1,7 @@
 use rand::{prelude::*};
 use rand_xorshift::XorShiftRng;
 use ::approx::*;
-use crate::complex::*;
+use crate::{complex::*, distributions::*};
 
 
 #[cfg(feature = "std")]

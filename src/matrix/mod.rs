@@ -18,9 +18,9 @@ pub use product::*;
 mod square;
 pub use square::*;
 
+#[cfg(feature = "approx")]
 #[macro_use]
 mod approx;
-pub use self::approx::*;
 
 #[cfg(test)]
 mod tests;
@@ -45,8 +45,8 @@ use core::{
 use num_traits::{Zero, One, Num, Float};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, vector::*};
-#[cfg(test)]
-use ::approx::*;
+#[cfg(feature = "approx")]
+use ::approx::{AbsDiffEq, abs_diff_eq};
 
 
 pub use crate::traits::{Dot, Outer};
@@ -55,6 +55,7 @@ pub use crate::traits::{Dot, Outer};
 macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident) => (
 	matrix_base!($M, $N, $W, $V, $U, $GI);
 	matrix_ops!($M, $N, $W);
+	#[cfg(feature = "approx")]
 	matrix_approx!($M, $N, $W);
 ) }
 

@@ -10,7 +10,7 @@ pub use affine::*;
 //mod rotation;
 //pub use rotation::*;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "approx"))]
 mod tests;
 
 
