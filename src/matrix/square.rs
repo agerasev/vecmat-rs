@@ -95,3 +95,24 @@ macro_rules! matrix_inverse { ($N:expr, $W:ident) => (
 matrix_inverse!(4, Matrix4x4);
 matrix_inverse!(3, Matrix3x3);
 matrix_inverse!(2, Matrix2x2);
+
+#[cfg(feature = "random")]
+macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
+	impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + Float + Clone {
+		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
+			loop {
+				let x = rng.sample(&StandardNormal);
+				if x.clone().det().abs() > T::epsilon() {
+					break x;
+				}
+			}
+		}
+	}
+) }
+
+#[cfg(feature = "random")]
+matrix_random_invertible!(4, Matrix4x4, MatrixDistribution4x4);
+#[cfg(feature = "random")]
+matrix_random_invertible!(3, Matrix3x3, MatrixDistribution3x3);
+#[cfg(feature = "random")]
+matrix_random_invertible!(2, Matrix2x2, MatrixDistribution2x2);
