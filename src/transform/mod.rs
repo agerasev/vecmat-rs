@@ -10,9 +10,6 @@ pub use affine::*;
 mod rotation;
 pub use rotation::*;
 
-#[cfg(all(test, feature = "approx"))]
-mod tests;
-
 
 use crate::vector::*;
 

@@ -16,51 +16,75 @@ pub struct Quaternion<T> {
 }
 
 impl<T> Quaternion<T> {
-    pub fn new(w: T, x: T, y: T, z: T) -> Quaternion<T> {
+    pub fn new(w: T, x: T, y: T, z: T) -> Self {
         Self { vec: [w, x, y, z].into() }
+    }
+    pub fn from_vector(vec: Vector4<T>) -> Self {
+        Self { vec }
+    }
+    pub fn from_array(arr: [T; 4]) -> Self {
+        Self { vec: arr.into() }
+    }
+    pub fn from_tuple(tup: (T, T, T, T)) -> Self {
+        Self { vec: tup.into() }
+    }
+    pub fn from_scalar_and_vector3(w: T, vec: Vector3<T>) -> Self {
+        let (x, y, z) = vec.into();
+        Self::new(w, x, y, z)
+    }
+    pub fn into_vector(self) -> Vector4<T> {
+        self.vec
+    }
+    pub fn into_array(self) -> [T; 4] {
+        self.vec.into()
+    }
+    pub fn into_tuple(self) -> (T, T, T, T) {
+        self.vec.into()
+    }
+    pub fn into_scalar_and_vector3(self) -> (T, Vector3<T>) {
+        let (w, x, y, z) = self.vec.into();
+        (w, [x, y, z].into())
     }
 }
 
 impl<T> From<Vector4<T>> for Quaternion<T> {
     fn from(vec: Vector4<T>) -> Self {
-        Self { vec }
+        Self::from_vector(vec)
     }
 }
 impl<T> Into<Vector4<T>> for Quaternion<T> {
     fn into(self) -> Vector4<T> {
-        self.vec
+        self.into_vector()
     }
 }
 impl<T> From<(T, Vector3<T>)> for Quaternion<T> {
     fn from((w, vec): (T, Vector3<T>)) -> Self {
-        let (x, y, z) = vec.into();
-        Self::new(w, x, y, z)
+        Self::from_scalar_and_vector3(w, vec)
     }
 }
 impl<T> Into<(T, Vector3<T>)> for Quaternion<T> {
     fn into(self) -> (T, Vector3<T>) {
-        let (w, x, y, z) = self.vec.into();
-        (w, [x, y, z].into())
+        self.into_scalar_and_vector3()
     }
 }
 impl<T> From<[T; 4]> for Quaternion<T> {
     fn from(arr: [T; 4]) -> Self {
-        Self { vec: arr.into() }
+        Self::from_array(arr)
     }
 }
 impl<T> Into<[T; 4]> for Quaternion<T> {
     fn into(self) -> [T; 4] {
-        self.vec.into()
+        self.into_array()
     }
 }
 impl<T> From<(T, T, T, T)> for Quaternion<T> {
     fn from(tup: (T, T, T, T)) -> Self {
-        Self { vec: tup.into() }
+        Self::from_tuple(tup)
     }
 }
 impl<T> Into<(T, T, T, T)> for Quaternion<T> {
     fn into(self) ->(T, T, T, T) {
-        self.vec.into()
+        self.into_tuple()
     }
 }
 

@@ -23,7 +23,7 @@ impl<T> Into<Quaternion<T>> for Rotation3<T> {
 impl<T> Rotation3<T> where T: Float + FromPrimitive + Clone {
 	pub fn new(axis: Vector3<T>, angle: T) -> Self {
 		let half = angle / T::from_f32(2.0).unwrap();
-		Self { quat: Quaternion::from((half.cos(), axis * half.sin())) }
+		Self { quat: Quaternion::from_scalar_and_vector3(half.cos(), axis * half.sin()) }
 	}
 	pub fn axis(&self) -> Vector3<T> {
 		let (_, ax) = self.quat.into();
@@ -43,7 +43,7 @@ impl<T> Transform3<T> for Rotation3<T> where T: Neg<Output=T> + Num + Clone {
 		Self { quat: self.quat.conj() }
 	}
 	fn apply(self, pos: Vector3<T>) -> Vector3<T> {
-		let qpos = Quaternion::from((T::zero(), pos));
+		let qpos = Quaternion::from_scalar_and_vector3(T::zero(), pos);
 		let qres = self.quat.clone() * qpos * self.quat.conj();
 		let (_, res) = qres.into();
 		res
