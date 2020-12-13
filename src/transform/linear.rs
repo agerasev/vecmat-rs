@@ -3,6 +3,10 @@ use num_traits::{One, Num, Float, FromPrimitive};
 use crate::*;
 #[cfg(feature = "approx")]
 use approx::{AbsDiffEq, abs_diff_eq};
+#[cfg(feature = "random")]
+use rand::{prelude::*};
+#[cfg(feature = "random")]
+use crate::distributions::*;
 
 
 macro_rules! linear { ($Z:ident, $X:ident, $W:ident, $V:ident) => (
@@ -50,6 +54,19 @@ macro_rules! linear { ($Z:ident, $X:ident, $W:ident, $V:ident) => (
 		}
 	}
 
+	#[cfg(feature = "random")]
+	impl<T> Distribution<$Z<T>> for StandardNormal where StandardNormal: Distribution<$W<T>> {
+		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
+			$Z::from_matrix(self.sample(rng))
+		}
+	}
+	#[cfg(feature = "random")]
+	impl<T> Distribution<$Z<T>> for Invertible where Invertible: Distribution<$W<T>> {
+		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
+			$Z::from_matrix(self.sample(rng))
+		}
+	}
+
 	#[cfg(feature = "approx")]
 	impl<T> AbsDiffEq for $Z<T> where T: AbsDiffEq<Epsilon=T> + Clone {
 		type Epsilon = T;
@@ -88,18 +105,19 @@ impl<T> Linear3<T> where T: Float + FromPrimitive + Clone {
 	}
 }
 
+
 #[cfg(all(test, feature = "random", feature = "approx"))]
 mod tests {
 	use rand::{prelude::*};
 	use rand_xorshift::XorShiftRng;
 	use approx::{assert_abs_diff_eq};
-	use crate::{distributions::*};
 	use super::*;
 
 	const SAMPLE_ATTEMPTS: usize = 256;
 
 	#[test]
 	fn linearity() {
+		const EPS: f64 = 1e-14;
 		let mut rng = XorShiftRng::seed_from_u64(0xBEE);
 
         for _ in 0..SAMPLE_ATTEMPTS {
@@ -108,50 +126,53 @@ mod tests {
             let x: Vector3<f64> = rng.sample(&StandardNormal);
             let a: f64 = rng.sample(&StandardNormal);
 
-            assert_abs_diff_eq!(Linear3::from(m * a).apply(x), Linear3::from(m).apply(x * a), epsilon=1e-14);
-            assert_abs_diff_eq!(Linear3::from(m * a).apply(x), Linear3::from(m).apply(x) * a, epsilon=1e-14);
+            assert_abs_diff_eq!(Linear3::from(m * a).apply(x), Linear3::from(m).apply(x * a), epsilon=EPS);
+            assert_abs_diff_eq!(Linear3::from(m * a).apply(x), Linear3::from(m).apply(x) * a, epsilon=EPS);
         }
 	}
 	
 	#[test]
 	fn chaining() {
+		const EPS: f64 = 1e-14;
 		let mut rng = XorShiftRng::seed_from_u64(0xBEA);
 
         for _ in 0..SAMPLE_ATTEMPTS {
-            let a = Linear3::<f64>::from_matrix(rng.sample(&StandardNormal));
-            let b = Linear3::<f64>::from_matrix(rng.sample(&StandardNormal));
+            let a: Linear3<f64> = rng.sample(&StandardNormal);
+            let b: Linear3<f64> = rng.sample(&StandardNormal);
             let c: Vector3<f64> = rng.sample(&StandardNormal);
 
-            assert_abs_diff_eq!(a.chain(Linear3::identity()), a, epsilon=1e-14);
-            assert_abs_diff_eq!(Linear3::identity().chain(b), b, epsilon=1e-14);
-            assert_abs_diff_eq!(a.chain(b).apply(c), a.apply(b.apply(c)), epsilon=1e-14);
+            assert_abs_diff_eq!(a.chain(Linear3::identity()), a, epsilon=EPS);
+            assert_abs_diff_eq!(Linear3::identity().chain(b), b, epsilon=EPS);
+            assert_abs_diff_eq!(a.chain(b).apply(c), a.apply(b.apply(c)), epsilon=EPS);
         }
 	}
 	
 	#[test]
 	fn inversion() {
+		const EPS: f64 = 1e-12;
 		let mut rng = XorShiftRng::seed_from_u64(0xBEB);
 
         for _ in 0..SAMPLE_ATTEMPTS {
-			let a = Linear3::<f64>::from_matrix(rng.sample(&Invertible));
+			let a: Linear3<f64> = rng.sample(&Invertible);
             let x: Vector3<f64> = rng.sample(&StandardNormal);
 
-            assert_abs_diff_eq!(a.chain(a.inverse()), Linear3::identity(), epsilon=1e-12);
-            assert_abs_diff_eq!(a.inverse().chain(a), Linear3::identity(), epsilon=1e-12);
-            assert_abs_diff_eq!(a.inverse().apply(a.apply(x)), x, epsilon=1e-12);
-            assert_abs_diff_eq!(a.apply(a.inverse().apply(x)), x, epsilon=1e-12);
+            assert_abs_diff_eq!(a.chain(a.inverse()), Linear3::identity(), epsilon=EPS);
+            assert_abs_diff_eq!(a.inverse().chain(a), Linear3::identity(), epsilon=EPS);
+            assert_abs_diff_eq!(a.inverse().apply(a.apply(x)), x, epsilon=EPS);
+            assert_abs_diff_eq!(a.apply(a.inverse().apply(x)), x, epsilon=EPS);
         }
 	}
 	
 	#[test]
 	fn look_to_the_direction() {
+		const EPS: f64 = 1e-14;
 		let mut rng = XorShiftRng::seed_from_u64(0xBEC);
 
         for _ in 0..SAMPLE_ATTEMPTS {
             let d: Vector3<f64> = rng.sample(&Unit);
             let m = Linear3::look_at_any(d);
 
-            assert_abs_diff_eq!(m.apply(d), Vector3::from([0.0, 0.0, 1.0]), epsilon=1e-14);
+            assert_abs_diff_eq!(m.apply(d), Vector3::from([0.0, 0.0, 1.0]), epsilon=EPS);
         }
     }
 }
