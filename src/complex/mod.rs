@@ -1,4 +1,5 @@
-pub use num_complex::*;
+mod complex;
+pub use complex::*;
 
 mod quaternion;
 pub use quaternion::*;

@@ -147,6 +147,7 @@ mod tests {
 
 	#[cfg(feature = "random")]
 	mod random {
+		use num_traits::{Zero};
 		use rand::{prelude::*};
 		use rand_xorshift::XorShiftRng;
 		use approx::{assert_abs_diff_eq};

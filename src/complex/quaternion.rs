@@ -1,11 +1,11 @@
-pub use core::ops::{
+use core::ops::{
     Neg,
-    Add, Sub, Mul, Div, Rem,
-    AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
+    Add, Sub, Mul, Div,
+    AddAssign, SubAssign, MulAssign, DivAssign,
 };
-pub use num_traits::{Zero, One, Num, Float};
-pub use num_complex::{Complex};
-pub use crate::{Vector4, Vector3, Dot};
+use num_traits::{Zero, One, Num, Float};
+use num_complex::{Complex};
+use crate::{Vector4, Vector3, Dot};
 
 
 /// Quaternion.
@@ -294,6 +294,22 @@ impl<T> Mul<T> for Quaternion<T> where T: Mul<Output=T> + Clone {
     }
 }
 
+impl<T> MulAssign for Quaternion<T> where Self: Mul<Output=Self> + Clone {
+    fn mul_assign(&mut self, other: Self) {
+        *self = self.clone() * other;
+    }
+}
+impl<T> MulAssign<Complex<T>> for Quaternion<T> where Self: Mul<Complex<T>, Output=Self> + Clone {
+    fn mul_assign(&mut self, other: Complex<T>) {
+        *self = self.clone() * other;
+    }
+}
+impl<T> MulAssign<T> for Quaternion<T> where Self: Mul<T, Output=Self> + Clone {
+    fn mul_assign(&mut self, other: T) {
+        *self = self.clone() * other;
+    }
+}
+
 impl<T> One for Quaternion<T> where T: Zero + One + Sub<Output=T> + Clone {
     fn one() -> Self {
         Self::new(T::one(), T::zero(), T::zero(), T::zero())
@@ -351,6 +367,22 @@ impl<T> Div<Complex<T>> for Quaternion<T> where T: Neg<Output=T> + Num + Clone {
     type Output = Self;
     fn div(self, other: Complex<T>) -> Self {
         self * other.inv()
+    }
+}
+
+impl<T> DivAssign for Quaternion<T> where Self: Div<Output=Self> + Clone {
+    fn div_assign(&mut self, other: Self) {
+        *self = self.clone() / other;
+    }
+}
+impl<T> DivAssign<Complex<T>> for Quaternion<T> where Self: Div<Complex<T>, Output=Self> + Clone {
+    fn div_assign(&mut self, other: Complex<T>) {
+        *self = self.clone() / other;
+    }
+}
+impl<T> DivAssign<T> for Quaternion<T> where Self: Div<T, Output=Self> + Clone {
+    fn div_assign(&mut self, other: T) {
+        *self = self.clone() / other;
     }
 }
 
