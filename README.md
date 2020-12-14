@@ -23,6 +23,10 @@
 
 Low-dimensional vector and matrix structures and common operations for them
 
+# TODO
+
++ Add reverse multiplication for vectors and matrices
+
 ## Documentation
 
 + [`crates.io` version documentation](https://docs.rs/vecmat)
