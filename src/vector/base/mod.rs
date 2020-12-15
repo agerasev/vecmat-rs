@@ -1,10 +1,10 @@
+mod format;
 mod init;
 mod iter;
-mod format;
 
 #[cfg(test)]
 mod tests;
 
+pub use format::*;
 pub use init::*;
 pub use iter::*;
-pub use format::*;

@@ -56,20 +56,20 @@ mod tests;
 
 
 use core::{
-	mem::{self, MaybeUninit},
+    mem::{self, MaybeUninit},
     ptr,
-	convert::{TryFrom, TryInto},
-	ops::{
-		Index, IndexMut,
-		Neg, Add, Sub, Mul, Div, Rem,
-		AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
-		Not, BitAnd, BitOr, BitXor,
-		BitAndAssign, BitOrAssign, BitXorAssign,
-	},
-	cmp::{PartialOrd},
-	iter::{IntoIterator},
-	slice,
-	fmt::{Debug, Display, Formatter, Result as FmtResult},
+    convert::{TryFrom, TryInto},
+    ops::{
+        Index, IndexMut,
+        Neg, Add, Sub, Mul, Div, Rem,
+        AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
+        Not, BitAnd, BitOr, BitXor,
+        BitAndAssign, BitOrAssign, BitXorAssign,
+    },
+    cmp::{PartialOrd},
+    iter::{IntoIterator},
+    slice,
+    fmt::{Debug, Display, Formatter, Result as FmtResult},
 };
 #[cfg(feature = "random")]
 use core::marker::PhantomData;
@@ -90,13 +90,13 @@ pub use crate::traits::Dot;
 
 
 macro_rules! vector_all { ($N:expr, $V:ident, $II:ident, $GI:ident, $D:ident) => (
-	vector_base!($N, $V, $II, $GI);
-	vector_ops!($N, $V);
-	vector_dot!($N, $V);
-	#[cfg(feature = "random")]
-	vector_random!($N, $V, $D);
-	#[cfg(feature = "approx")]
-	vector_approx!($N, $V);
+    vector_base!($N, $V, $II, $GI);
+    vector_ops!($N, $V);
+    vector_dot!($N, $V);
+    #[cfg(feature = "random")]
+    vector_random!($N, $V, $D);
+    #[cfg(feature = "approx")]
+    vector_approx!($N, $V);
 ) }
 
 vector_all!(2, Vector2, IntoIter2, GroupIter2, VectorDistribution2);

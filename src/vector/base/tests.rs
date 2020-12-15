@@ -1,10 +1,9 @@
 use crate::vector::*;
 
-
 #[cfg(feature = "std")]
 mod mem {
-    use std::{mem, rc::Rc, vec::Vec};
     use super::*;
+    use std::{mem, rc::Rc, vec::Vec};
 
     #[test]
     fn init_drop() {
