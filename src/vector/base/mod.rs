@@ -2,8 +2,8 @@ mod init;
 mod iter;
 mod format;
 
-//#[cfg(test)]
-//mod tests;
+#[cfg(test)]
+mod tests;
 
 pub use init::*;
 pub use iter::*;
