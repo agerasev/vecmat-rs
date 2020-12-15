@@ -110,12 +110,8 @@ impl<T, const N: usize> Vector<T, N> {
 impl<T, U, const N: usize> Vector<(T, U), N> {
 	/// Unzip vector of tuples into two vectors.
 	pub fn unzip(self) -> (Vector<T, N>, Vector<U, N>) {
-		let mut a: Vector<MaybeUninit<T>, N> = unsafe {
-			MaybeUninit::uninit().assume_init()
-		};
-		let mut b: Vector<MaybeUninit<U>, N> = unsafe {
-			MaybeUninit::uninit().assume_init()
-		};
+		let mut a = Vector::<T, N>::uninit();
+		let mut b = Vector::<U, N>::uninit();
 
 		for ((x, y), (u, v)) in self.into_iter().zip(a.iter_mut().zip(b.iter_mut())) {
 			let _ = mem::replace(u, MaybeUninit::new(x));
@@ -123,8 +119,8 @@ impl<T, U, const N: usize> Vector<(T, U), N> {
 		}
 
 		unsafe { (
-			ptr::read(&a as *const _ as *const Vector<T, N>),
-			ptr::read(&b as *const _ as *const Vector<U, N>),
+			a.assume_init(),
+			b.assume_init(),
 		) }
 	}
 }
@@ -155,7 +151,7 @@ impl<I, const N: usize> GroupIter<I, N> where I: Iterator {
 impl<I, const N: usize> Iterator for GroupIter<I, N> where I: Iterator {
 	type Item = Vector<I::Item, N>;
 	fn next(&mut self) -> Option<Self::Item> {
-		<Self::Item>::try_from_iter(&mut self.iter).ok()
+		<Self::Item>::try_from_iter(&mut self.iter)
 	}
 }
 

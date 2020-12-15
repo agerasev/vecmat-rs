@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 use core::{
 	mem::{self, MaybeUninit},
     ptr,
@@ -12,19 +14,42 @@ pub struct Vector<T, const N: usize> {
 	data: [T; N],
 }
 
+impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
+	/// Transpose `MaybeUninit<Vector<T, N>>` into `Vector<MaybeUninit<T>, N>`.
+	fn from_uninit(uninit: MaybeUninit<Vector<T, N>>) -> Self {
+		// TODO: Use `mem::transmute` when it will be possible.
+		unsafe { ptr::read(&uninit as *const _ as *const Vector<MaybeUninit<T>, N>) }
+	}
+	/// Transpose `Vector<MaybeUninit<T>, N>` into `MaybeUninit<Vector<T, N>>`.
+	fn into_uninit(self) -> MaybeUninit<Vector<T, N>> {
+		// TODO: Use `mem::transmute` when it will be possible.
+		unsafe { ptr::read(&self as *const _ as *const MaybeUninit<Vector<T, N>>) }
+	}
+}
+
+impl<T, const N: usize> Vector<T, N> {
+	/// Create a vector with uninitialized content.
+	pub fn uninit() -> Vector<MaybeUninit<T>, N> {
+		Vector::from_uninit(MaybeUninit::uninit())
+	}
+}
+impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
+	/// Assume that vector content is initialized.
+	pub unsafe fn assume_init(self) -> Vector<T, N> {
+		self.into_uninit().assume_init()
+	}
+}
+
 impl<T, const N: usize> Vector<T, N> {
 	/// Initialize a vector with values from closure.
 	pub fn init<F: FnMut() -> T>(mut f: F) -> Self {
-		let mut a: [MaybeUninit<T>; N] = unsafe {
-			MaybeUninit::uninit().assume_init()
-		};
+		let mut a = Vector::uninit();
 
-		for x in a.iter_mut() {
+		for x in a.data.iter_mut() {
 			*x = MaybeUninit::new(f());
 		}
 
-		// unsafe { mem::transmute::<_, [T; N]>(a) }
-		Self { data: unsafe { ptr::read(&a as *const _ as *const [T; N]) } }
+		unsafe { a.assume_init() }
 	}
 }
 
@@ -96,25 +121,24 @@ impl<'a, T, const N: usize> TryFrom<&'a [T]> for Vector<T, N> where T: Copy {
 	}
 }
 impl<T, const N: usize> Vector<T, N> {
+	// TODO: Implement `TryFrom` without conflict.
 	/// Try to conctruct a vector from iterator.
 	/// If iterator conatins less items than vector, then `Err` is returned.
-	///
-	/// *FIXME: Implement `TryFrom` without conflict.*
-	pub fn try_from_iter<I>(iter: I) -> Result<Self, ()> where I: Iterator<Item=T> {
-		let mut a: Vector<MaybeUninit<T>, N> = unsafe {
-			MaybeUninit::uninit().assume_init()
-		};
+	pub fn try_from_iter<I>(iter: I) -> Option<Self> where I: Iterator<Item=T> {
+		let mut a = Vector::uninit();
 
 		let mut pos: usize = 0;
-		for (x, y) in a.iter_mut().zip(iter) {
+		for (x, y) in a.data.iter_mut().zip(iter) {
 			let _ = mem::replace(x, MaybeUninit::new(y));
 			pos += 1;
 		}
 
+		// TODO: Use exclusive range pattern when it will be possible.
+		#[allow(clippy::comparison_chain)]
 		if pos > N {
 			unreachable!();
 		} else if pos == N {
-			Ok(unsafe { ptr::read(&a as *const _ as *const Vector<T, N>) })
+			Some(unsafe { a.assume_init() })
 		} else {
 			// Drop loaded items
 			unsafe {
@@ -122,7 +146,7 @@ impl<T, const N: usize> Vector<T, N> {
 					mem::replace(x, MaybeUninit::uninit()).assume_init();
 				}
 			}
-			Err(())
+			None
 		}
 	}
 }
@@ -140,18 +164,24 @@ impl<T, const N: usize> IndexMut<usize> for Vector<T, N> {
 }
 
 impl<T, const N: usize> Vector<T, N> {
-	pub fn into_inner(self) -> [T; N] {
+	// TODO: Create other `From` analogs.
+	/// Convert to array.
+	pub fn into_array(self) -> [T; N] {
 		self.into()
 	}
+	/// Get pointer to the first element.
 	pub fn as_ptr(&self) -> *const T {
 		self.as_ref().as_ptr()
 	}
+	/// Get mutable pointer to the first element.
 	pub fn as_mut_ptr(&mut self) -> *mut T {
 		self.as_mut().as_mut_ptr()
 	}
+	/// Get reference to the elements without boundary checking.
 	pub unsafe fn get_unchecked(&self, i: usize) -> &T {
 		self.as_ref().get_unchecked(i)
 	}
+	/// Get mutable reference to the elements without boundary checking.
 	pub unsafe fn get_unchecked_mut(&mut self, i: usize) -> &mut T {
 		self.as_mut().get_unchecked_mut(i)
 	}
