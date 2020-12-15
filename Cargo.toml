@@ -27,5 +27,5 @@ rand_xorshift = "0.2"
 
 [features]
 default = ["std", "random", "approx"]
-std = ["num-traits/std", "num-integer/std", "num-complex/std"]
+std = ["num-traits/std", "num-integer/std", "num-complex/std", "rand/std", "approx/std"]
 random = ["rand", "rand_distr"]

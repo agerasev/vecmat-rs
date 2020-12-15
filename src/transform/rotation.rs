@@ -1,6 +1,8 @@
 use core::ops::{Neg};
-use num_traits::{One, Num, Float, FromPrimitive, FloatConst};
+use num_traits::{One, Num, Float, FromPrimitive};
 use crate::*;
+#[cfg(feature = "random")]
+use num_traits::{FloatConst};
 #[cfg(feature = "random")]
 use rand::prelude::*;
 #[cfg(feature = "random")]
