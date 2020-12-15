@@ -1,3 +1,32 @@
+mod base;
+//mod ops;
+//mod dot;
+//mod spec;
+
+//#[cfg(feature = "random")]
+//mod random;
+
+//#[cfg(feature = "approx")]
+//mod approx;
+
+//#[cfg(test)]
+//mod tests;
+
+pub use base::*;
+//pub use ops::*;
+//pub use dot::*;
+//pub use spec::*;
+
+//#[cfg(feature = "random")]
+//pub use random::*;
+
+pub type Vector2<T> = Vector<T, 2>;
+pub type Vector3<T> = Vector<T, 3>;
+pub type Vector4<T> = Vector<T, 4>;
+pub type Vector8<T> = Vector<T, 8>;
+pub type Vector16<T> = Vector<T, 16>;
+
+/*
 #[macro_use]
 mod base;
 pub use base::*;
@@ -85,3 +114,4 @@ vector_all!(13, Vector13, IntoIter13, GroupIter13, VectorDistribution13);
 vector_all!(14, Vector14, IntoIter14, GroupIter14, VectorDistribution14);
 vector_all!(15, Vector15, IntoIter15, GroupIter15, VectorDistribution15);
 vector_all!(16, Vector16, IntoIter16, GroupIter16, VectorDistribution16);
+*/

@@ -2,7 +2,7 @@
 //! 
 //! ## Usage example
 //! 
-//! ```
+//! ```ignore
 //! use vecmat::{
 //!     prelude::*,
 //!     Vector3,
@@ -63,27 +63,29 @@
 //! }
 //! ```
 
+#![feature(min_const_generics)]
+
 #![no_std]
 #[cfg(feature = "std")]
 extern crate std;
 
-pub mod traits;
+mod traits;
 pub use traits::*;
 
-pub mod vector;
+mod vector;
 pub use vector::*;
 
-pub mod matrix;
-pub use matrix::*;
+//pub mod matrix;
+//pub use matrix::*;
 
-pub mod complex;
-pub use complex::*;
+//pub mod complex;
+//pub use complex::*;
 
-pub mod transform;
-pub use transform::*;
+//pub mod transform;
+//pub use transform::*;
 
-#[cfg(feature = "random")]
-pub mod distributions;
+//#[cfg(feature = "random")]
+//pub mod distributions;
 
 pub mod prelude {
     pub use num_traits::{Zero, One};
