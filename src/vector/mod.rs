@@ -1,7 +1,7 @@
 mod base;
+mod dot;
 mod ops;
-//mod dot;
-//mod spec;
+mod spec;
 
 //#[cfg(feature = "random")]
 //mod random;
@@ -9,13 +9,13 @@ mod ops;
 //#[cfg(feature = "approx")]
 //mod approx;
 
-//#[cfg(test)]
-//mod tests;
+#[cfg(test)]
+mod tests;
 
 pub use base::*;
+pub use dot::*;
 pub use ops::*;
-//pub use dot::*;
-//pub use spec::*;
+pub use spec::*;
 
 //#[cfg(feature = "random")]
 //pub use random::*;

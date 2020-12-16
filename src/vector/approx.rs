@@ -1,6 +1,6 @@
 
 macro_rules! vector_approx { ($N:expr, $V:ident) => (
-	impl<T> AbsDiffEq for $V<T> where T: AbsDiffEq<Epsilon=T> + Clone {
+	impl<T> AbsDiffEq for $V<T> where T: AbsDiffEq<Epsilon=T> + ImplicitClone {
 		type Epsilon = T;
 		fn default_epsilon() -> Self::Epsilon {
 			T::default_epsilon()
