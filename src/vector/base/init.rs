@@ -6,6 +6,7 @@ use core::{
     ops::{Index, IndexMut},
     ptr,
 };
+use crate::traits::ImplicitClone;
 
 /// Vector of fixed size.
 #[repr(transparent)]
@@ -76,7 +77,7 @@ where
 
 impl<T, const N: usize> Vector<T, N>
 where
-    T: Clone,
+    T: ImplicitClone,
 {
     /// Create vector which elements are filled with scalar value.
     pub fn fill(v: T) -> Self {
@@ -115,7 +116,7 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, N> {
 
 impl<T, const N: usize> From<&[T; N]> for Vector<T, N>
 where
-    T: Clone,
+    T: ImplicitClone,
 {
     fn from(a: &[T; N]) -> Self {
         Self::from_array(a.clone())

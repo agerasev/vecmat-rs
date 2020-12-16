@@ -41,6 +41,13 @@ pub trait Outer<V> {
     fn outer(self, other: V) -> Self::Output;
 }
 
+/// Implicit clone trait.
+///
+/// Implementing this trait for non-`Copy` type means that
+/// it allowed to be copied on vector operations when required.
+pub trait ImplicitClone: Clone {}
+impl<T: Copy> ImplicitClone for T {}
+
 macro_rules! derive_primitive_base {
     ($T:ident) => {
         impl Dot for $T {

@@ -64,7 +64,7 @@ where
 
 impl<T, const N: usize> Mul<T> for Vector<T, N>
 where
-    T: Mul<Output = T> + Clone,
+    T: Mul<Output = T> + ImplicitClone,
 {
     type Output = Vector<T, N>;
     fn mul(self, a: T) -> Self::Output {
@@ -73,7 +73,7 @@ where
 }
 impl<T, const N: usize> Div<T> for Vector<T, N>
 where
-    T: Div<Output = T> + Clone,
+    T: Div<Output = T> + ImplicitClone,
 {
     type Output = Vector<T, N>;
     fn div(self, a: T) -> Self::Output {
@@ -82,7 +82,7 @@ where
 }
 impl<T, const N: usize> Rem<T> for Vector<T, N>
 where
-    T: Rem<Output = T> + Clone,
+    T: Rem<Output = T> + ImplicitClone,
 {
     type Output = Vector<T, N>;
     fn rem(self, a: T) -> Self::Output {
@@ -143,7 +143,7 @@ where
 
 impl<T, const N: usize> MulAssign<T> for Vector<T, N>
 where
-    T: MulAssign + Clone,
+    T: MulAssign + ImplicitClone,
 {
     fn mul_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
@@ -153,7 +153,7 @@ where
 }
 impl<T, const N: usize> DivAssign<T> for Vector<T, N>
 where
-    T: DivAssign + Clone,
+    T: DivAssign + ImplicitClone,
 {
     fn div_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
@@ -163,7 +163,7 @@ where
 }
 impl<T, const N: usize> RemAssign<T> for Vector<T, N>
 where
-    T: RemAssign + Clone,
+    T: RemAssign + ImplicitClone,
 {
     fn rem_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {

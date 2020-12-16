@@ -13,7 +13,7 @@ where
 }
 impl<T, const N: usize> Vector<T, N>
 where
-    T: Add<Output = T> + Mul<Output = T> + Clone,
+    T: Add<Output = T> + Mul<Output = T> + ImplicitClone,
 {
     pub fn square_length(self) -> T {
         self.map(|x| x.clone() * x).sum()
@@ -21,7 +21,7 @@ where
 }
 impl<T, const N: usize> Vector<T, N>
 where
-    T: Float + Clone,
+    T: Float + ImplicitClone,
 {
     pub fn length(self) -> T {
         self.square_length().sqrt()

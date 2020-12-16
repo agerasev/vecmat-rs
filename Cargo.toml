@@ -1,10 +1,10 @@
 [package]
 name = "vecmat"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
-description = "Lightweight low-dimensional vector and matrix library"
+description = "Low-dimensional vector algebra with min_const_generics support"
 documentation = "https://docs.rs/vecmat"
 homepage = "https://github.com/agerasev/vecmat-rs"
 repository = "https://github.com/agerasev/vecmat-rs"

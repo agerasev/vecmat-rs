@@ -1,10 +1,10 @@
-use crate::vector::*;
+use crate::{prelude::*, vector::*};
 use core::ops::{Mul, Sub};
 use num_traits::Zero;
 
 impl<T> Vector2<T>
 where
-    T: Clone,
+    T: ImplicitClone,
 {
     pub fn x(&self) -> T {
         unsafe { self.get_unchecked(0).clone() }
@@ -15,7 +15,7 @@ where
 }
 impl<T> Vector3<T>
 where
-    T: Clone,
+    T: ImplicitClone,
 {
     pub fn x(&self) -> T {
         unsafe { self.get_unchecked(0).clone() }
@@ -29,7 +29,7 @@ where
 }
 impl<T> Vector4<T>
 where
-    T: Clone,
+    T: ImplicitClone,
 {
     pub fn x(&self) -> T {
         unsafe { self.get_unchecked(0).clone() }
@@ -108,7 +108,7 @@ impl<T> Vector4<T> {
 
 impl<T> Vector2<T>
 where
-    T: Mul<Output = T> + Sub<Output = T> + Clone,
+    T: Mul<Output = T> + Sub<Output = T> + ImplicitClone,
 {
     /// Pseudo-cross product for 2D vector.
     pub fn cross(self, other: Vector2<T>) -> T {
@@ -117,7 +117,7 @@ where
 }
 impl<T> Vector3<T>
 where
-    T: Mul<Output = T> + Sub<Output = T> + Clone,
+    T: Mul<Output = T> + Sub<Output = T> + ImplicitClone,
 {
     /// Cross product.
     pub fn cross(self, other: Vector3<T>) -> Vector3<T> {
@@ -131,7 +131,7 @@ where
 }
 impl<T> Vector4<T>
 where
-    T: Mul<Output = T> + Sub<Output = T> + Zero + Clone,
+    T: Mul<Output = T> + Sub<Output = T> + Zero + ImplicitClone,
 {
     /// Cross product of first three components, fourth one is set to zero.
     pub fn cross(self, other: Vector4<T>) -> Vector4<T> {
