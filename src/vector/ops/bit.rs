@@ -1,61 +1,82 @@
+use crate::vector::*;
+use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not};
 
-macro_rules! vector_bit_not { ($N:expr, $V:ident) => (
-    impl<T> Not for $V<T> where T: Not<Output=T> {
-        type Output = $V<T>;
-        fn not(self) -> Self::Output {
-            self.map(|x| !x)
-        }
+impl<T, const N: usize> Not for Vector<T, N>
+where
+    T: Not<Output = T>,
+{
+    type Output = Vector<T, N>;
+    fn not(self) -> Self::Output {
+        self.map(|x| !x)
     }
-) }
+}
 
-macro_rules! op_bitand { ($a:expr, $b:expr) => ({ $a & $b }) }
-macro_rules! op_bitor  { ($a:expr, $b:expr) => ({ $a | $b }) }
-macro_rules! op_bitxor { ($a:expr, $b:expr) => ({ $a ^ $b }) }
-
-macro_rules! op_bitand_assign { ($a:expr, $b:expr) => ({ $a &= $b }) }
-macro_rules! op_bitor_assign  { ($a:expr, $b:expr) => ({ $a |= $b }) }
-macro_rules! op_bitxor_assign { ($a:expr, $b:expr) => ({ $a ^= $b }) }
-
-macro_rules! vector_bit_op { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-    impl<T> $Trait for $V<T> where T: $Trait<Output=T> {
-        type Output = $V<T>;
-        fn $method(self, other: $V<T>) -> Self::Output {
-            self.zip(other).map(|(x, y)| $op!(x, y))
-        }
+impl<T, const N: usize> BitAnd for Vector<T, N>
+where
+    T: BitAnd<Output = T>,
+{
+    type Output = Vector<T, N>;
+    fn bitand(self, other: Vector<T, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x & y)
     }
-) }
-macro_rules! vector_bit_op_assign { ($N:expr, $V:ident, $Trait:ident, $method:ident, $op:ident) => (
-    impl<T> $Trait for $V<T> where T: $Trait {
-        fn $method(&mut self, other: $V<T>) {
-			self.iter_mut().zip(other.into_iter()).for_each(|(s, y)| $op!(*s, y))
-        }
+}
+impl<T, const N: usize> BitOr for Vector<T, N>
+where
+    T: BitOr<Output = T>,
+{
+    type Output = Vector<T, N>;
+    fn bitor(self, other: Vector<T, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x | y)
     }
-) }
-
-macro_rules! vector_bool_any_all { ($N:expr, $V:ident) => (
-    impl $V<bool> {
-        pub fn any(self) -> bool {
-            self.into_iter().any(|x| x)
-        }
+}
+impl<T, const N: usize> BitXor for Vector<T, N>
+where
+    T: BitXor<Output = T>,
+{
+    type Output = Vector<T, N>;
+    fn bitxor(self, other: Vector<T, N>) -> Self::Output {
+        self.zip(other).map(|(x, y)| x ^ y)
     }
-    impl $V<bool> {
-        pub fn all(self) -> bool {
-            self.into_iter().all(|x| x)
-        }
+}
+
+impl<T, const N: usize> BitAndAssign for Vector<T, N>
+where
+    T: BitAndAssign,
+{
+    fn bitand_assign(&mut self, other: Vector<T, N>) {
+        self.iter_mut()
+            .zip(other.into_iter())
+            .for_each(|(s, y)| *s &= y)
     }
-) }
+}
+impl<T, const N: usize> BitOrAssign for Vector<T, N>
+where
+    T: BitOrAssign,
+{
+    fn bitor_assign(&mut self, other: Vector<T, N>) {
+        self.iter_mut()
+            .zip(other.into_iter())
+            .for_each(|(s, y)| *s |= y)
+    }
+}
+impl<T, const N: usize> BitXorAssign for Vector<T, N>
+where
+    T: BitXorAssign,
+{
+    fn bitxor_assign(&mut self, other: Vector<T, N>) {
+        self.iter_mut()
+            .zip(other.into_iter())
+            .for_each(|(s, y)| *s ^= y)
+    }
+}
 
-
-macro_rules! vector_bit { ($N:expr, $V:ident) => (
-    vector_bit_not!($N, $V);
-
-	vector_bit_op!($N, $V, BitAnd, bitand, op_bitand);
-	vector_bit_op!($N, $V, BitOr, bitor, op_bitor);
-	vector_bit_op!($N, $V, BitXor, bitxor, op_bitxor);
-
-	vector_bit_op_assign!($N, $V, BitAndAssign, bitand_assign, op_bitand_assign);
-	vector_bit_op_assign!($N, $V, BitOrAssign, bitor_assign, op_bitor_assign);
-	vector_bit_op_assign!($N, $V, BitXorAssign, bitxor_assign, op_bitxor_assign);
-
-	vector_bool_any_all!($N, $V);
-) }
+impl<const N: usize> Vector<bool, N> {
+    pub fn any(self) -> bool {
+        self.into_iter().any(|x| x)
+    }
+}
+impl<const N: usize> Vector<bool, N> {
+    pub fn all(self) -> bool {
+        self.into_iter().all(|x| x)
+    }
+}

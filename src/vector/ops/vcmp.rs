@@ -1,25 +1,31 @@
+use crate::vector::*;
+use core::cmp::PartialOrd;
 
-macro_rules! vector_vcmp { ($N:expr, $V:ident) => (
-	impl<T> $V<T> where T: PartialEq {
-		pub fn veq(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x == y)
-		}
-		pub fn vne(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x != y)
-		}
-	}
-	impl<T> $V<T> where T: PartialOrd {
-		pub fn vlt(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x < y)
-		}
-		pub fn vle(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x <= y)
-		}
-		pub fn vgt(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x > y)
-		}
-		pub fn vge(self, other: $V<T>) -> $V<bool> {
-			self.zip(other).map(|(x, y)| x >= y)
-		}
-	}
-) }
+impl<T, const N: usize> Vector<T, N>
+where
+    T: PartialEq,
+{
+    pub fn veq(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x == y)
+    }
+    pub fn vne(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x != y)
+    }
+}
+impl<T, const N: usize> Vector<T, N>
+where
+    T: PartialOrd,
+{
+    pub fn vlt(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x < y)
+    }
+    pub fn vle(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x <= y)
+    }
+    pub fn vgt(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x > y)
+    }
+    pub fn vge(self, other: Vector<T, N>) -> Vector<bool, N> {
+        self.zip(other).map(|(x, y)| x >= y)
+    }
+}

@@ -1,5 +1,5 @@
 mod base;
-//mod ops;
+mod ops;
 //mod dot;
 //mod spec;
 
@@ -13,7 +13,7 @@ mod base;
 //mod tests;
 
 pub use base::*;
-//pub use ops::*;
+pub use ops::*;
 //pub use dot::*;
 //pub use spec::*;
 
