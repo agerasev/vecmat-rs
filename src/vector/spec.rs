@@ -7,10 +7,10 @@ where
     T: ImplicitClone,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0).clone() }
+        unsafe { self.get_unchecked(0) }.clone()
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1).clone() }
+        unsafe { self.get_unchecked(1) }.clone()
     }
 }
 impl<T> Vector3<T>
@@ -18,13 +18,13 @@ where
     T: ImplicitClone,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0).clone() }
+        unsafe { self.get_unchecked(0) }.clone()
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1).clone() }
+        unsafe { self.get_unchecked(1) }.clone()
     }
     pub fn z(&self) -> T {
-        unsafe { self.get_unchecked(2).clone() }
+        unsafe { self.get_unchecked(2) }.clone()
     }
 }
 impl<T> Vector4<T>
@@ -32,16 +32,16 @@ where
     T: ImplicitClone,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0).clone() }
+        unsafe { self.get_unchecked(0) }.clone()
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1).clone() }
+        unsafe { self.get_unchecked(1) }.clone()
     }
     pub fn z(&self) -> T {
-        unsafe { self.get_unchecked(2).clone() }
+        unsafe { self.get_unchecked(2) }.clone()
     }
     pub fn w(&self) -> T {
-        unsafe { self.get_unchecked(3).clone() }
+        unsafe { self.get_unchecked(3) }.clone()
     }
 }
 
@@ -145,35 +145,29 @@ where
     }
 }
 
-impl<T> From<(T, T)> for Vector2<T> {
-    fn from((x, y): (T, T)) -> Self {
-        Self::from([x, y])
+impl<T> Vector2<T> {
+    pub fn from_tuple((x, y): (T, T)) -> Self {
+        Self::from_array([x, y])
     }
-}
-impl<T> Into<(T, T)> for Vector2<T> {
-    fn into(self) -> (T, T) {
+    pub fn into_tuple(self) -> (T, T) {
         let mut it = self.into_iter();
         (it.next().unwrap(), it.next().unwrap())
     }
 }
-impl<T> From<(T, T, T)> for Vector3<T> {
-    fn from((x, y, z): (T, T, T)) -> Self {
-        Self::from([x, y, z])
+impl<T> Vector3<T> {
+    pub fn from_tuple((x, y, z): (T, T, T)) -> Self {
+        Self::from_array([x, y, z])
     }
-}
-impl<T> Into<(T, T, T)> for Vector3<T> {
-    fn into(self) -> (T, T, T) {
+    pub fn into_tuple(self) -> (T, T, T) {
         let mut it = self.into_iter();
         (it.next().unwrap(), it.next().unwrap(), it.next().unwrap())
     }
 }
-impl<T> From<(T, T, T, T)> for Vector4<T> {
-    fn from((x, y, z, w): (T, T, T, T)) -> Self {
-        Self::from([x, y, z, w])
+impl<T> Vector4<T> {
+    pub fn from_tuple((x, y, z, w): (T, T, T, T)) -> Self {
+        Self::from_array([x, y, z, w])
     }
-}
-impl<T> Into<(T, T, T, T)> for Vector4<T> {
-    fn into(self) -> (T, T, T, T) {
+    pub fn into_tuple(self) -> (T, T, T, T) {
         let mut it = self.into_iter();
         (
             it.next().unwrap(),
@@ -181,5 +175,36 @@ impl<T> Into<(T, T, T, T)> for Vector4<T> {
             it.next().unwrap(),
             it.next().unwrap(),
         )
+    }
+}
+
+impl<T> From<(T, T)> for Vector2<T> {
+    fn from(tuple: (T, T)) -> Self {
+        Self::from_tuple(tuple)
+    }
+}
+impl<T> Into<(T, T)> for Vector2<T> {
+    fn into(self) -> (T, T) {
+        self.into_tuple()
+    }
+}
+impl<T> From<(T, T, T)> for Vector3<T> {
+    fn from(tuple: (T, T, T)) -> Self {
+        Self::from_tuple(tuple)
+    }
+}
+impl<T> Into<(T, T, T)> for Vector3<T> {
+    fn into(self) -> (T, T, T) {
+        self.into_tuple()
+    }
+}
+impl<T> From<(T, T, T, T)> for Vector4<T> {
+    fn from(tuple: (T, T, T, T)) -> Self {
+        Self::from_tuple(tuple)
+    }
+}
+impl<T> Into<(T, T, T, T)> for Vector4<T> {
+    fn into(self) -> (T, T, T, T) {
+        self.into_tuple()
     }
 }
