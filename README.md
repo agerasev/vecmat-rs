@@ -9,7 +9,7 @@
 
 [crates_badge]: https://img.shields.io/crates/v/vecmat.svg
 [docs_badge]: https://docs.rs/vecmat/badge.svg
-[travis_badge]: https://api.travis-ci.org/agerasev/vecmat-rs.svg
+[travis_badge]: https://api.travis-ci.org/agerasev/vecmat-rs.svg?branch=master
 [appveyor_badge]: https://ci.appveyor.com/api/projects/status/e43qp5a1alb9ilcp/branch/master?svg=true
 [codecov_badge]: https://codecov.io/gh/agerasev/vecmat-rs/graphs/badge.svg
 [license_badge]: https://img.shields.io/crates/l/vecmat.svg
