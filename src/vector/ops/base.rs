@@ -4,7 +4,7 @@ use core::{
     iter::IntoIterator,
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
-use num_traits::{Float, Zero};
+use num_traits::Zero;
 
 impl<T, const N: usize> Neg for Vector<T, N>
 where
@@ -239,11 +239,11 @@ where
 }
 impl<T, const N: usize> NormL2 for Vector<T, N>
 where
-    T: Float,
+    T: Mul<Output = T> + Add<Output = T> + GenericFloat + ImplicitClone,
 {
     type Output = T;
     fn norm_l2(self) -> T {
-        self.map(|x| x * x).sum().sqrt()
+        self.map(|x| x.clone() * x).sum().sqrt()
     }
 }
 impl<T, const N: usize> NormLInf for Vector<T, N>

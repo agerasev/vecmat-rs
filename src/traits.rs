@@ -1,6 +1,3 @@
-#[cfg(not(feature = "std"))]
-pub use num_traits::float::FloatCore;
-
 /// L1 Norm trait.
 pub trait NormL1 {
     /// Type of the norm.
@@ -47,6 +44,12 @@ pub trait Outer<V> {
 /// it allowed to be copied on vector operations when required.
 pub trait ImplicitClone: Clone {}
 impl<T: Copy> ImplicitClone for T {}
+
+/// Generic floating point number.
+/// It doesn't require the type to be `Copy` and `Num`.
+pub trait GenericFloat {
+    fn sqrt(self) -> Self;
+}
 
 macro_rules! derive_primitive_base {
     ($T:ident) => {
@@ -109,6 +112,18 @@ macro_rules! derive_primitive_signed {
     };
 }
 
+macro_rules! derive_primitive_float {
+    ($T:ident) => {
+        derive_primitive_signed!($T);
+
+        impl GenericFloat for $T {
+            fn sqrt(self) -> Self {
+                $T::sqrt(self)
+            }
+        }
+    };
+}
+
 derive_primitive_unsigned!(u8);
 derive_primitive_unsigned!(u16);
 derive_primitive_unsigned!(u32);
@@ -119,5 +134,5 @@ derive_primitive_signed!(i16);
 derive_primitive_signed!(i32);
 derive_primitive_signed!(i64);
 
-derive_primitive_signed!(f32);
-derive_primitive_signed!(f64);
+derive_primitive_float!(f32);
+derive_primitive_float!(f64);

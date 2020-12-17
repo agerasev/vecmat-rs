@@ -23,7 +23,7 @@ macro_rules! vector_random { ($N:expr, $V:ident, $D:ident) => (
         }
     }
 
-    impl<T: Float + ImplicitClone> Distribution<$V<T>> for NonZero where StandardNormal: Distribution<$V<T>> {
+    impl<T: GenericFloat + ImplicitClone> Distribution<$V<T>> for NonZero where StandardNormal: Distribution<$V<T>> {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $V<T> {
             loop {
                 let x = rng.sample(&StandardNormal);
@@ -34,7 +34,7 @@ macro_rules! vector_random { ($N:expr, $V:ident, $D:ident) => (
         }
     }
 
-    impl<T: Float + ImplicitClone> Distribution<$V<T>> for Unit where NonZero: Distribution<$V<T>> {
+    impl<T: GenericFloat + ImplicitClone> Distribution<$V<T>> for Unit where NonZero: Distribution<$V<T>> {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $V<T> {
             rng.sample(&NonZero).normalize()
         }

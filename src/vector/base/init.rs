@@ -1,12 +1,12 @@
 #![allow(clippy::missing_safety_doc)]
 
+use crate::traits::ImplicitClone;
 use core::{
     convert::{TryFrom, TryInto},
     mem::{self, MaybeUninit},
     ops::{Index, IndexMut},
     ptr,
 };
-use crate::traits::ImplicitClone;
 
 /// Vector of fixed size.
 #[repr(transparent)]

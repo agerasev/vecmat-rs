@@ -1,6 +1,5 @@
 use crate::{traits::*, vector::*};
-use core::ops::{Add, Mul};
-use num_traits::Float;
+use core::ops::{Add, Div, Mul};
 
 impl<T, const N: usize> Dot<Vector<T, N>> for Vector<T, N>
 where
@@ -11,6 +10,7 @@ where
         self.zip(other).map(|(x, y)| x * y).sum()
     }
 }
+
 impl<T, const N: usize> Vector<T, N>
 where
     T: Add<Output = T> + Mul<Output = T> + ImplicitClone,
@@ -19,14 +19,15 @@ where
         self.map(|x| x.clone() * x).sum()
     }
 }
+
 impl<T, const N: usize> Vector<T, N>
 where
-    T: Float + ImplicitClone,
+    T: Add<Output = T> + Mul<Output = T> + Div<Output = T> + GenericFloat + ImplicitClone,
 {
     pub fn length(self) -> T {
         self.square_length().sqrt()
     }
     pub fn normalize(self) -> Vector<T, N> {
-        self / self.length()
+        self.clone() / self.length()
     }
 }

@@ -74,7 +74,7 @@ use core::{
 #[cfg(feature = "random")]
 use core::marker::PhantomData;
 
-use num_traits::{Zero, Float};
+use num_traits::{Zero, GenericFloat};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, };
 #[cfg(feature = "approx")]
