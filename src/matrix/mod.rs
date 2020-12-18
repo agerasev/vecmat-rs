@@ -1,50 +1,50 @@
-#[macro_use]
 mod base;
+//mod ops;
+//mod transpose;
+//mod product;
+//mod square;
+
+//#[cfg(feature = "random")]
+//mod random;
+
+//#[cfg(feature = "approx")]
+//mod approx;
+
 pub use base::*;
+//pub use ops::*;
+//pub use transpose::*;
+//pub use product::*;
+//pub use square::*;
 
-#[macro_use]
-mod ops;
-pub use ops::*;
+//#[cfg(test)]
+//mod tests;
 
-#[macro_use]
-mod transpose;
-pub use transpose::*;
+pub type Matrix2x2<T> = Matrix<T, 2, 2>;
+pub type Matrix2x3<T> = Matrix<T, 2, 3>;
+pub type Matrix2x4<T> = Matrix<T, 2, 4>;
+pub type Matrix3x2<T> = Matrix<T, 3, 2>;
+pub type Matrix3x3<T> = Matrix<T, 3, 3>;
+pub type Matrix3x4<T> = Matrix<T, 3, 4>;
+pub type Matrix4x2<T> = Matrix<T, 4, 2>;
+pub type Matrix4x3<T> = Matrix<T, 4, 3>;
+pub type Matrix4x4<T> = Matrix<T, 4, 4>;
 
-#[macro_use]
-mod product;
-pub use product::*;
-
-#[macro_use]
-mod square;
-pub use square::*;
-
-#[cfg(feature = "random")]
-#[macro_use]
-mod random;
-
-#[cfg(feature = "approx")]
-#[macro_use]
-mod approx;
-
-#[cfg(test)]
-mod tests;
-
-
+/*
 use core::{
-	mem::{self, MaybeUninit},
-	ptr,
-	convert::{TryFrom},
-	ops::{
-		Index, IndexMut,
-		Neg, Add, Sub, Mul, Div, Rem,
-		AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
-		Not, BitAnd, BitOr, BitXor,
-		BitAndAssign, BitOrAssign, BitXorAssign,
-	},
-	cmp::{PartialOrd},
-	iter::{IntoIterator},
-	slice,
-	fmt::{Display, Formatter, Result as FmtResult},
+    mem::{self, MaybeUninit},
+    ptr,
+    convert::{TryFrom},
+    ops::{
+        Index, IndexMut,
+        Neg, Add, Sub, Mul, Div, Rem,
+        AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
+        Not, BitAnd, BitOr, BitXor,
+        BitAndAssign, BitOrAssign, BitXorAssign,
+    },
+    cmp::{PartialOrd},
+    iter::{IntoIterator},
+    slice,
+    fmt::{Display, Formatter, Result as FmtResult},
 };
 #[cfg(feature = "random")]
 use core::marker::PhantomData;
@@ -65,12 +65,12 @@ pub use crate::traits::{Dot, Outer};
 
 
 macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident, $D:ident) => (
-	matrix_base!($M, $N, $W, $V, $U, $GI);
-	matrix_ops!($M, $N, $W);
-	#[cfg(feature = "random")]
-	matrix_random!($M, $N, $W, $D);
-	#[cfg(feature = "approx")]
-	matrix_approx!($M, $N, $W);
+    matrix_base!($M, $N, $W, $V, $U, $GI);
+    matrix_ops!($M, $N, $W);
+    #[cfg(feature = "random")]
+    matrix_random!($M, $N, $W, $D);
+    #[cfg(feature = "approx")]
+    matrix_approx!($M, $N, $W);
 ) }
 
 matrix_all!(2, 2, Matrix2x2, Vector2, Vector2, GroupIter2, MatrixDistribution2x2);
@@ -130,3 +130,4 @@ matrix_dot!(4, 3, 4, Matrix4x3, Matrix3x4, Matrix4x4);
 matrix_dot!(4, 4, 2, Matrix4x4, Matrix4x2, Matrix4x2);
 matrix_dot!(4, 4, 3, Matrix4x4, Matrix4x3, Matrix4x3);
 matrix_dot!(4, 4, 4, Matrix4x4, Matrix4x4, Matrix4x4);
+*/

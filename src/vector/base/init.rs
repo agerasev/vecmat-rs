@@ -103,7 +103,7 @@ impl<T, const N: usize> Vector<T, N> {
         &self.data
     }
     /// Get a mutable reference to underlying array.
-    pub fn as_array_mut(&mut self) -> &mut [T; N] {
+    pub fn as_mut_array(&mut self) -> &mut [T; N] {
         &mut self.data
     }
 }
@@ -113,31 +113,27 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, N> {
         Self::from_array(a)
     }
 }
-
 impl<T, const N: usize> From<&[T; N]> for Vector<T, N>
 where
     T: ImplicitClone,
 {
-    fn from(a: &[T; N]) -> Self {
-        Self::from_array(a.clone())
+    fn from(ar: &[T; N]) -> Self {
+        Self::from_array(ar.clone())
     }
 }
-
 impl<T, const N: usize> Into<[T; N]> for Vector<T, N> {
     fn into(self) -> [T; N] {
         self.into_array()
     }
 }
-
 impl<'a, T, const N: usize> Into<&'a [T; N]> for &'a Vector<T, N> {
     fn into(self) -> &'a [T; N] {
         self.as_array()
     }
 }
-
 impl<'a, T, const N: usize> Into<&'a mut [T; N]> for &'a mut Vector<T, N> {
     fn into(self) -> &'a mut [T; N] {
-        self.as_array_mut()
+        self.as_mut_array()
     }
 }
 
@@ -146,10 +142,9 @@ impl<T, const N: usize> AsRef<[T; N]> for Vector<T, N> {
         self.as_array()
     }
 }
-
 impl<T, const N: usize> AsMut<[T; N]> for Vector<T, N> {
     fn as_mut(&mut self) -> &mut [T; N] {
-        self.as_array_mut()
+        self.as_mut_array()
     }
 }
 
