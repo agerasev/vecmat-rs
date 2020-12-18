@@ -1,5 +1,4 @@
-use crate::matrix::*;
-use crate::vector::*;
+use crate::{prelude::*, matrix::*};
 
 macro_rules! mat_new_test {
 	($M:expr, $N:expr, $W:ident) => (
@@ -508,6 +507,7 @@ fn scal_rem_assign() {
 	mat_op_scal_assign_test!(4, 4, Matrix4x4, op_rem_assign, op_rem);
 }
 
+/*
 macro_rules! mat_zero_test {
 	($M:expr, $N:expr, $W:ident) => (
 		let z = $W::<i32>::zero();
@@ -711,3 +711,4 @@ fn inverse() {
 	let dm = m - im;
 	assert!(dm[(0, 0)].abs() + dm[(0, 1)].abs() + dm[(1, 0)].abs() + dm[(1, 1)].abs() < 1e-8);
 }
+*/

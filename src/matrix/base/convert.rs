@@ -110,6 +110,7 @@ impl<T, const M: usize, const N: usize> AsMut<Vector<Vector<T, N>, M>> for Matri
         self.as_mut_vector_of_vectors()
     }
 }
+/*
 impl<T, const M: usize, const N: usize> AsRef<[Vector<T, N>; M]> for Matrix<T, M, N> {
     fn as_ref(&self) -> &[Vector<T, N>; M] {
         self.as_array_of_vectors()
@@ -130,6 +131,7 @@ impl<T, const M: usize, const N: usize> AsMut<[[T; N]; M]> for Matrix<T, M, N> {
         self.as_mut_array_of_arrays()
     }
 }
+*/
 
 impl<'a, T, const M: usize, const N: usize> Into<&'a Vector<Vector<T, N>, M>>
     for &'a Matrix<T, M, N>

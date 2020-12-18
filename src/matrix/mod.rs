@@ -3,6 +3,7 @@ mod ops;
 mod product;
 mod transpose;
 //mod square;
+mod format;
 
 //#[cfg(feature = "random")]
 //mod random;
@@ -15,9 +16,10 @@ pub use ops::*;
 pub use product::*;
 pub use transpose::*;
 //pub use square::*;
+pub use format::*;
 
-//#[cfg(test)]
-//mod tests;
+#[cfg(test)]
+mod tests;
 
 pub type Matrix2x2<T> = Matrix<T, 2, 2>;
 pub type Matrix2x3<T> = Matrix<T, 2, 3>;
