@@ -1,12 +1,12 @@
 #![allow(clippy::missing_safety_doc)]
 
+use super::Matrix;
 use crate::{traits::*, vector::*};
 use core::{
+    mem::MaybeUninit,
     ops::{Index, IndexMut},
-    mem::{MaybeUninit},
     ptr,
 };
-use super::Matrix;
 
 impl<T, const M: usize, const N: usize> Matrix<MaybeUninit<T>, M, N> {
     /// Transpose `MaybeUninit<Matrix<T, M, N>>` into `Matrix<MaybeUninit<T>, M, N>`.

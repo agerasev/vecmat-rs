@@ -64,7 +64,7 @@ where
 
 impl<T, const M: usize, const N: usize> Mul<T> for Matrix<T, N, M>
 where
-    T: Mul<Output = T> + Clone,
+    T: Mul<Output = T> + ImplicitClone,
 {
     type Output = Matrix<T, N, M>;
     fn mul(self, a: T) -> Self::Output {
@@ -73,7 +73,7 @@ where
 }
 impl<T, const M: usize, const N: usize> Div<T> for Matrix<T, N, M>
 where
-    T: Div<Output = T> + Clone,
+    T: Div<Output = T> + ImplicitClone,
 {
     type Output = Matrix<T, N, M>;
     fn div(self, a: T) -> Self::Output {
@@ -82,7 +82,7 @@ where
 }
 impl<T, const M: usize, const N: usize> Rem<T> for Matrix<T, N, M>
 where
-    T: Rem<Output = T> + Clone,
+    T: Rem<Output = T> + ImplicitClone,
 {
     type Output = Matrix<T, N, M>;
     fn rem(self, a: T) -> Self::Output {
@@ -143,7 +143,7 @@ where
 
 impl<T, const M: usize, const N: usize> MulAssign<T> for Matrix<T, N, M>
 where
-    T: MulAssign + Clone,
+    T: MulAssign + ImplicitClone,
 {
     fn mul_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
@@ -153,7 +153,7 @@ where
 }
 impl<T, const M: usize, const N: usize> DivAssign<T> for Matrix<T, N, M>
 where
-    T: DivAssign + Clone,
+    T: DivAssign + ImplicitClone,
 {
     fn div_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
@@ -163,7 +163,7 @@ where
 }
 impl<T, const M: usize, const N: usize> RemAssign<T> for Matrix<T, N, M>
 where
-    T: RemAssign + Clone,
+    T: RemAssign + ImplicitClone,
 {
     fn rem_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {

@@ -1,8 +1,6 @@
-use crate::{traits::*, vector::*};
-use core::{
-    convert::TryFrom,
-};
 use super::Matrix;
+use crate::{traits::*, vector::*};
+use core::convert::TryFrom;
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
     pub fn from_vector_of_vectors(a: Vector<Vector<T, N>, M>) -> Self {

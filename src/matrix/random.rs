@@ -1,5 +1,5 @@
 macro_rules! matrix_random { ($M:expr, $N:expr, $W:ident, $D:ident) => (
-    #[derive(Clone, Copy, Debug, PartialEq)]
+    #[derive(ImplicitClone, Copy, Debug, PartialEq)]
     pub struct $D<T, D: Distribution<T>> {
         pub inner: D,
         phantom: PhantomData<T>,
@@ -11,7 +11,7 @@ macro_rules! matrix_random { ($M:expr, $N:expr, $W:ident, $D:ident) => (
         }
     }
 
-    impl<T, D: Distribution<T> + Clone> Distribution<$W<T>> for $D<T, D> {
+    impl<T, D: Distribution<T> + ImplicitClone> Distribution<$W<T>> for $D<T, D> {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
             $W::init(|| rng.sample(self.inner.clone()))
         }

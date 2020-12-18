@@ -1,12 +1,12 @@
 #![allow(clippy::missing_safety_doc)]
 
+use super::Vector;
 use crate::traits::ImplicitClone;
 use core::{
-    mem::{MaybeUninit},
+    mem::MaybeUninit,
     ops::{Index, IndexMut},
     ptr,
 };
-use super::Vector;
 
 impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
     /// Transpose `MaybeUninit<Vector<T, N>>` into `Vector<MaybeUninit<T>, N>`.

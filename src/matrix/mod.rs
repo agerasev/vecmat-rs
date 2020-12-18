@@ -1,7 +1,7 @@
 mod base;
 mod ops;
-//mod transpose;
-//mod product;
+mod product;
+mod transpose;
 //mod square;
 
 //#[cfg(feature = "random")]
@@ -12,8 +12,8 @@ mod ops;
 
 pub use base::*;
 pub use ops::*;
-//pub use transpose::*;
-//pub use product::*;
+pub use product::*;
+pub use transpose::*;
 //pub use square::*;
 
 //#[cfg(test)]
@@ -48,7 +48,7 @@ use core::{
 };
 #[cfg(feature = "random")]
 use core::marker::PhantomData;
-use num_traits::{Zero, One, Num, Float};
+use num_traits::{Zero, One, Num, GenericFloat};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, vector::*};
 #[cfg(feature = "random")]

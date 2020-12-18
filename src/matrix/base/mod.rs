@@ -1,9 +1,9 @@
-mod init;
 mod convert;
+mod init;
 mod iter;
 
-pub use init::*;
 pub use convert::*;
+pub use init::*;
 pub use iter::*;
 
 use crate::vector::*;

@@ -1,9 +1,9 @@
 use super::Vector;
 use core::{
+    convert::{TryFrom, TryInto},
     iter::IntoIterator,
     mem::{self, MaybeUninit},
     ptr, slice,
-    convert::{TryFrom, TryInto},
 };
 
 /// Iterator by values for array.
@@ -86,7 +86,6 @@ impl<'a, T, const N: usize> IntoIterator for &'a mut Vector<T, N> {
         self.as_mut().iter_mut()
     }
 }
-
 
 impl<'a, T, const N: usize> TryFrom<&'a [T]> for Vector<T, N>
 where

@@ -1,8 +1,6 @@
-use crate::{vector::*};
-use core::{
-    slice,
-};
 use super::Matrix;
+use crate::vector::*;
+use core::slice;
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
     /// Returns iterator over matrix element refrences.
