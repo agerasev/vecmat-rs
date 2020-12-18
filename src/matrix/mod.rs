@@ -1,5 +1,5 @@
 mod base;
-//mod ops;
+mod ops;
 //mod transpose;
 //mod product;
 //mod square;
@@ -11,7 +11,7 @@ mod base;
 //mod approx;
 
 pub use base::*;
-//pub use ops::*;
+pub use ops::*;
 //pub use transpose::*;
 //pub use product::*;
 //pub use square::*;
