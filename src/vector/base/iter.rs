@@ -3,6 +3,7 @@ use core::{
     iter::IntoIterator,
     mem::{self, MaybeUninit},
     ptr, slice,
+    convert::{TryFrom, TryInto},
 };
 
 /// Iterator by values for array.
@@ -83,6 +84,51 @@ impl<'a, T, const N: usize> IntoIterator for &'a mut Vector<T, N> {
     type IntoIter = slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.as_mut().iter_mut()
+    }
+}
+
+
+impl<'a, T, const N: usize> TryFrom<&'a [T]> for Vector<T, N>
+where
+    T: Copy,
+{
+    type Error = ();
+    fn try_from(s: &'a [T]) -> Result<Self, Self::Error> {
+        s.try_into().map(Self::from_array).map_err(|_| ())
+    }
+}
+
+impl<T, const N: usize> Vector<T, N> {
+    // TODO: Implement `TryFrom` without conflict.
+    /// Try to conctruct a vector from iterator.
+    /// If iterator conatins less items than vector, then `Err` is returned.
+    pub fn try_from_iter<I>(iter: I) -> Option<Self>
+    where
+        I: Iterator<Item = T>,
+    {
+        let mut a = Vector::uninit();
+
+        let mut pos: usize = 0;
+        for (x, y) in a.iter_mut().zip(iter) {
+            let _ = mem::replace(x, MaybeUninit::new(y));
+            pos += 1;
+        }
+
+        // TODO: Use exclusive range pattern when it will be possible.
+        #[allow(clippy::comparison_chain)]
+        if pos > N {
+            unreachable!();
+        } else if pos == N {
+            Some(unsafe { a.assume_init() })
+        } else {
+            // Drop loaded items
+            unsafe {
+                for x in a.as_mut().get_unchecked_mut(0..pos) {
+                    mem::replace(x, MaybeUninit::uninit()).assume_init();
+                }
+            }
+            None
+        }
     }
 }
 

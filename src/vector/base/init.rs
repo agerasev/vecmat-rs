@@ -2,18 +2,11 @@
 
 use crate::traits::ImplicitClone;
 use core::{
-    convert::{TryFrom, TryInto},
-    mem::{self, MaybeUninit},
+    mem::{MaybeUninit},
     ops::{Index, IndexMut},
     ptr,
 };
-
-/// Vector of fixed size.
-#[repr(transparent)]
-#[derive(Clone, Copy, PartialEq)]
-pub struct Vector<T, const N: usize> {
-    data: [T; N],
-}
+use super::Vector;
 
 impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
     /// Transpose `MaybeUninit<Vector<T, N>>` into `Vector<MaybeUninit<T>, N>`.
@@ -27,14 +20,12 @@ impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
         unsafe { ptr::read(&self as *const _ as *const MaybeUninit<Vector<T, N>>) }
     }
 }
-
 impl<T, const N: usize> Vector<T, N> {
     /// Create a vector with uninitialized content.
     pub fn uninit() -> Vector<MaybeUninit<T>, N> {
         Vector::from_uninit(MaybeUninit::uninit())
     }
 }
-
 impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
     /// Assume that vector content is initialized.
     pub unsafe fn assume_init(self) -> Vector<T, N> {
@@ -145,50 +136,6 @@ impl<T, const N: usize> AsRef<[T; N]> for Vector<T, N> {
 impl<T, const N: usize> AsMut<[T; N]> for Vector<T, N> {
     fn as_mut(&mut self) -> &mut [T; N] {
         self.as_mut_array()
-    }
-}
-
-impl<'a, T, const N: usize> TryFrom<&'a [T]> for Vector<T, N>
-where
-    T: Copy,
-{
-    type Error = ();
-    fn try_from(s: &'a [T]) -> Result<Self, Self::Error> {
-        s.try_into().map(|a| Self { data: a }).map_err(|_| ())
-    }
-}
-
-impl<T, const N: usize> Vector<T, N> {
-    // TODO: Implement `TryFrom` without conflict.
-    /// Try to conctruct a vector from iterator.
-    /// If iterator conatins less items than vector, then `Err` is returned.
-    pub fn try_from_iter<I>(iter: I) -> Option<Self>
-    where
-        I: Iterator<Item = T>,
-    {
-        let mut a = Vector::uninit();
-
-        let mut pos: usize = 0;
-        for (x, y) in a.data.iter_mut().zip(iter) {
-            let _ = mem::replace(x, MaybeUninit::new(y));
-            pos += 1;
-        }
-
-        // TODO: Use exclusive range pattern when it will be possible.
-        #[allow(clippy::comparison_chain)]
-        if pos > N {
-            unreachable!();
-        } else if pos == N {
-            Some(unsafe { a.assume_init() })
-        } else {
-            // Drop loaded items
-            unsafe {
-                for x in a.as_mut().get_unchecked_mut(0..pos) {
-                    mem::replace(x, MaybeUninit::uninit()).assume_init();
-                }
-            }
-            None
-        }
     }
 }
 
