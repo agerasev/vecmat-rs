@@ -43,7 +43,6 @@ pub trait Outer<V> {
 /// Implementing this trait for non-`Copy` type means that
 /// it allowed to be copied on vector operations when required.
 pub trait ImplicitClone: Clone {}
-impl<T: Copy> ImplicitClone for T {}
 
 /// Generic floating point number.
 /// It doesn't require the type to be `Copy` and `Num`.
@@ -53,6 +52,14 @@ pub trait GenericFloat {
 
 macro_rules! derive_primitive_base {
     ($T:ident) => {
+        impl ImplicitClone for $T {}
+    };
+}
+
+macro_rules! derive_primitive_number {
+    ($T:ident) => {
+        derive_primitive_base!($T);
+
         impl Dot for $T {
             type Output = Self;
             fn dot(self, other: Self) -> Self {
@@ -64,7 +71,7 @@ macro_rules! derive_primitive_base {
 
 macro_rules! derive_primitive_unsigned {
     ($T:ident) => {
-        derive_primitive_base!($T);
+        derive_primitive_number!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -89,7 +96,7 @@ macro_rules! derive_primitive_unsigned {
 
 macro_rules! derive_primitive_signed {
     ($T:ident) => {
-        derive_primitive_base!($T);
+        derive_primitive_number!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -124,15 +131,19 @@ macro_rules! derive_primitive_float {
     };
 }
 
+derive_primitive_base!(bool);
+
 derive_primitive_unsigned!(u8);
 derive_primitive_unsigned!(u16);
 derive_primitive_unsigned!(u32);
 derive_primitive_unsigned!(u64);
+derive_primitive_unsigned!(usize);
 
 derive_primitive_signed!(i8);
 derive_primitive_signed!(i16);
 derive_primitive_signed!(i32);
 derive_primitive_signed!(i64);
+derive_primitive_signed!(isize);
 
 derive_primitive_float!(f32);
 derive_primitive_float!(f64);

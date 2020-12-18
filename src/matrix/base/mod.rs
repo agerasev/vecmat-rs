@@ -6,7 +6,7 @@ pub use convert::*;
 pub use init::*;
 pub use iter::*;
 
-use crate::vector::*;
+use crate::{traits::ImplicitClone, vector::Vector};
 
 /// Matrix with fixed dimensions.
 #[repr(transparent)]
@@ -14,3 +14,5 @@ use crate::vector::*;
 pub struct Matrix<T, const M: usize, const N: usize> {
     data: Vector<Vector<T, N>, M>,
 }
+
+impl<T: ImplicitClone, const M: usize, const N: usize> ImplicitClone for Matrix<T, M, N> {}

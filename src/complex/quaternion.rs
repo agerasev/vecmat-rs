@@ -10,6 +10,8 @@ pub struct Quaternion<T> {
     vec: Vector4<T>,
 }
 
+impl<T: ImplicitClone> ImplicitClone for Quaternion<T> {}
+
 impl<T> Quaternion<T> {
     pub fn new(w: T, x: T, y: T, z: T) -> Self {
         Self {
