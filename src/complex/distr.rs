@@ -1,6 +1,10 @@
+use crate::{
+    distr::*,
+    vector::{Vector, VectorDistribution},
+    Quaternion,
+};
 use num_traits::Float;
-use rand_::{Rng, {distributions::Distribution}};
-use crate::{vector::{Vector, VectorDistribution}, Quaternion, distr::*};
+use rand_::{distributions::Distribution, Rng};
 
 pub struct QuaternionDistribution<D: Distribution<T>, T> {
     pub inner: VectorDistribution<D, T, 4>,
@@ -8,7 +12,9 @@ pub struct QuaternionDistribution<D: Distribution<T>, T> {
 
 impl<D: Distribution<T>, T> QuaternionDistribution<D, T> {
     pub fn new(inner: D) -> Self {
-        Self { inner: VectorDistribution::new(inner) }
+        Self {
+            inner: VectorDistribution::new(inner),
+        }
     }
 }
 
@@ -18,19 +24,28 @@ impl<D: Distribution<T>, T> Distribution<Quaternion<T>> for QuaternionDistributi
     }
 }
 
-impl<T> Distribution<Quaternion<T>> for Normal where Normal: Distribution<Vector<T, 4>> {
+impl<T> Distribution<Quaternion<T>> for Normal
+where
+    Normal: Distribution<Vector<T, 4>>,
+{
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
         rng.sample(Self).into()
     }
 }
 
-impl<T: Float> Distribution<Quaternion<T>> for NonZero where NonZero: Distribution<Vector<T, 4>> {
+impl<T: Float> Distribution<Quaternion<T>> for NonZero
+where
+    NonZero: Distribution<Vector<T, 4>>,
+{
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
         rng.sample(Self).into()
     }
 }
 
-impl<T: Float> Distribution<Quaternion<T>> for Unit where Unit: Distribution<Vector<T, 4>> {
+impl<T: Float> Distribution<Quaternion<T>> for Unit
+where
+    Unit: Distribution<Vector<T, 4>>,
+{
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
         rng.sample(Self).into()
     }

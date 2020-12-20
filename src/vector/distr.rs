@@ -1,5 +1,5 @@
 use crate::{
-    distr::{NonZero, StatefulNormal, Normal, Unit},
+    distr::{NonZero, Normal, StatefulNormal, Unit},
     Vector,
 };
 use core::marker::PhantomData;
@@ -21,7 +21,9 @@ impl<D: Distribution<T>, T, const N: usize> VectorDistribution<D, T, N> {
     }
 }
 
-impl<D: Distribution<T>, T, const N: usize> Distribution<Vector<T, N>> for VectorDistribution<D, T, N> {
+impl<D: Distribution<T>, T, const N: usize> Distribution<Vector<T, N>>
+    for VectorDistribution<D, T, N>
+{
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vector<T, N> {
         Vector::init(|| rng.sample(&self.inner))
     }

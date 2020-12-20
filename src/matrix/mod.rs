@@ -1,11 +1,11 @@
 mod base;
+#[cfg(feature = "rand")]
+mod distr;
 mod format;
 mod ops;
 mod product;
 mod square;
 mod transpose;
-#[cfg(feature = "rand")]
-mod distr;
 //#[cfg(feature = "approx")]
 //mod approx;
 #[cfg(test)]

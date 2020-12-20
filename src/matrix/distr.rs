@@ -1,7 +1,10 @@
-use crate::{distr::{StatefulNormal, Normal, Invertible}, Matrix};
+use crate::{
+    distr::{Invertible, Normal, StatefulNormal},
+    Matrix,
+};
 use core::marker::PhantomData;
-use rand_::{distributions::Distribution, Rng};
 use num_traits::Float;
+use rand_::{distributions::Distribution, Rng};
 
 /// Per-component matrix distribution.
 pub struct MatrixDistribution<D: Distribution<T>, T, const N: usize, const M: usize> {
@@ -28,7 +31,7 @@ impl<D: Distribution<T>, T, const N: usize, const M: usize> Distribution<Matrix<
 
 impl<T, const N: usize, const M: usize> Distribution<Matrix<T, M, N>> for Normal
 where
-    StatefulNormal<T>: Distribution<T>
+    StatefulNormal<T>: Distribution<T>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, M, N> {
         rng.sample(&MatrixDistribution::new(StatefulNormal::new()))
@@ -38,7 +41,7 @@ where
 impl<T, const N: usize> Distribution<Matrix<T, N, N>> for Invertible
 where
     Normal: Distribution<Matrix<T, N, N>>,
-    T: Float
+    T: Float,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, N, N> {
         loop {

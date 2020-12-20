@@ -27,7 +27,9 @@ pub struct StatefulNormal<T> {
 
 impl<T> StatefulNormal<T> {
     pub fn new() -> Self {
-        Self { other: Cell::new(None) }
+        Self {
+            other: Cell::new(None),
+        }
     }
 }
 
