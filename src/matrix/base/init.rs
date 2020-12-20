@@ -1,6 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 
-use crate::{traits::ImplicitClone, Matrix, Vector};
+use crate::{Matrix, Vector};
 use core::{
     mem::MaybeUninit,
     ops::{Index, IndexMut},
@@ -60,15 +60,15 @@ where
 }
 impl<T, const M: usize, const N: usize> Matrix<T, M, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     /// Create matrix which elements are filled with scalar value.
     pub fn fill(v: T) -> Self {
-        Self::init(|| v.clone())
+        Self::init(|| v)
     }
     /// Fill with a scalar value reference.
     pub fn fill_ref(v: &T) -> Self {
-        Self::init(|| v.clone())
+        Self::init(|| *v)
     }
 }
 
@@ -94,13 +94,13 @@ impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
 }
 impl<T, const M: usize, const N: usize> Matrix<T, M, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     pub fn row(&self, i: usize) -> Vector<T, N> {
-        self.row_ref(i).clone()
+        *self.row_ref(i)
     }
     pub fn col(&self, j: usize) -> Vector<T, M> {
-        Vector::indices().map(|i| self[(i, j)].clone())
+        Vector::indices().map(|i| self[(i, j)])
     }
 }
 

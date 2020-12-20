@@ -1,4 +1,4 @@
-use crate::{traits::ImplicitClone, vector::GroupIter, Matrix, Vector};
+use crate::{vector::GroupIter, Matrix, Vector};
 use core::convert::TryFrom;
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
@@ -57,26 +57,26 @@ impl<T, const M: usize, const N: usize> Into<[[T; N]; M]> for Matrix<T, M, N> {
 
 impl<T, const M: usize, const N: usize> From<&Vector<Vector<T, N>, M>> for Matrix<T, M, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     fn from(ar: &Vector<Vector<T, N>, M>) -> Self {
-        Self::from_vector_of_vectors(ar.clone())
+        Self::from_vector_of_vectors(*ar)
     }
 }
 impl<T, const M: usize, const N: usize> From<&[Vector<T, N>; M]> for Matrix<T, M, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     fn from(ar: &[Vector<T, N>; M]) -> Self {
-        Self::from_array_of_vectors(ar.clone())
+        Self::from_array_of_vectors(*ar)
     }
 }
 impl<T, const M: usize, const N: usize> From<&[[T; N]; M]> for Matrix<T, M, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     fn from(ar: &[[T; N]; M]) -> Self {
-        Self::from_array_of_arrays(ar.clone())
+        Self::from_array_of_arrays(*ar)
     }
 }
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {

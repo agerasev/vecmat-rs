@@ -1,5 +1,3 @@
-use num_traits::FromPrimitive;
-
 /// L1 Norm trait.
 pub trait NormL1 {
     /// Type of the norm.
@@ -40,32 +38,8 @@ pub trait Outer<V> {
     fn outer(self, other: V) -> Self::Output;
 }
 
-/// Implicit clone trait.
-///
-/// Implementing this trait for non-`Copy` type means that
-/// it allowed to be copied on vector operations when required.
-pub trait ImplicitClone: Clone {}
-
-/// Generic floating point number.
-/// It doesn't require the type to be `Copy` and `Num`.
-pub trait GenericFloat: FromPrimitive {
-    fn sqrt(self) -> Self;
-    fn exp(self) -> Self;
-    fn log(self) -> Self;
-    fn sin(self) -> Self;
-    fn cos(self) -> Self;
-}
-
 macro_rules! derive_primitive_base {
     ($T:ident) => {
-        impl ImplicitClone for $T {}
-    };
-}
-
-macro_rules! derive_primitive_number {
-    ($T:ident) => {
-        derive_primitive_base!($T);
-
         impl Dot for $T {
             type Output = Self;
             fn dot(self, other: Self) -> Self {
@@ -77,7 +51,7 @@ macro_rules! derive_primitive_number {
 
 macro_rules! derive_primitive_unsigned {
     ($T:ident) => {
-        derive_primitive_number!($T);
+        derive_primitive_base!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -102,7 +76,7 @@ macro_rules! derive_primitive_unsigned {
 
 macro_rules! derive_primitive_signed {
     ($T:ident) => {
-        derive_primitive_number!($T);
+        derive_primitive_base!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -128,28 +102,8 @@ macro_rules! derive_primitive_signed {
 macro_rules! derive_primitive_float {
     ($T:ident) => {
         derive_primitive_signed!($T);
-
-        impl GenericFloat for $T {
-            fn sqrt(self) -> Self {
-                $T::sqrt(self)
-            }
-            fn exp(self) -> Self {
-                $T::exp(self)
-            }
-            fn log(self) -> Self {
-                $T::ln(self)
-            }
-            fn sin(self) -> Self {
-                $T::sin(self)
-            }
-            fn cos(self) -> Self {
-                $T::cos(self)
-            }
-        }
     };
 }
-
-derive_primitive_base!(bool);
 
 derive_primitive_unsigned!(u8);
 derive_primitive_unsigned!(u16);

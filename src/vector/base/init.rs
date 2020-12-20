@@ -1,7 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 
 use super::Vector;
-use crate::traits::ImplicitClone;
 use core::{
     mem::MaybeUninit,
     ops::{Index, IndexMut},
@@ -68,15 +67,11 @@ where
 
 impl<T, const N: usize> Vector<T, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     /// Create vector which elements are filled with scalar value.
     pub fn fill(v: T) -> Self {
-        Self::init(|| v.clone())
-    }
-    /// Fill with a scalar value reference.
-    pub fn fill_ref(v: &T) -> Self {
-        Self::init(|| v.clone())
+        Self::init(|| v)
     }
 }
 
@@ -106,10 +101,10 @@ impl<T, const N: usize> From<[T; N]> for Vector<T, N> {
 }
 impl<T, const N: usize> From<&[T; N]> for Vector<T, N>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     fn from(ar: &[T; N]) -> Self {
-        Self::from_array(ar.clone())
+        Self::from_array(*ar)
     }
 }
 impl<T, const N: usize> Into<[T; N]> for Vector<T, N> {

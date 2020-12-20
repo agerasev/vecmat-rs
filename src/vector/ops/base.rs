@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ImplicitClone, GenericFloat, NormL1, NormL2, NormLInf},
+    traits::{NormL1, NormL2, NormLInf},
     Vector,
 };
 use core::{
@@ -7,7 +7,7 @@ use core::{
     iter::IntoIterator,
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
-use num_traits::Zero;
+use num_traits::{Float, Zero};
 
 impl<T, const N: usize> Neg for Vector<T, N>
 where
@@ -67,29 +67,29 @@ where
 
 impl<T, const N: usize> Mul<T> for Vector<T, N>
 where
-    T: Mul<Output = T> + ImplicitClone,
+    T: Mul<Output = T> + Copy,
 {
     type Output = Vector<T, N>;
     fn mul(self, a: T) -> Self::Output {
-        self.map(|v| v * a.clone())
+        self.map(|v| v * a)
     }
 }
 impl<T, const N: usize> Div<T> for Vector<T, N>
 where
-    T: Div<Output = T> + ImplicitClone,
+    T: Div<Output = T> + Copy,
 {
     type Output = Vector<T, N>;
     fn div(self, a: T) -> Self::Output {
-        self.map(|v| v / a.clone())
+        self.map(|v| v / a)
     }
 }
 impl<T, const N: usize> Rem<T> for Vector<T, N>
 where
-    T: Rem<Output = T> + ImplicitClone,
+    T: Rem<Output = T> + Copy,
 {
     type Output = Vector<T, N>;
     fn rem(self, a: T) -> Self::Output {
-        self.map(|v| v % a.clone())
+        self.map(|v| v % a)
     }
 }
 
@@ -146,31 +146,31 @@ where
 
 impl<T, const N: usize> MulAssign<T> for Vector<T, N>
 where
-    T: MulAssign + ImplicitClone,
+    T: MulAssign + Copy,
 {
     fn mul_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s *= a.clone();
+            *s *= a;
         })
     }
 }
 impl<T, const N: usize> DivAssign<T> for Vector<T, N>
 where
-    T: DivAssign + ImplicitClone,
+    T: DivAssign + Copy,
 {
     fn div_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s /= a.clone();
+            *s /= a;
         })
     }
 }
 impl<T, const N: usize> RemAssign<T> for Vector<T, N>
 where
-    T: RemAssign + ImplicitClone,
+    T: RemAssign + Copy,
 {
     fn rem_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s %= a.clone();
+            *s %= a;
         })
     }
 }
@@ -242,11 +242,11 @@ where
 }
 impl<T, const N: usize> NormL2 for Vector<T, N>
 where
-    T: Mul<Output = T> + Add<Output = T> + GenericFloat + ImplicitClone,
+    T: Float,
 {
     type Output = T;
     fn norm_l2(self) -> T {
-        self.map(|x| x.clone() * x).sum().sqrt()
+        self.map(|x| x * x).sum().sqrt()
     }
 }
 impl<T, const N: usize> NormLInf for Vector<T, N>

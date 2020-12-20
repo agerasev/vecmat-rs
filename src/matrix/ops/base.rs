@@ -1,5 +1,5 @@
 use crate::{
-    traits::{ImplicitClone, GenericFloat, NormL1, NormL2, NormLInf},
+    traits::{NormL1, NormL2, NormLInf},
     Matrix,
 };
 use core::{
@@ -7,7 +7,7 @@ use core::{
     iter::IntoIterator,
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
-use num_traits::Zero;
+use num_traits::{Float, Zero};
 
 impl<T, const M: usize, const N: usize> Neg for Matrix<T, N, M>
 where
@@ -67,29 +67,29 @@ where
 
 impl<T, const M: usize, const N: usize> Mul<T> for Matrix<T, N, M>
 where
-    T: Mul<Output = T> + ImplicitClone,
+    T: Mul<Output = T> + Copy,
 {
     type Output = Matrix<T, N, M>;
     fn mul(self, a: T) -> Self::Output {
-        self.map(|v| v * a.clone())
+        self.map(|v| v * a)
     }
 }
 impl<T, const M: usize, const N: usize> Div<T> for Matrix<T, N, M>
 where
-    T: Div<Output = T> + ImplicitClone,
+    T: Div<Output = T> + Copy,
 {
     type Output = Matrix<T, N, M>;
     fn div(self, a: T) -> Self::Output {
-        self.map(|v| v / a.clone())
+        self.map(|v| v / a)
     }
 }
 impl<T, const M: usize, const N: usize> Rem<T> for Matrix<T, N, M>
 where
-    T: Rem<Output = T> + ImplicitClone,
+    T: Rem<Output = T> + Copy,
 {
     type Output = Matrix<T, N, M>;
     fn rem(self, a: T) -> Self::Output {
-        self.map(|v| v % a.clone())
+        self.map(|v| v % a)
     }
 }
 
@@ -146,31 +146,31 @@ where
 
 impl<T, const M: usize, const N: usize> MulAssign<T> for Matrix<T, N, M>
 where
-    T: MulAssign + ImplicitClone,
+    T: MulAssign + Copy,
 {
     fn mul_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s *= a.clone();
+            *s *= a;
         })
     }
 }
 impl<T, const M: usize, const N: usize> DivAssign<T> for Matrix<T, N, M>
 where
-    T: DivAssign + ImplicitClone,
+    T: DivAssign + Copy,
 {
     fn div_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s /= a.clone();
+            *s /= a;
         })
     }
 }
 impl<T, const M: usize, const N: usize> RemAssign<T> for Matrix<T, N, M>
 where
-    T: RemAssign + ImplicitClone,
+    T: RemAssign + Copy,
 {
     fn rem_assign(&mut self, a: T) {
         self.iter_mut().for_each(|s| {
-            *s %= a.clone();
+            *s %= a;
         })
     }
 }
@@ -219,11 +219,11 @@ where
 }
 impl<T, const M: usize, const N: usize> NormL2 for Matrix<T, N, M>
 where
-    T: Mul<Output = T> + Add<Output = T> + GenericFloat + ImplicitClone,
+    T: Float,
 {
     type Output = T;
     fn norm_l2(self) -> T {
-        self.map(|x| x.clone() * x).sum().sqrt()
+        self.map(|x| x * x).sum().sqrt()
     }
 }
 impl<T, const M: usize, const N: usize> NormLInf for Matrix<T, N, M>

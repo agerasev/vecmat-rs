@@ -1,4 +1,4 @@
-use crate::{traits::ImplicitClone, Matrix, Vector};
+use crate::{Matrix, Vector};
 use core::ops::{Index, IndexMut, Neg};
 use num_traits::{Num, One, Zero};
 
@@ -30,13 +30,13 @@ where
 
 // TODO: Implement when it will be possible to perform const generic arithmetics and specialization.
 /*
-impl<T, const N: usize> Matrix<T, N, N> where T: ImplicitClone, N > 1 {
+impl<T, const N: usize> Matrix<T, N, N> where T: Copy, N > 1 {
     /// Take submatrix from original matrix.
     pub fn submatrix(&self, y: usize, x: usize) -> Matrix<T, N - 1, N - 1> {
         Matrix::indices().map(|(i, j)| self[(i + (i >= y) as usize, j + (j >= x) as usize)].clone())
     }
 }
-impl<T> Matrix<T, 1, 1> where T: ImplicitClone {
+impl<T> Matrix<T, 1, 1> where T: Copy {
     /// Take submatrix from original matrix.
     pub fn submatrix(&self, y: usize, x: usize) -> T {
         self[(0, 0)].clone()
@@ -107,7 +107,7 @@ struct Determinator<'a, T, const N: usize> {
 
 impl<'a, T, const N: usize> Determinator<'a, T, N>
 where
-    T: Neg<Output = T> + Num + ImplicitClone,
+    T: Neg<Output = T> + Num + Copy,
 {
     fn new(matrix: &'a Matrix<T, N, N>) -> Self {
         Self {
@@ -134,7 +134,7 @@ where
             let mut a = T::zero();
             for rj in 0..self.mask.deg {
                 j = self.mask.row.find(j);
-                a = a + self.matrix[(i, j)].clone() * self.cofactor((i, 0), (j, rj));
+                a = a + self.matrix[(i, j)] * self.cofactor((i, 0), (j, rj));
                 j += 1;
             }
             a
@@ -144,7 +144,7 @@ where
 
 impl<T, const N: usize> Matrix<T, N, N>
 where
-    T: Neg<Output = T> + Num + ImplicitClone,
+    T: Neg<Output = T> + Num + Copy,
 {
     /// Cofactor of the matrix at (i, j).
     pub fn cofactor(&self, i: usize, j: usize) -> T {
@@ -171,7 +171,7 @@ where
 /*
 #[cfg(feature = "rand")]
 macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
-    impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + GenericFloat + ImplicitClone {
+    impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + GenericFloat + Copy {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
             loop {
                 let x = rng.sample(&StandardNormal);

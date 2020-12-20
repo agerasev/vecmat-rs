@@ -1,47 +1,47 @@
-use crate::{traits::ImplicitClone, Vector};
+use crate::Vector;
 use core::ops::{Mul, Sub};
 use num_traits::Zero;
 
 impl<T> Vector<T, 2>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0) }.clone()
+        *unsafe { self.get_unchecked(0) }
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1) }.clone()
+        *unsafe { self.get_unchecked(1) }
     }
 }
 impl<T> Vector<T, 3>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0) }.clone()
+        *unsafe { self.get_unchecked(0) }
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1) }.clone()
+        *unsafe { self.get_unchecked(1) }
     }
     pub fn z(&self) -> T {
-        unsafe { self.get_unchecked(2) }.clone()
+        *unsafe { self.get_unchecked(2) }
     }
 }
 impl<T> Vector<T, 4>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     pub fn x(&self) -> T {
-        unsafe { self.get_unchecked(0) }.clone()
+        *unsafe { self.get_unchecked(0) }
     }
     pub fn y(&self) -> T {
-        unsafe { self.get_unchecked(1) }.clone()
+        *unsafe { self.get_unchecked(1) }
     }
     pub fn z(&self) -> T {
-        unsafe { self.get_unchecked(2) }.clone()
+        *unsafe { self.get_unchecked(2) }
     }
     pub fn w(&self) -> T {
-        unsafe { self.get_unchecked(3) }.clone()
+        *unsafe { self.get_unchecked(3) }
     }
 }
 
@@ -108,7 +108,7 @@ impl<T> Vector<T, 4> {
 
 impl<T> Vector<T, 2>
 where
-    T: Mul<Output = T> + Sub<Output = T> + ImplicitClone,
+    T: Mul<Output = T> + Sub<Output = T> + Copy,
 {
     /// Pseudo-cross product for 2D vector.
     pub fn cross(self, other: Vector<T, 2>) -> T {
@@ -117,7 +117,7 @@ where
 }
 impl<T> Vector<T, 3>
 where
-    T: Mul<Output = T> + Sub<Output = T> + ImplicitClone,
+    T: Mul<Output = T> + Sub<Output = T> + Copy,
 {
     /// Cross product.
     pub fn cross(self, other: Vector<T, 3>) -> Vector<T, 3> {
@@ -131,7 +131,7 @@ where
 }
 impl<T> Vector<T, 4>
 where
-    T: Mul<Output = T> + Sub<Output = T> + Zero + ImplicitClone,
+    T: Mul<Output = T> + Sub<Output = T> + Zero + Copy,
 {
     /// Cross product of first three components, fourth one is set to zero.
     pub fn cross(self, other: Vector<T, 4>) -> Vector<T, 4> {

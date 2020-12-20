@@ -1,10 +1,10 @@
 use crate::{
-    traits::{ImplicitClone, Dot, GenericFloat},
+    traits::Dot,
     vector::{Vector3, Vector4},
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use num_complex::Complex;
-use num_traits::{Num, One, Zero};
+use num_traits::{Float, Num, One, Zero};
 
 /// Quaternion.
 #[repr(transparent)]
@@ -12,8 +12,6 @@ use num_traits::{Num, One, Zero};
 pub struct Quaternion<T> {
     vec: Vector4<T>,
 }
-
-impl<T: ImplicitClone> ImplicitClone for Quaternion<T> {}
 
 impl<T> Quaternion<T> {
     pub fn new(w: T, x: T, y: T, z: T) -> Self {
@@ -92,7 +90,7 @@ impl<T> Into<(T, T, T, T)> for Quaternion<T> {
 
 impl<T> Quaternion<T>
 where
-    T: ImplicitClone,
+    T: Copy,
 {
     pub fn w(&self) -> T {
         self.vec.x()
@@ -107,7 +105,7 @@ where
         self.vec.w()
     }
     pub fn xyz(&self) -> Vector3<T> {
-        <Self as Into<(T, Vector3<T>)>>::into(self.clone()).1
+        <Self as Into<(T, Vector3<T>)>>::into(*self).1
     }
 }
 
@@ -318,7 +316,7 @@ where
 
 impl<T> Mul for Quaternion<T>
 where
-    T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + ImplicitClone,
+    T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Copy,
 {
     type Output = Self;
     fn mul(self, other: Self) -> Self {
@@ -339,21 +337,21 @@ where
 }
 impl<T> Mul<Complex<T>> for Quaternion<T>
 where
-    T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + ImplicitClone,
+    T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Copy,
 {
     type Output = Self;
     fn mul(self, other: Complex<T>) -> Self {
         Self::new(
-            self.w() * other.re.clone() - self.x() * other.im.clone(),
-            self.w() * other.im.clone() + self.x() * other.re.clone(),
-            self.z() * other.im.clone() + self.y() * other.re.clone(),
+            self.w() * other.re - self.x() * other.im,
+            self.w() * other.im + self.x() * other.re,
+            self.z() * other.im + self.y() * other.re,
             self.z() * other.re - self.y() * other.im,
         )
     }
 }
 impl<T> Mul<T> for Quaternion<T>
 where
-    T: Mul<Output = T> + ImplicitClone,
+    T: Mul<Output = T> + Copy,
 {
     type Output = Self;
     fn mul(self, other: T) -> Self {
@@ -363,32 +361,32 @@ where
 
 impl<T> MulAssign for Quaternion<T>
 where
-    Self: Mul<Output = Self> + ImplicitClone,
+    Self: Mul<Output = Self> + Copy,
 {
     fn mul_assign(&mut self, other: Self) {
-        *self = self.clone() * other;
+        *self = *self * other;
     }
 }
 impl<T> MulAssign<Complex<T>> for Quaternion<T>
 where
-    Self: Mul<Complex<T>, Output = Self> + ImplicitClone,
+    Self: Mul<Complex<T>, Output = Self> + Copy,
 {
     fn mul_assign(&mut self, other: Complex<T>) {
-        *self = self.clone() * other;
+        *self = *self * other;
     }
 }
 impl<T> MulAssign<T> for Quaternion<T>
 where
-    Self: Mul<T, Output = Self> + ImplicitClone,
+    Self: Mul<T, Output = Self> + Copy,
 {
     fn mul_assign(&mut self, other: T) {
-        *self = self.clone() * other;
+        *self = *self * other;
     }
 }
 
 impl<T> One for Quaternion<T>
 where
-    T: Zero + One + Sub<Output = T> + ImplicitClone,
+    T: Zero + One + Sub<Output = T> + Copy,
 {
     fn one() -> Self {
         Self::new(T::one(), T::zero(), T::zero(), T::zero())
@@ -412,7 +410,7 @@ where
 
 impl<T> Quaternion<T>
 where
-    T: Add<Output = T> + Mul<Output = T> + ImplicitClone,
+    T: Add<Output = T> + Mul<Output = T> + Copy,
 {
     pub fn norm_sqr(self) -> T {
         self.vec.square_length()
@@ -420,7 +418,7 @@ where
 }
 impl<T> Quaternion<T>
 where
-    T: Num + GenericFloat + ImplicitClone,
+    T: Float,
 {
     pub fn norm(self) -> T {
         self.vec.length()
@@ -429,7 +427,7 @@ where
 
 impl<T> Div<T> for Quaternion<T>
 where
-    T: Div<Output = T> + ImplicitClone,
+    T: Div<Output = T> + Copy,
 {
     type Output = Self;
     fn div(self, other: T) -> Self {
@@ -439,25 +437,25 @@ where
 
 impl<T> Quaternion<T>
 where
-    T: Num + GenericFloat + ImplicitClone,
+    T: Float,
 {
     pub fn normalize(self) -> Self {
-        self.clone() / self.norm()
+        self / self.norm()
     }
 }
 impl<T> Quaternion<T>
 where
-    T: Neg<Output = T> + Num + ImplicitClone,
+    T: Neg<Output = T> + Num + Copy,
 {
     pub fn inv(self) -> Self {
-        self.clone().conj() / self.norm_sqr()
+        self.conj() / self.norm_sqr()
     }
 }
 
 #[allow(clippy::suspicious_arithmetic_impl)]
 impl<T> Div for Quaternion<T>
 where
-    T: Neg<Output = T> + Num + ImplicitClone,
+    T: Neg<Output = T> + Num + Copy,
 {
     type Output = Self;
     fn div(self, other: Self) -> Self {
@@ -467,7 +465,7 @@ where
 #[allow(clippy::suspicious_arithmetic_impl)]
 impl<T> Div<Complex<T>> for Quaternion<T>
 where
-    T: Neg<Output = T> + Num + ImplicitClone,
+    T: Neg<Output = T> + Num + Copy,
 {
     type Output = Self;
     fn div(self, other: Complex<T>) -> Self {
@@ -477,26 +475,26 @@ where
 
 impl<T> DivAssign for Quaternion<T>
 where
-    Self: Div<Output = Self> + ImplicitClone,
+    Self: Div<Output = Self> + Copy,
 {
     fn div_assign(&mut self, other: Self) {
-        *self = self.clone() / other;
+        *self = *self / other;
     }
 }
 impl<T> DivAssign<Complex<T>> for Quaternion<T>
 where
-    Self: Div<Complex<T>, Output = Self> + ImplicitClone,
+    Self: Div<Complex<T>, Output = Self> + Copy,
 {
     fn div_assign(&mut self, other: Complex<T>) {
-        *self = self.clone() / other;
+        *self = *self / other;
     }
 }
 impl<T> DivAssign<T> for Quaternion<T>
 where
-    Self: Div<T, Output = Self> + ImplicitClone,
+    Self: Div<T, Output = Self> + Copy,
 {
     fn div_assign(&mut self, other: T) {
-        *self = self.clone() / other;
+        *self = *self / other;
     }
 }
 
@@ -514,10 +512,10 @@ macro_rules! reverse_mul_div {
             type Output = Quaternion<$T>;
             fn mul(self, other: Quaternion<$T>) -> Self::Output {
                 Quaternion::new(
-                    self.re.clone() * other.w() - self.im.clone() * other.x(),
-                    self.re.clone() * other.x() + self.im.clone() * other.w(),
-                    self.re.clone() * other.y() - self.im.clone() * other.z(),
-                    self.re.clone() * other.z() + self.im.clone() * other.y(),
+                    self.re * other.w() - self.im * other.x(),
+                    self.re * other.x() + self.im * other.w(),
+                    self.re * other.y() - self.im * other.z(),
+                    self.re * other.z() + self.im * other.y(),
                 )
             }
         }
