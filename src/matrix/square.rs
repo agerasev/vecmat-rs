@@ -116,7 +116,6 @@ where
         }
     }
     fn cofactor(&mut self, (i, ri): (usize, usize), (j, rj): (usize, usize)) -> T {
-        std::println!("{}, {}", i, j);
         self.mask.exclude(i, j);
         let mut a = self.det();
         if (ri + rj) % 2 != 0 {
@@ -167,26 +166,3 @@ where
         self.adj() / self.det()
     }
 }
-
-/*
-#[cfg(feature = "rand")]
-macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
-    impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + GenericFloat + Copy {
-        fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
-            loop {
-                let x = rng.sample(&StandardNormal);
-                if x.clone().det().abs() > T::epsilon() {
-                    break x;
-                }
-            }
-        }
-    }
-) }
-
-#[cfg(feature = "rand")]
-matrix_random_invertible!(4, Matrix4x4, MatrixDistribution4x4);
-#[cfg(feature = "rand")]
-matrix_random_invertible!(3, Matrix3x3, MatrixDistribution3x3);
-#[cfg(feature = "rand")]
-matrix_random_invertible!(2, Matrix2x2, MatrixDistribution2x2);
-*/

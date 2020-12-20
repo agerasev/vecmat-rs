@@ -1,3 +1,5 @@
+use num_traits::float::FloatCore;
+
 /// L1 Norm trait.
 pub trait NormL1 {
     /// Type of the norm.
@@ -101,7 +103,26 @@ macro_rules! derive_primitive_signed {
 
 macro_rules! derive_primitive_float {
     ($T:ident) => {
-        derive_primitive_signed!($T);
+        derive_primitive_base!($T);
+
+        impl NormL1 for $T {
+            type Output = Self;
+            fn norm_l1(self) -> Self {
+                <$T as FloatCore>::abs(self)
+            }
+        }
+        impl NormL2 for $T {
+            type Output = Self;
+            fn norm_l2(self) -> Self {
+                <$T as FloatCore>::abs(self)
+            }
+        }
+        impl NormLInf for $T {
+            type Output = Self;
+            fn norm_l_inf(self) -> Self {
+                <$T as FloatCore>::abs(self)
+            }
+        }
     };
 }
 

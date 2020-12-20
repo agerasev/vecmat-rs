@@ -67,13 +67,12 @@ pub mod matrix;
 pub mod traits;
 pub mod vector;
 //pub mod transform;
+#[cfg(feature = "rand")]
+pub mod distr;
 
 pub use complex::{Complex, Quaternion};
 pub use matrix::Matrix;
 pub use vector::Vector;
-
-#[cfg(feature = "rand")]
-pub mod distr;
 
 pub mod prelude {
     pub use crate::traits::*;
