@@ -20,8 +20,15 @@ where
     }
 }
 
+#[derive(Default)]
 pub struct StatefulNormal<T> {
     other: Cell<Option<T>>,
+}
+
+impl<T> StatefulNormal<T> {
+    pub fn new() -> Self {
+        Self { other: Cell::new(None) }
+    }
 }
 
 impl<T> Distribution<T> for StatefulNormal<T>
@@ -42,6 +49,15 @@ where
 
 /// Standard normal distribution.
 pub struct Normal;
+
+impl<T> Distribution<T> for Normal
+where
+    NormalPair: Distribution<(T, T)>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> T {
+        rng.sample(&NormalPair).0
+    }
+}
 
 /// Uniform distribution over all possible values.
 pub struct Uniform;

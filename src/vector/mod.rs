@@ -4,8 +4,8 @@ mod ops;
 mod spec;
 #[cfg(feature = "rand")]
 mod distr;
-//#[cfg(feature = "approx")]
-//mod approx;
+#[cfg(feature = "approx")]
+mod approx;
 #[cfg(test)]
 mod tests;
 

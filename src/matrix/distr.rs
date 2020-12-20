@@ -1,4 +1,4 @@
-use crate::{distr::{Normal, Invertible}, Matrix};
+use crate::{distr::{StatefulNormal, Normal, Invertible}, Matrix};
 use core::marker::PhantomData;
 use rand_::{distributions::Distribution, Rng};
 use num_traits::Float;
@@ -28,10 +28,10 @@ impl<D: Distribution<T>, T, const N: usize, const M: usize> Distribution<Matrix<
 
 impl<T, const N: usize, const M: usize> Distribution<Matrix<T, M, N>> for Normal
 where
-    Normal: Distribution<T>,
+    StatefulNormal<T>: Distribution<T>
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, M, N> {
-        rng.sample(&MatrixDistribution::new(Normal))
+        rng.sample(&MatrixDistribution::new(StatefulNormal::new()))
     }
 }
 

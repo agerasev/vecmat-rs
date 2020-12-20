@@ -18,20 +18,20 @@ impl<D: Distribution<T>, T> Distribution<Quaternion<T>> for QuaternionDistributi
     }
 }
 
-impl<T> Distribution<Quaternion<T>> for Normal where Normal: Distribution<T> {
+impl<T> Distribution<Quaternion<T>> for Normal where Normal: Distribution<Vector<T, 4>> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        rng.sample::<Vector<T, 4>, Self>(Self).into()
+        rng.sample(Self).into()
     }
 }
 
-impl<T: Float + Clone> Distribution<Quaternion<T>> for NonZero where Normal: Distribution<T> {
+impl<T: Float> Distribution<Quaternion<T>> for NonZero where NonZero: Distribution<Vector<T, 4>> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        rng.sample::<Vector<T, 4>, Self>(Self).into()
+        rng.sample(Self).into()
     }
 }
 
-impl<T: Float + Clone> Distribution<Quaternion<T>> for Unit where Normal: Distribution<T> {
+impl<T: Float> Distribution<Quaternion<T>> for Unit where Unit: Distribution<Vector<T, 4>> {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        rng.sample::<Vector<T, 4>, Self>(Self).into()
+        rng.sample(Self).into()
     }
 }

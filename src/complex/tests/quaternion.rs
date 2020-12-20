@@ -1,8 +1,8 @@
 use num_traits::{One};
-use rand::{prelude::*};
+use rand_::{prelude::*};
 use rand_xorshift::XorShiftRng;
-use ::approx::*;
-use crate::{complex::*, distributions::*, Dot};
+use approx::*;
+use crate::{Quaternion, distr::*, traits::Dot};
 
 
 #[cfg(feature = "std")]
@@ -31,6 +31,7 @@ fn imaginary_units() {
 }
 
 #[test]
+#[allow(clippy::eq_op)]
 fn inversion() {
     let mut rng = XorShiftRng::seed_from_u64(0xFEED0);
     for _ in 0..SAMPLE_ATTEMPTS {
@@ -43,8 +44,8 @@ fn inversion() {
 fn law_of_cosines() {
     for _ in 0..SAMPLE_ATTEMPTS {
         let mut rng = XorShiftRng::seed_from_u64(0xFEED1);
-        let a: Qf = rng.sample(&StandardNormal);
-        let b: Qf = rng.sample(&StandardNormal);
+        let a: Qf = rng.sample(&Normal);
+        let b: Qf = rng.sample(&Normal);
         assert_abs_diff_eq!(
             a.norm_sqr() + b.norm_sqr() + 2.0*a.dot(b),
             (a + b).norm_sqr(),
@@ -57,7 +58,7 @@ fn law_of_cosines() {
 fn conjugation() {
     for _ in 0..SAMPLE_ATTEMPTS {
         let mut rng = XorShiftRng::seed_from_u64(0xFEED2);
-        let a: Qf = rng.sample(&StandardNormal);
+        let a: Qf = rng.sample(&Normal);
         assert_abs_diff_eq!(a*a.conj(), Quaternion::<f64>::one()*a.norm_sqr());
         assert_abs_diff_eq!(a.conj()*a, Quaternion::<f64>::one()*a.norm_sqr());
     }
@@ -89,7 +90,7 @@ fn derivation() {
 
     for (f, dfdv) in cases.iter() {
         for _ in 0..SAMPLE_ATTEMPTS {
-            let p = rng.sample(&StandardNormal);
+            let p = rng.sample(&Normal);
             let v = rng.sample(&Unit);
             let deriv = dfdv(p, v);
             let dabs = deriv.norm();
