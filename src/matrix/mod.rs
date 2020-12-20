@@ -1,9 +1,9 @@
 mod base;
+mod format;
 mod ops;
 mod product;
+mod square;
 mod transpose;
-//mod square;
-mod format;
 
 //#[cfg(feature = "random")]
 //mod random;
@@ -12,11 +12,11 @@ mod format;
 //mod approx;
 
 pub use base::*;
+pub use format::*;
 pub use ops::*;
 pub use product::*;
+pub use square::*;
 pub use transpose::*;
-//pub use square::*;
-pub use format::*;
 
 #[cfg(test)]
 mod tests;

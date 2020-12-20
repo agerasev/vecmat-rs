@@ -86,6 +86,26 @@ impl<T, const M: usize, const N: usize> IndexMut<(usize, usize)> for Matrix<T, M
 }
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
+    pub fn row_ref(&self, i: usize) -> &Vector<T, N> {
+        &self.as_vector_of_vectors()[i]
+    }
+    pub fn row_mut(&mut self, i: usize) -> &mut Vector<T, N> {
+        &mut self.as_mut_vector_of_vectors()[i]
+    }
+}
+impl<T, const M: usize, const N: usize> Matrix<T, M, N>
+where
+    T: ImplicitClone,
+{
+    pub fn row(&self, i: usize) -> Vector<T, N> {
+        self.row_ref(i).clone()
+    }
+    pub fn col(&self, j: usize) -> Vector<T, M> {
+        Vector::indices().map(|i| self[(i, j)].clone())
+    }
+}
+
+impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
     /// Get pointer to the first element.
     pub fn as_ptr(&self) -> *const T {
         self.data.as_ptr() as *const T

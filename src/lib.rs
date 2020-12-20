@@ -85,6 +85,6 @@ pub use vector::*;
 
 pub mod prelude {
     pub use crate::traits::*;
-    pub use num_traits::{One, Zero};
     pub use core::convert::TryFrom;
+    pub use num_traits::{One, Zero};
 }
