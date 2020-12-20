@@ -63,19 +63,20 @@
 extern crate std;
 
 pub mod complex;
-pub mod matrix;
-pub mod traits;
-pub mod vector;
-//pub mod transform;
 #[cfg(feature = "rand")]
 pub mod distr;
+pub mod matrix;
+pub mod traits;
+pub mod transform;
+pub mod vector;
 
 pub use complex::{Complex, Quaternion};
 pub use matrix::Matrix;
+pub use transform::Transform;
 pub use vector::Vector;
 
 pub mod prelude {
-    pub use crate::traits::*;
+    pub use crate::{traits::*, Transform};
     pub use core::convert::TryFrom;
     pub use num_traits::{One, Zero};
 }

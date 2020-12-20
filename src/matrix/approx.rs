@@ -1,12 +1,17 @@
+use crate::Matrix;
+use approx::{abs_diff_eq, AbsDiffEq};
 
-macro_rules! matrix_approx { ($M:expr, $N:expr, $W:ident) => (
-	impl<T> AbsDiffEq for $W<T> where T: AbsDiffEq<Epsilon=T> + ImplicitClone {
-		type Epsilon = T;
-		fn default_epsilon() -> Self::Epsilon {
-			T::default_epsilon()
-		}
-		fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-			self.clone().zip(other.clone()).map(|(x, y)| abs_diff_eq!(x, y, epsilon=epsilon.clone())).all()
-		}
-	}
-) }
+impl<T, const M: usize, const N: usize> AbsDiffEq for Matrix<T, M, N>
+where
+    T: AbsDiffEq<Epsilon = T> + Copy,
+{
+    type Epsilon = T;
+    fn default_epsilon() -> Self::Epsilon {
+        T::default_epsilon()
+    }
+    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
+        self.zip(*other)
+            .map(|(x, y)| abs_diff_eq!(x, y, epsilon = epsilon))
+            .all()
+    }
+}

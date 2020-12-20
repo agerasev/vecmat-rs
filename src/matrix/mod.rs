@@ -1,3 +1,5 @@
+#[cfg(feature = "approx")]
+mod approx;
 mod base;
 #[cfg(feature = "rand")]
 mod distr;
@@ -5,11 +7,9 @@ mod format;
 mod ops;
 mod product;
 mod square;
-mod transpose;
-//#[cfg(feature = "approx")]
-//mod approx;
 #[cfg(test)]
 mod tests;
+mod transpose;
 
 pub use base::*;
 #[cfg(feature = "rand")]
