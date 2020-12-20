@@ -5,7 +5,7 @@ mod product;
 mod square;
 mod transpose;
 
-//#[cfg(feature = "random")]
+//#[cfg(feature = "rand")]
 //mod random;
 
 //#[cfg(feature = "approx")]
@@ -27,11 +27,11 @@ pub type Matrix4x3<T> = Matrix<T, 4, 3>;
 pub type Matrix4x4<T> = Matrix<T, 4, 4>;
 
 /*
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::Rng;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand_distr::Distribution;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 #[cfg(feature = "approx")]
 use ::approx::{AbsDiffEq, abs_diff_eq};
@@ -43,7 +43,7 @@ pub use crate::traits::{Dot, Outer};
 macro_rules! matrix_all { ($M:expr, $N:expr, $W:ident, $V:ident, $U:ident, $GI:ident, $D:ident) => (
     matrix_base!($M, $N, $W, $V, $U, $GI);
     matrix_ops!($M, $N, $W);
-    #[cfg(feature = "random")]
+    #[cfg(feature = "rand")]
     matrix_random!($M, $N, $W, $D);
     #[cfg(feature = "approx")]
     matrix_approx!($M, $N, $W);

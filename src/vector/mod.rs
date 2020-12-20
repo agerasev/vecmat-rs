@@ -3,7 +3,7 @@ mod dot;
 mod ops;
 mod spec;
 
-//#[cfg(feature = "random")]
+//#[cfg(feature = "rand")]
 //mod random;
 
 //#[cfg(feature = "approx")]
@@ -26,11 +26,11 @@ use num_integer::{self as nint, Integer};
 use crate::{traits::*, };
 #[cfg(feature = "approx")]
 use ::approx::{AbsDiffEq, abs_diff_eq};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::Rng;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand_distr::Distribution;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 
 pub use crate::traits::Dot;
@@ -40,7 +40,7 @@ macro_rules! vector_all { ($N:expr, $V:ident, $II:ident, $GI:ident, $D:ident) =>
     vector_base!($N, $V, $II, $GI);
     vector_ops!($N, $V);
     vector_dot!($N, $V);
-    #[cfg(feature = "random")]
+    #[cfg(feature = "rand")]
     vector_random!($N, $V, $D);
     #[cfg(feature = "approx")]
     vector_approx!($N, $V);

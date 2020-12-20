@@ -1,9 +1,9 @@
 use core::ops::{Neg};
 use num_traits::{Zero, One, Num};
 use crate::*;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::{prelude::*};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 #[cfg(feature = "approx")]
 use approx::{AbsDiffEq, abs_diff_eq};
@@ -63,13 +63,13 @@ macro_rules! linear { ($Z:ident, $X:ident, $L:ident, $S:ident, $W:ident, $V:iden
 		}
 	}
 
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	impl<T> Distribution<$Z<T>> for StandardNormal where StandardNormal: Distribution<$L<T>> + Distribution<$S<T>> {
 		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
 			$Z::new(self.sample(rng), self.sample(rng))
 		}
 	}
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	impl<T> Distribution<$Z<T>> for Invertible where Invertible: Distribution<$L<T>>, StandardNormal: Distribution<$S<T>> {
 		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
 			$Z::new(rng.sample(&Self), rng.sample(&StandardNormal))
@@ -145,7 +145,7 @@ mod tests {
 		}
 	}
 
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	mod random {
 		use num_traits::{Zero};
 		use rand::{prelude::*};

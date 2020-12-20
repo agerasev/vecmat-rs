@@ -1,9 +1,9 @@
 use core::ops::{Neg};
 use num_traits::{Zero, Num};
 use crate::{vector::*, transform::*};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::{prelude::*};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 #[cfg(feature = "approx")]
 use approx::{AbsDiffEq, abs_diff_eq};
@@ -46,7 +46,7 @@ macro_rules! shift { ($Z:ident, $X:ident, $V:ident) => (
 		}
 	}
 
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	impl<T> Distribution<$Z<T>> for StandardNormal where StandardNormal: Distribution<$V<T>> {
 		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
 			$Z::from(self.sample(rng))

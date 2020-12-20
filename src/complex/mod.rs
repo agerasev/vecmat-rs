@@ -4,9 +4,9 @@ mod quaternion;
 pub use complex_::*;
 pub use quaternion::*;
 
-//#[cfg(feature = "random")]
+//#[cfg(feature = "rand")]
 //mod random;
-//#[cfg(feature = "random")]
+//#[cfg(feature = "rand")]
 //pub use random::*;
 
 //#[cfg(feature = "approx")]

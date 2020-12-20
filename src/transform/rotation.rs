@@ -1,13 +1,13 @@
 use core::ops::{Neg};
 use num_traits::{One, Num, Float, FromPrimitive};
 use crate::*;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use num_traits::{FloatConst};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::prelude::*;
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand_distr::{Uniform as RangedUniform, uniform::{SampleUniform}};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 #[cfg(feature = "approx")]
 use approx::{AbsDiffEq, abs_diff_eq};
@@ -75,7 +75,7 @@ impl<T> Rotation2<T> where T: Neg<Output=T> + Clone {
 	}
 }
 
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 impl<T> Distribution<Rotation2<T>> for Uniform
 where RangedUniform<T>: Distribution<T>, T: SampleUniform + Float + FloatConst + FromPrimitive + Clone {
 	fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Rotation2<T> {
@@ -178,7 +178,7 @@ impl<T> Rotation3<T> where T: Float + FromPrimitive + Clone {
 	}
 }
 
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 impl<T> Distribution<Rotation3<T>> for Uniform where
 	Unit: Distribution<Vector3<T>>,
 	RangedUniform<T>: Distribution<T>,
@@ -203,7 +203,7 @@ impl<T> AbsDiffEq for Rotation3<T> where T: AbsDiffEq<Epsilon=T> + Clone {
 }
 
 
-#[cfg(all(test, feature = "approx", feature = "random"))]
+#[cfg(all(test, feature = "approx", feature = "rand"))]
 mod tests {
 	use rand_xorshift::XorShiftRng;
 	use approx::{assert_abs_diff_eq};

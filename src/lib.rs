@@ -72,8 +72,8 @@ pub use complex::{Complex, Quaternion};
 pub use matrix::Matrix;
 pub use vector::Vector;
 
-//#[cfg(feature = "random")]
-//pub mod distr;
+#[cfg(feature = "rand")]
+pub mod distr;
 
 pub mod prelude {
     pub use crate::traits::*;

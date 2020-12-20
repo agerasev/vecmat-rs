@@ -3,9 +3,9 @@ use num_traits::{One, Num, Float, FromPrimitive};
 use crate::*;
 #[cfg(feature = "approx")]
 use approx::{AbsDiffEq, abs_diff_eq};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use rand::{prelude::*};
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 use crate::distributions::*;
 
 
@@ -54,13 +54,13 @@ macro_rules! linear { ($Z:ident, $X:ident, $W:ident, $V:ident) => (
 		}
 	}
 
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	impl<T> Distribution<$Z<T>> for StandardNormal where StandardNormal: Distribution<$W<T>> {
 		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
 			$Z::from_matrix(self.sample(rng))
 		}
 	}
-	#[cfg(feature = "random")]
+	#[cfg(feature = "rand")]
 	impl<T> Distribution<$Z<T>> for Invertible where Invertible: Distribution<$W<T>> {
 		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $Z<T> {
 			$Z::from_matrix(self.sample(rng))
@@ -106,7 +106,7 @@ impl<T> Linear3<T> where T: Float + FromPrimitive + Clone {
 }
 
 
-#[cfg(all(test, feature = "random", feature = "approx"))]
+#[cfg(all(test, feature = "rand", feature = "approx"))]
 mod tests {
 	use rand::{prelude::*};
 	use rand_xorshift::XorShiftRng;

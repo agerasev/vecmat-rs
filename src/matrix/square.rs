@@ -169,7 +169,7 @@ where
 }
 
 /*
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
     impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + GenericFloat + ImplicitClone {
         fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
@@ -183,10 +183,10 @@ macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
     }
 ) }
 
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 matrix_random_invertible!(4, Matrix4x4, MatrixDistribution4x4);
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 matrix_random_invertible!(3, Matrix3x3, MatrixDistribution3x3);
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 matrix_random_invertible!(2, Matrix2x2, MatrixDistribution2x2);
 */
