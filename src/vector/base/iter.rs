@@ -6,7 +6,7 @@ use core::{
     ptr, slice,
 };
 
-/// Iterator by values for array.
+/// Iterator by values for vector.
 pub struct IntoIter<T, const N: usize> {
     data: Vector<MaybeUninit<T>, N>,
     pos: usize,
@@ -208,48 +208,5 @@ where
     type Item = Vector<I::Item, N>;
     fn next(&mut self) -> Option<Self::Item> {
         <Self::Item>::try_from_iter(&mut self.iter)
-    }
-}
-
-/// Iterator that iterates over flattened sequence of `IntoIter`s.
-pub struct FlatIter<I, IT, II>
-where
-    I: Iterator<Item = IT>,
-    IT: IntoIterator<IntoIter = II, Item = II::Item>,
-    II: Iterator,
-{
-    iter: I,
-    subiter: II,
-}
-
-impl<I, IT, II> FlatIter<I, IT, II>
-where
-    I: Iterator<Item = IT>,
-    IT: IntoIterator<IntoIter = II, Item = II::Item>,
-    II: Iterator,
-{
-    /// Create `FlatIter` from sequence of `IntoIter`s.
-    pub fn new(mut iter: I) -> Option<Self> {
-        iter.next().map(|a| Self {
-            iter,
-            subiter: a.into_iter(),
-        })
-    }
-}
-
-impl<I, IT, II> Iterator for FlatIter<I, IT, II>
-where
-    I: Iterator<Item = IT>,
-    IT: IntoIterator<IntoIter = II, Item = II::Item>,
-    II: Iterator,
-{
-    type Item = II::Item;
-    fn next(&mut self) -> Option<Self::Item> {
-        self.subiter.next().or_else(|| {
-            self.iter.next().and_then(|a| {
-                self.subiter = a.into_iter();
-                self.subiter.next()
-            })
-        })
     }
 }

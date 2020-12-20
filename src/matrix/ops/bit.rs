@@ -1,4 +1,4 @@
-use crate::matrix::*;
+use crate::Matrix;
 use core::{
     iter::IntoIterator,
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not},

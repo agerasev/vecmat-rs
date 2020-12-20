@@ -1,7 +1,7 @@
 mod complex_;
-pub use complex_::*;
-
 mod quaternion;
+
+pub use complex_::*;
 pub use quaternion::*;
 
 //#[cfg(feature = "random")]

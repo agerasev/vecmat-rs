@@ -11,15 +11,10 @@ mod transpose;
 //#[cfg(feature = "approx")]
 //mod approx;
 
-pub use base::*;
-pub use format::*;
-pub use ops::*;
-pub use product::*;
-pub use square::*;
-pub use transpose::*;
-
 #[cfg(test)]
 mod tests;
+
+pub use base::*;
 
 pub type Matrix2x2<T> = Matrix<T, 2, 2>;
 pub type Matrix2x3<T> = Matrix<T, 2, 3>;
@@ -32,27 +27,6 @@ pub type Matrix4x3<T> = Matrix<T, 4, 3>;
 pub type Matrix4x4<T> = Matrix<T, 4, 4>;
 
 /*
-use core::{
-    mem::{self, MaybeUninit},
-    ptr,
-    convert::{TryFrom},
-    ops::{
-        Index, IndexMut,
-        Neg, Add, Sub, Mul, Div, Rem,
-        AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
-        Not, BitAnd, BitOr, BitXor,
-        BitAndAssign, BitOrAssign, BitXorAssign,
-    },
-    cmp::{PartialOrd},
-    iter::{IntoIterator},
-    slice,
-    fmt::{Display, Formatter, Result as FmtResult},
-};
-#[cfg(feature = "random")]
-use core::marker::PhantomData;
-use num_traits::{Zero, One, Num, GenericFloat};
-use num_integer::{self as nint, Integer};
-use crate::{traits::*, vector::*};
 #[cfg(feature = "random")]
 use rand::Rng;
 #[cfg(feature = "random")]

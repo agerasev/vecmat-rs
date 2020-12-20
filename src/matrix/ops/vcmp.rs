@@ -1,4 +1,4 @@
-use crate::matrix::*;
+use crate::Matrix;
 use core::cmp::PartialOrd;
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N>

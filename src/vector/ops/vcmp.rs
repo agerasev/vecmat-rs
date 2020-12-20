@@ -1,4 +1,4 @@
-use crate::vector::*;
+use crate::Vector;
 use core::cmp::PartialOrd;
 
 impl<T, const N: usize> Vector<T, N>

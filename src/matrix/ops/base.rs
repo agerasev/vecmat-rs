@@ -1,4 +1,7 @@
-use crate::{matrix::*, traits::*};
+use crate::{
+    traits::{ImplicitClone, GenericFloat, NormL1, NormL2, NormLInf},
+    Matrix,
+};
 use core::{
     cmp::PartialOrd,
     iter::IntoIterator,

@@ -1,4 +1,4 @@
-use super::*;
+use crate::Quaternion;
 use core::fmt::{Debug, Display, Formatter, Result as FmtResult};
 
 impl<T: Debug> Debug for Quaternion<T> {

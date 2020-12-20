@@ -1,7 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 
-use super::Matrix;
-use crate::{traits::*, vector::*};
+use crate::{traits::ImplicitClone, Matrix, Vector};
 use core::{
     mem::MaybeUninit,
     ops::{Index, IndexMut},

@@ -1,4 +1,4 @@
-use crate::vector::*;
+use crate::Vector;
 use num_integer::{self as int, Integer};
 
 impl<T, const N: usize> Vector<T, N>

@@ -1,4 +1,4 @@
-use crate::matrix::*;
+use crate::Matrix;
 use core::{
     mem::{self, MaybeUninit},
     ptr,

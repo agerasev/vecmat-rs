@@ -1,8 +1,8 @@
-use crate::{Dot, Vector2};
+use crate::{traits::Dot, vector::Vector2};
 use core::ops::Neg;
 use num_traits::Num;
 
-pub use num_complex::*;
+pub use num_complex::{Complex, ParseComplexError};
 
 impl<T> From<Vector2<T>> for Complex<T> {
     fn from(vec: Vector2<T>) -> Self {

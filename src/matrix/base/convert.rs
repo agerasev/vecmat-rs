@@ -1,5 +1,4 @@
-use super::Matrix;
-use crate::{traits::*, vector::*};
+use crate::{traits::ImplicitClone, vector::GroupIter, Matrix, Vector};
 use core::convert::TryFrom;
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N> {

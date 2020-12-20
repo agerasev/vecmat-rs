@@ -13,12 +13,6 @@ mod spec;
 mod tests;
 
 pub use base::*;
-pub use dot::*;
-pub use ops::*;
-pub use spec::*;
-
-//#[cfg(feature = "random")]
-//pub use random::*;
 
 pub type Vector2<T> = Vector<T, 2>;
 pub type Vector3<T> = Vector<T, 3>;
@@ -27,53 +21,6 @@ pub type Vector8<T> = Vector<T, 8>;
 pub type Vector16<T> = Vector<T, 16>;
 
 /*
-#[macro_use]
-mod base;
-pub use base::*;
-
-#[macro_use]
-mod ops;
-pub use ops::*;
-
-#[macro_use]
-mod dot;
-pub use dot::*;
-
-#[macro_use]
-mod spec;
-pub use spec::*;
-
-#[macro_use]
-#[cfg(feature = "random")]
-mod random;
-
-#[macro_use]
-#[cfg(feature = "approx")]
-mod approx;
-
-#[cfg(test)]
-mod tests;
-
-
-use core::{
-    mem::{self, MaybeUninit},
-    ptr,
-    convert::{TryFrom, TryInto},
-    ops::{
-        Index, IndexMut,
-        Neg, Add, Sub, Mul, Div, Rem,
-        AddAssign, SubAssign, MulAssign, DivAssign, RemAssign,
-        Not, BitAnd, BitOr, BitXor,
-        BitAndAssign, BitOrAssign, BitXorAssign,
-    },
-    cmp::{PartialOrd},
-    iter::{IntoIterator},
-    slice,
-    fmt::{Debug, Display, Formatter, Result as FmtResult},
-};
-#[cfg(feature = "random")]
-use core::marker::PhantomData;
-
 use num_traits::{Zero, GenericFloat};
 use num_integer::{self as nint, Integer};
 use crate::{traits::*, };

@@ -1,4 +1,4 @@
-use crate::matrix::*;
+use crate::Matrix;
 use num_integer::{self as nint, Integer};
 
 impl<T, const M: usize, const N: usize> Matrix<T, M, N>

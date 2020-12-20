@@ -1,5 +1,4 @@
-use super::*;
-use crate::{traits::ImplicitClone, vector::Vector};
+use crate::{traits::ImplicitClone, Matrix, Vector};
 use core::ops::{Index, IndexMut, Neg};
 use num_traits::{Num, One, Zero};
 

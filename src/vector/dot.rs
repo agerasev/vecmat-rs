@@ -1,4 +1,7 @@
-use crate::{traits::*, vector::*};
+use crate::{
+    traits::{ImplicitClone, Dot, GenericFloat},
+    Vector,
+};
 use core::ops::{Add, Div, Mul};
 
 impl<T, const N: usize> Dot<Vector<T, N>> for Vector<T, N>

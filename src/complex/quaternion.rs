@@ -1,4 +1,7 @@
-use crate::{traits::*, vector::*};
+use crate::{
+    traits::{ImplicitClone, Dot, GenericFloat},
+    vector::{Vector3, Vector4},
+};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use num_complex::Complex;
 use num_traits::{Num, One, Zero};

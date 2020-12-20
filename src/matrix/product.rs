@@ -1,4 +1,7 @@
-use crate::{matrix::*, traits::*, vector::*};
+use crate::{
+    traits::{ImplicitClone, Dot, Outer},
+    Matrix, Vector,
+};
 use core::ops::{Add, Mul};
 
 impl<T, const M: usize, const N: usize> Outer<Vector<T, N>> for Vector<T, M>

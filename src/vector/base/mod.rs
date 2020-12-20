@@ -5,8 +5,6 @@ mod iter;
 #[cfg(test)]
 mod tests;
 
-pub use format::*;
-pub use init::*;
 pub use iter::*;
 
 use crate::traits::ImplicitClone;

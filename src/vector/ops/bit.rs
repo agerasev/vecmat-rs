@@ -1,4 +1,4 @@
-use crate::vector::*;
+use crate::Vector;
 use core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not};
 
 impl<T, const N: usize> Not for Vector<T, N>
