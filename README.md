@@ -32,12 +32,10 @@ vecmat = { version = "0.6.0", features = ["nightly"] }
 
 ## Cargo features
 
-+ `std` (crate could be used with `no_std`).
++ `std` - use std (enabled by default). Crate could be used with `no_std`.
 + `rand` - distributions for generating random entities.
 + `approx` - approximate comparison.
 + `nightly` - enables nightly features. (required before Rust 1.50) 
-
-All these features are enabled by default.
 
 ## [Documentation](https://docs.rs/vecmat)
 

@@ -12,7 +12,7 @@ rust:
 #    - rust: nightly
 
 script:
-  - cargo test --verbose --features=nightly
+  - cargo test --verbose --features=rand,approx,nightly
   - cargo test --verbose --no-default-features --features=nightly
 
 #addons:
