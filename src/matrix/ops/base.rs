@@ -9,142 +9,142 @@ use core::{
 };
 use num_traits::{Float, Zero};
 
-impl<T, const M: usize, const N: usize> Neg for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Neg for Matrix<T, M, N>
 where
     T: Neg<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
+    type Output = Matrix<T, M, N>;
     fn neg(self) -> Self::Output {
         self.map(|v| -v)
     }
 }
 
-impl<T, const M: usize, const N: usize> Add for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Add for Matrix<T, M, N>
 where
     T: Add<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
-    fn add(self, vec: Matrix<T, N, M>) -> Self::Output {
+    type Output = Matrix<T, M, N>;
+    fn add(self, vec: Matrix<T, M, N>) -> Self::Output {
         self.zip(vec).map(|(x, y)| x + y)
     }
 }
-impl<T, const M: usize, const N: usize> Sub for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Sub for Matrix<T, M, N>
 where
     T: Sub<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
-    fn sub(self, vec: Matrix<T, N, M>) -> Self::Output {
+    type Output = Matrix<T, M, N>;
+    fn sub(self, vec: Matrix<T, M, N>) -> Self::Output {
         self.zip(vec).map(|(x, y)| x - y)
     }
 }
-impl<T, const M: usize, const N: usize> Mul for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Mul for Matrix<T, M, N>
 where
     T: Mul<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
-    fn mul(self, vec: Matrix<T, N, M>) -> Self::Output {
+    type Output = Matrix<T, M, N>;
+    fn mul(self, vec: Matrix<T, M, N>) -> Self::Output {
         self.zip(vec).map(|(x, y)| x * y)
     }
 }
-impl<T, const M: usize, const N: usize> Div for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Div for Matrix<T, M, N>
 where
     T: Div<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
-    fn div(self, vec: Matrix<T, N, M>) -> Self::Output {
+    type Output = Matrix<T, M, N>;
+    fn div(self, vec: Matrix<T, M, N>) -> Self::Output {
         self.zip(vec).map(|(x, y)| x / y)
     }
 }
-impl<T, const M: usize, const N: usize> Rem for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Rem for Matrix<T, M, N>
 where
     T: Rem<Output = T>,
 {
-    type Output = Matrix<T, N, M>;
-    fn rem(self, vec: Matrix<T, N, M>) -> Self::Output {
+    type Output = Matrix<T, M, N>;
+    fn rem(self, vec: Matrix<T, M, N>) -> Self::Output {
         self.zip(vec).map(|(x, y)| x % y)
     }
 }
 
-impl<T, const M: usize, const N: usize> Mul<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Mul<T> for Matrix<T, M, N>
 where
     T: Mul<Output = T> + Copy,
 {
-    type Output = Matrix<T, N, M>;
+    type Output = Matrix<T, M, N>;
     fn mul(self, a: T) -> Self::Output {
         self.map(|v| v * a)
     }
 }
-impl<T, const M: usize, const N: usize> Div<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Div<T> for Matrix<T, M, N>
 where
     T: Div<Output = T> + Copy,
 {
-    type Output = Matrix<T, N, M>;
+    type Output = Matrix<T, M, N>;
     fn div(self, a: T) -> Self::Output {
         self.map(|v| v / a)
     }
 }
-impl<T, const M: usize, const N: usize> Rem<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Rem<T> for Matrix<T, M, N>
 where
     T: Rem<Output = T> + Copy,
 {
-    type Output = Matrix<T, N, M>;
+    type Output = Matrix<T, M, N>;
     fn rem(self, a: T) -> Self::Output {
         self.map(|v| v % a)
     }
 }
 
-impl<T, const M: usize, const N: usize> AddAssign for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> AddAssign for Matrix<T, M, N>
 where
     T: AddAssign,
 {
-    fn add_assign(&mut self, vec: Matrix<T, N, M>) {
+    fn add_assign(&mut self, vec: Matrix<T, M, N>) {
         self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| {
             *s += x;
         })
     }
 }
-impl<T, const M: usize, const N: usize> SubAssign for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> SubAssign for Matrix<T, M, N>
 where
     T: SubAssign,
 {
-    fn sub_assign(&mut self, vec: Matrix<T, N, M>) {
+    fn sub_assign(&mut self, vec: Matrix<T, M, N>) {
         self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| {
             *s -= x;
         })
     }
 }
-impl<T, const M: usize, const N: usize> MulAssign for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> MulAssign for Matrix<T, M, N>
 where
     T: MulAssign,
 {
-    fn mul_assign(&mut self, vec: Matrix<T, N, M>) {
+    fn mul_assign(&mut self, vec: Matrix<T, M, N>) {
         self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| {
             *s *= x;
         })
     }
 }
-impl<T, const M: usize, const N: usize> DivAssign for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> DivAssign for Matrix<T, M, N>
 where
     T: DivAssign,
 {
-    fn div_assign(&mut self, vec: Matrix<T, N, M>) {
+    fn div_assign(&mut self, vec: Matrix<T, M, N>) {
         self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| {
             *s /= x;
         })
     }
 }
-impl<T, const M: usize, const N: usize> RemAssign for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> RemAssign for Matrix<T, M, N>
 where
     T: RemAssign,
 {
-    fn rem_assign(&mut self, vec: Matrix<T, N, M>) {
+    fn rem_assign(&mut self, vec: Matrix<T, M, N>) {
         self.iter_mut().zip(vec.into_iter()).for_each(|(s, x)| {
             *s %= x;
         })
     }
 }
 
-impl<T, const M: usize, const N: usize> MulAssign<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> MulAssign<T> for Matrix<T, M, N>
 where
     T: MulAssign + Copy,
 {
@@ -154,7 +154,7 @@ where
         })
     }
 }
-impl<T, const M: usize, const N: usize> DivAssign<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> DivAssign<T> for Matrix<T, M, N>
 where
     T: DivAssign + Copy,
 {
@@ -164,7 +164,7 @@ where
         })
     }
 }
-impl<T, const M: usize, const N: usize> RemAssign<T> for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> RemAssign<T> for Matrix<T, M, N>
 where
     T: RemAssign + Copy,
 {
@@ -175,7 +175,7 @@ where
     }
 }
 
-impl<T, const M: usize, const N: usize> Zero for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> Zero for Matrix<T, M, N>
 where
     T: Zero,
 {
@@ -187,7 +187,7 @@ where
     }
 }
 
-impl<T, const M: usize, const N: usize> Matrix<T, N, M> {
+impl<T, const M: usize, const N: usize> Matrix<T, M, N> {
     pub fn sum(self) -> T
     where
         T: Add<Output = T>,
@@ -208,7 +208,7 @@ impl<T, const M: usize, const N: usize> Matrix<T, N, M> {
     }
 }
 
-impl<T, const M: usize, const N: usize> NormL1 for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> NormL1 for Matrix<T, M, N>
 where
     T: NormL1<Output = T> + Add<Output = T>,
 {
@@ -217,7 +217,7 @@ where
         self.map(|x| x.norm_l1()).sum()
     }
 }
-impl<T, const M: usize, const N: usize> NormL2 for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> NormL2 for Matrix<T, M, N>
 where
     T: Float,
 {
@@ -226,7 +226,7 @@ where
         self.map(|x| x * x).sum().sqrt()
     }
 }
-impl<T, const M: usize, const N: usize> NormLInf for Matrix<T, N, M>
+impl<T, const M: usize, const N: usize> NormLInf for Matrix<T, M, N>
 where
     T: NormLInf<Output = T> + PartialOrd,
 {

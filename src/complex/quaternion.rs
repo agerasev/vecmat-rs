@@ -1,4 +1,5 @@
 use crate::{
+    matrix::Matrix4x4,
     traits::Dot,
     vector::{Vector3, Vector4},
 };
@@ -133,6 +134,16 @@ impl<T> Quaternion<T> {
     }
     pub fn z_mut(&mut self) -> &mut T {
         self.vec.w_mut()
+    }
+}
+
+impl<T> Quaternion<T>
+where
+    T: Neg<Output = T> + Copy,
+{
+    pub fn into_matrix(self) -> Matrix4x4<T> {
+        let (w, x, y, z) = self.into();
+        Matrix4x4::from([[w, -x, -y, -z], [x, w, -z, y], [y, z, w, -x], [z, -y, x, w]])
     }
 }
 

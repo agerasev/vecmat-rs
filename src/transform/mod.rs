@@ -1,11 +1,11 @@
+mod affine;
 mod linear;
 mod shift;
-//mod affine;
 //mod rotation;
 
+pub use affine::*;
 pub use linear::*;
 pub use shift::*;
-//pub use affine::*;
 //pub use rotation::*;
 
 use crate::Vector;

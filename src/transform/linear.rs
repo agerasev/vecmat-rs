@@ -18,6 +18,10 @@ pub struct Linear<T, const N: usize> {
     lin: Matrix<T, N, N>,
 }
 
+pub type Linear2<T> = Linear<T, 2>;
+pub type Linear3<T> = Linear<T, 3>;
+pub type Linear4<T> = Linear<T, 4>;
+
 impl<T, const N: usize> Linear<T, N> {
     pub fn from_matrix(lin: Matrix<T, N, N>) -> Self {
         Self { lin }

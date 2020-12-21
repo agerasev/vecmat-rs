@@ -15,6 +15,10 @@ pub struct Shift<T, const N: usize> {
     pos: Vector<T, N>,
 }
 
+pub type Shift2<T> = Shift<T, 2>;
+pub type Shift3<T> = Shift<T, 3>;
+pub type Shift4<T> = Shift<T, 4>;
+
 impl<T, const N: usize> Shift<T, N> {
     pub fn from_vector(pos: Vector<T, N>) -> Self {
         Self { pos }

@@ -95,3 +95,17 @@ fn derivation() {
         }
     }
 }
+
+#[test]
+fn into_matrix() {
+    let mut rng = XorShiftRng::seed_from_u64(0xFEED0);
+    for _ in 0..SAMPLE_ATTEMPTS {
+        let a: Qf = rng.sample(&NonZero);
+        let b: Qf = rng.sample(&NonZero);
+        assert_abs_diff_eq!(
+            (a * b).into_matrix(),
+            a.into_matrix().dot(b.into_matrix()),
+            epsilon = 1e-14,
+        );
+    }
+}
