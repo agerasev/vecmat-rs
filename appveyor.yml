@@ -46,5 +46,5 @@ install:
 build: false
 
 test_script:
-- cargo test --verbose %cargoflags%
-- cargo test --verbose --no-default-features %cargoflags%
+- cargo test --verbose %cargoflags% --features=nightly
+- cargo test --verbose --no-default-features %cargoflags% --features=nightly

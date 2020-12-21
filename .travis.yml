@@ -12,8 +12,8 @@ rust:
 #    - rust: nightly
 
 script:
-  - cargo test --verbose
-  - cargo test --verbose --no-default-features
+  - cargo test --verbose --features=nightly
+  - cargo test --verbose --no-default-features --features=nightly
 
 #addons:
 #  apt:

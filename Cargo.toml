@@ -9,7 +9,7 @@ documentation = "https://docs.rs/vecmat"
 homepage = "https://github.com/agerasev/vecmat-rs"
 repository = "https://github.com/agerasev/vecmat-rs"
 readme = "README.md"
-keywords = ["vector", "matrix", "math"]
+keywords = ["vector", "matrix", "math", "min_const_generics"]
 categories = ["algorithms", "data-structures", "science"]
 license = "MIT/Apache-2.0"
 
@@ -28,3 +28,7 @@ rand_xorshift = "0.2"
 default = ["std", "rand", "approx"]
 std = ["num-traits/std", "num-integer/std", "num-complex/std", "rand_/std", "approx/std"]
 rand = ["rand_", "num-complex/rand"]
+nightly = []
+
+[package.metadata.docs.rs]
+features = ["std", "random", "approx", "nightly"]
