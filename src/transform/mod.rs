@@ -1,12 +1,12 @@
 mod affine;
 mod linear;
+mod rotation;
 mod shift;
-//mod rotation;
 
 pub use affine::*;
 pub use linear::*;
+pub use rotation::*;
 pub use shift::*;
-//pub use rotation::*;
 
 use crate::Vector;
 
@@ -27,3 +27,8 @@ pub trait Transform<T, const N: usize> {
     /// Chain two transformations into a new one.
     fn chain(self, other: Self) -> Self;
 }
+
+// TODO: Use trait aliases when it will be possible.
+//trait Transform2<T> = Transform<T, 2>;
+//trait Transform3<T> = Transform<T, 3>;
+//trait Transform4<T> = Transform<T, 4>;
