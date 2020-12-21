@@ -1,9 +1,6 @@
 #[cfg(feature = "rand")]
-use crate::{
-    distr::{Invertible, Normal},
-    traits::Dot,
-    Matrix, Transform, Vector,
-};
+use crate::distr::{Invertible, Normal};
+use crate::{traits::Dot, Matrix, Transform, Vector};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
