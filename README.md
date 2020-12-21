@@ -24,7 +24,11 @@
 Low-dimensional vector algebra with `min_const_generics` support.
 
 *`min_const_generics` feature are planning to be stabilized in Rust 1.50.
-So for now this crate requires nightly compiler and `nighly` feature to be enabled.*
+So for now this crate requires nightly compiler and `nightly` feature to be enabled:*
+
+```toml
+vecmat = { version = "0.6.0", features = ["nightly"] }
+```
 
 ## Cargo features
 
