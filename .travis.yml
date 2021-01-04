@@ -3,16 +3,16 @@ language: rust
 sudo: required
 
 rust:
-  - stable
-  - beta
+  #- stable
+  #- beta
   - nightly
 
-matrix:
-  allow_failures:
-    - rust: nightly
+#matrix:
+#  allow_failures:
+#    - rust: nightly
 
 script:
-  - cargo test --verbose
+  - cargo test --verbose --features=rand,approx
   - cargo test --verbose --no-default-features
 
 #addons:

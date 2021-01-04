@@ -1,7 +1,6 @@
 use crate::*;
-use num_traits::{Zero, One};
 use ::approx::*;
-
+use num_traits::{One, Zero};
 
 #[test]
 fn new() {

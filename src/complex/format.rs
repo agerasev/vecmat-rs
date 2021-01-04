@@ -1,6 +1,5 @@
+use crate::Quaternion;
 use core::fmt::{Debug, Display, Formatter, Result as FmtResult};
-use super::*;
-
 
 impl<T: Debug> Debug for Quaternion<T> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
@@ -29,8 +28,8 @@ impl<T: Display> Display for Quaternion<T> {
 
 #[cfg(all(test, feature = "std"))]
 mod tests {
-    use std::format;
     use super::*;
+    use std::format;
 
     #[test]
     fn quaternion() {

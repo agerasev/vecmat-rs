@@ -1,118 +1,168 @@
-use crate::matrix::*;
+use crate::{Matrix, Vector};
+use core::ops::{Index, IndexMut, Neg};
+use num_traits::{Num, One, Zero};
 
-
-macro_rules! matrix_one { ($N:expr, $W:ident) => (
-	impl<T> One for $W<T> where T: One + Zero {
-		/// Create identity matrix.
-		fn one() -> Self {
-			$W::indices().map(|(i, j)| if i == j { T::one() } else { T::zero() })
-		}
-	}
-) }
-matrix_one!(2, Matrix2x2);
-matrix_one!(3, Matrix3x3);
-matrix_one!(4, Matrix4x4);
-
-macro_rules! matrix_submatrix { ($N:expr, $W:ident, $V:ident) => (
-	impl<T> $W<T> where T: Clone {
-		/// Take submatrix from original matrix.
-		pub fn submatrix(&self, y: usize, x: usize) -> $V<T> {
-			$V::indices().map(|(i, j)| self[(i + (i >= y) as usize, j + (j >= x) as usize)].clone())
-		}
-	}
-) }
-matrix_submatrix!(4, Matrix4x4, Matrix3x3);
-matrix_submatrix!(3, Matrix3x3, Matrix2x2);
-impl<T> Matrix2x2<T> where T: Clone {
-	/// Take submatrix from original matrix.
-	pub fn submatrix(&self, y: usize, x: usize) -> T {
-		self[(1 - y, 1 - x)].clone()
-	}
+impl<T, const N: usize> Matrix<T, N, N>
+where
+    T: Zero,
+{
+    /// Create diagonal matrix.
+    pub fn diagonal(diag: Vector<T, N>) -> Self {
+        let mut iter = diag.into_iter();
+        Matrix::indices().map(|(i, j)| {
+            if i == j {
+                iter.next().unwrap()
+            } else {
+                T::zero()
+            }
+        })
+    }
+}
+impl<T, const N: usize> One for Matrix<T, N, N>
+where
+    T: One + Zero,
+{
+    /// Create identity matrix.
+    fn one() -> Self {
+        Matrix::indices().map(|(i, j)| if i == j { T::one() } else { T::zero() })
+    }
 }
 
-macro_rules! matrix_cofactor { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
-		/// Find a cofactor of the matrix.
-		pub fn cofactor(&self, y: usize, x: usize) -> T {
-			(if (x + y) % 2 == 0 {
-				T::one()
-			} else {
-				-T::one()
-			}) * self.submatrix(y, x).det()
-		}
-	}
-) }
-matrix_cofactor!(4, Matrix4x4);
-matrix_cofactor!(3, Matrix3x3);
-impl<T> Matrix2x2<T> where T: Neg<Output=T> + Num + Clone {
-	/// Find a cofactor of the matrix.
-	pub fn cofactor(&self, y: usize, x: usize) -> T {
-		(if (x + y) % 2 == 0 { T::one() } else { -T::one() }) * self.submatrix(y, x)
-	}
+// TODO: Implement when it will be possible to perform const generic arithmetics and specialization.
+/*
+impl<T, const N: usize> Matrix<T, N, N> where T: Copy, N > 1 {
+    /// Take submatrix from original matrix.
+    pub fn submatrix(&self, y: usize, x: usize) -> Matrix<T, N - 1, N - 1> {
+        Matrix::indices().map(|(i, j)| self[(i + (i >= y) as usize, j + (j >= x) as usize)].clone())
+    }
+}
+impl<T> Matrix<T, 1, 1> where T: Copy {
+    /// Take submatrix from original matrix.
+    pub fn submatrix(&self, y: usize, x: usize) -> T {
+        self[(0, 0)].clone()
+    }
+}
+*/
+
+struct IndexMask<const N: usize> {
+    data: [bool; N],
 }
 
-macro_rules! matrix_det { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
-		/// Find a determinant of the matrix.
-		pub fn det(&self) -> T {
-			let i = 0;
-			self.row(i).enumerate()
-			.map(|(j, x)| x * self.cofactor(i, j))
-			.sum()
-		}
-	}
-) }
-matrix_det!(4, Matrix4x4);
-matrix_det!(3, Matrix3x3);
-impl<T> Matrix2x2<T> where T: Neg<Output=T> + Num + Clone {
-	/// Find a determinant of the matrix.
-	pub fn det(&self) -> T {
-		self[(0, 0)].clone()*self[(1, 1)].clone() -
-		self[(0, 1)].clone()*self[(1, 0)].clone()
-	}
+impl<const N: usize> IndexMask<N> {
+    pub fn new() -> Self {
+        Self { data: [true; N] }
+    }
+    pub fn find(&self, mut i: usize) -> usize {
+        loop {
+            if self.data[i] {
+                break i;
+            }
+            i += 1;
+        }
+    }
 }
 
-macro_rules! matrix_adj { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
-		/// Find an adjugate matrix.
-		pub fn adj(&self) -> $W<T> {
-			$W::indices().map(|(i, j)| self.cofactor(j, i))
-		}
-	}
-) }
-matrix_adj!(4, Matrix4x4);
-matrix_adj!(3, Matrix3x3);
-matrix_adj!(2, Matrix2x2);
+impl<const N: usize> Index<usize> for IndexMask<N> {
+    type Output = bool;
+    fn index(&self, i: usize) -> &bool {
+        &self.data[i]
+    }
+}
+impl<const N: usize> IndexMut<usize> for IndexMask<N> {
+    fn index_mut(&mut self, i: usize) -> &mut bool {
+        &mut self.data[i]
+    }
+}
 
-macro_rules! matrix_inverse { ($N:expr, $W:ident) => (
-	impl<T> $W<T> where T: Neg<Output=T> + Num + Clone {
-		/// Find an inverse matrix.
-		pub fn inverse(&self) -> $W<T> {
-			self.adj() / self.det()
-		}
-	}
-) }
-matrix_inverse!(4, Matrix4x4);
-matrix_inverse!(3, Matrix3x3);
-matrix_inverse!(2, Matrix2x2);
+struct SubmatrixMask<const N: usize> {
+    pub col: IndexMask<N>,
+    pub row: IndexMask<N>,
+    pub deg: usize,
+}
 
-#[cfg(feature = "random")]
-macro_rules! matrix_random_invertible { ($N:expr, $W:ident, $D:ident) => (
-	impl<T> Distribution<$W<T>> for Invertible where StandardNormal: Distribution<$W<T>>, T: Neg<Output=T> + Float + Clone {
-		fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $W<T> {
-			loop {
-				let x = rng.sample(&StandardNormal);
-				if x.clone().det().abs() > T::epsilon() {
-					break x;
-				}
-			}
-		}
-	}
-) }
+impl<const N: usize> SubmatrixMask<N> {
+    fn new() -> Self {
+        Self {
+            col: IndexMask::new(),
+            row: IndexMask::new(),
+            deg: N,
+        }
+    }
+    fn exclude(&mut self, i: usize, j: usize) {
+        self.col[i] = false;
+        self.row[j] = false;
+        self.deg -= 1;
+    }
+    fn include(&mut self, i: usize, j: usize) {
+        self.col[i] = true;
+        self.row[j] = true;
+        self.deg += 1;
+    }
+}
 
-#[cfg(feature = "random")]
-matrix_random_invertible!(4, Matrix4x4, MatrixDistribution4x4);
-#[cfg(feature = "random")]
-matrix_random_invertible!(3, Matrix3x3, MatrixDistribution3x3);
-#[cfg(feature = "random")]
-matrix_random_invertible!(2, Matrix2x2, MatrixDistribution2x2);
+struct Determinator<'a, T, const N: usize> {
+    matrix: &'a Matrix<T, N, N>,
+    mask: SubmatrixMask<N>,
+}
+
+impl<'a, T, const N: usize> Determinator<'a, T, N>
+where
+    T: Neg<Output = T> + Num + Copy,
+{
+    fn new(matrix: &'a Matrix<T, N, N>) -> Self {
+        Self {
+            matrix,
+            mask: SubmatrixMask::new(),
+        }
+    }
+    fn cofactor(&mut self, (i, ri): (usize, usize), (j, rj): (usize, usize)) -> T {
+        self.mask.exclude(i, j);
+        let mut a = self.det();
+        if (ri + rj) % 2 != 0 {
+            a = -a;
+        }
+        self.mask.include(i, j);
+        a
+    }
+    fn det(&mut self) -> T {
+        if self.mask.deg == 0 {
+            T::one()
+        } else {
+            let i = self.mask.col.find(0);
+            let mut j = 0;
+            let mut a = T::zero();
+            for rj in 0..self.mask.deg {
+                j = self.mask.row.find(j);
+                a = a + self.matrix[(i, j)] * self.cofactor((i, 0), (j, rj));
+                j += 1;
+            }
+            a
+        }
+    }
+}
+
+impl<T, const N: usize> Matrix<T, N, N>
+where
+    T: Neg<Output = T> + Num + Copy,
+{
+    /// Cofactor of the matrix at (i, j).
+    pub fn cofactor(&self, i: usize, j: usize) -> T {
+        assert!(i < N && j < N);
+        Determinator::new(self).cofactor((i, i), (j, j))
+    }
+
+    /// Determinant of the matrix.
+    pub fn det(&self) -> T {
+        Determinator::new(self).det()
+    }
+
+    /// Adjugate matrix.
+    pub fn adj(&self) -> Self {
+        Matrix::indices().map(|(i, j)| self.cofactor(j, i))
+    }
+
+    /// Inverse matrix.
+    pub fn inv(&self) -> Self {
+        self.adj() / self.det()
+    }
+}

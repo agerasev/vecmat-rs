@@ -21,7 +21,15 @@
 [codecov]: https://codecov.io/gh/agerasev/vecmat-rs
 [license]: #license
 
-Low-dimensional vector algebra structures and operations.
+Low-dimensional vector algebra with `min_const_generics` support.
+
+*Rust 1.51 or higher requred because of `min_const_generics` feature.*
+
+## Cargo features
+
++ `std` - use std (enabled by default). Crate could be used with `no_std`.
++ `rand` - distributions for generating random entities.
++ `approx` - approximate comparison.
 
 ## [Documentation](https://docs.rs/vecmat)
 
@@ -29,29 +37,22 @@ Low-dimensional vector algebra structures and operations.
 
 ### Primitives
 
-+ `VectorN`
-+ `MatrixMxN`
-+ `Quaternion` (and `Complex` from `num_complex`)
++ `Vector`.
++ `Matrix`.
++ `Quaternion` (and `Complex` reexported from `num_complex`).
 
 ### Transformations
 
-+ `ShiftN`
-+ `LinearN`
-+ `AffineN`
-+ `RotationN`
-
-## Cargo features
-
-+ `std` (crate could be used with `no_std`).
-+ `random` - distributions for generating random primitives (`std` is required for now).
-+ `approx` - approximate comparison for primitives.
-
-All these features are enabled by default.
++ `Shift`.
++ `Linear`.
++ `Affine`.
++ `Rotation2` and `Rotation3`.
 
 ## Functionality
 
 ### Implemented
 
++ `min_const_generics` support.
 + Vector and matrix arithmetcs (`+`, `-`, `*`, `/`, `%`).
 + Integer vectors and matrices (including `div_floor`, `mod_floor` and bitwise).
 + Boolean vectors and matrices (comparison, `all`, `any`).
@@ -63,10 +64,9 @@ All these features are enabled by default.
 
 ### Planning
 
-+ `min-const-generics` support!
-+ Reverse multiplication for vector and matrix.
-+ Singular and eigenvalues decomposition for matrix.
++ Eigen- and singular decomposition for matrices.
 + Moebuis transformation.
++ `Rotation4`.
 
 ## License
 

@@ -1,16 +1,16 @@
 [package]
 name = "vecmat"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
-description = "Lightweight low-dimensional vector and matrix library"
+description = "Low-dimensional vector algebra with min_const_generics support"
 documentation = "https://docs.rs/vecmat"
 homepage = "https://github.com/agerasev/vecmat-rs"
 repository = "https://github.com/agerasev/vecmat-rs"
 readme = "README.md"
-keywords = ["vector", "matrix", "math"]
-categories = ["algorithms", "data-structures", "science"]
+keywords = ["vector", "matrix", "math", "algebra", "min-const-generics"]
+categories = ["algorithms", "data-structures", "science", "no-std"]
 license = "MIT/Apache-2.0"
 
 [dependencies]
@@ -18,14 +18,16 @@ num-traits = { version = "0.2", default-features = false, features = ["libm"] }
 num-complex = { version = "0.3", default-features = false, features = ["libm"] }
 num-integer = { version = "0.1", default-features = false }
 
-rand = { version = "0.7", optional = true }
-rand_distr = { version = "0.3", optional = true }
+rand_ = { package = "rand", version = "0.7", optional = true }
 approx = { version = "0.4", optional = true }
 
 [dev-dependencies]
 rand_xorshift = "0.2"
 
 [features]
-default = ["std", "random", "approx"]
-std = ["num-traits/std", "num-integer/std", "num-complex/std", "rand/std", "approx/std"]
-random = ["rand", "rand_distr"]
+default = ["std"]
+std = ["num-traits/std", "num-integer/std", "num-complex/std", "rand_/std", "approx/std"]
+rand = ["rand_", "num-complex/rand"]
+
+[package.metadata.docs.rs]
+features = ["std", "rand", "approx"]

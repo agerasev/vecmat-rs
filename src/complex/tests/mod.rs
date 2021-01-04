@@ -1,4 +1,3 @@
 mod base;
-
-#[cfg(feature = "random")]
+#[cfg(feature = "rand")]
 mod quaternion;

@@ -1,9 +1,8 @@
+use crate::{traits::Dot, vector::Vector2};
 use core::ops::Neg;
 use num_traits::Num;
-use crate::{Vector2, Dot};
 
-pub use num_complex::*;
-
+pub use num_complex::{Complex, ParseComplexError};
 
 impl<T> From<Vector2<T>> for Complex<T> {
     fn from(vec: Vector2<T>) -> Self {
@@ -17,9 +16,12 @@ impl<T> Into<Vector2<T>> for Complex<T> {
     }
 }
 
-impl<T> Dot for Complex<T> where T: Neg<Output=T> + Num {
+impl<T> Dot for Complex<T>
+where
+    T: Neg<Output = T> + Num,
+{
     type Output = T;
     fn dot(self, other: Self) -> T {
-        <Self as Into<Vector2<_>>>::into(self).dot(other.into()).into()
+        <Self as Into<Vector2<_>>>::into(self).dot(other.into())
     }
 }
