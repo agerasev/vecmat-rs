@@ -57,7 +57,6 @@
 //! println!("{}", ma.inv());
 //! ```
 
-#![cfg_attr(feature = "nightly", feature(min_const_generics))]
 #![no_std]
 #[cfg(feature = "std")]
 extern crate std;

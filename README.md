@@ -23,19 +23,13 @@
 
 Low-dimensional vector algebra with `min_const_generics` support.
 
-*`min_const_generics` feature are planning to be stabilized in Rust 1.50.
-So for now this crate requires nightly compiler and `nightly` feature to be enabled:*
-
-```toml
-vecmat = { version = "0.6.0", features = ["nightly"] }
-```
+*Rust 1.51 or higher requred because of `min_const_generics` feature.*
 
 ## Cargo features
 
 + `std` - use std (enabled by default). Crate could be used with `no_std`.
 + `rand` - distributions for generating random entities.
 + `approx` - approximate comparison.
-+ `nightly` - enables nightly features. (required before Rust 1.50) 
 
 ## [Documentation](https://docs.rs/vecmat)
 
@@ -70,7 +64,7 @@ vecmat = { version = "0.6.0", features = ["nightly"] }
 
 ### Planning
 
-+ Eigen and singular decomposition for matrices.
++ Eigen- and singular decomposition for matrices.
 + Moebuis transformation.
 + `Rotation4`.
 
