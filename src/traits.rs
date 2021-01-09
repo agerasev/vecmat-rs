@@ -1,4 +1,5 @@
 use num_traits::float::FloatCore;
+use num_complex::Complex;
 
 /// L1 Norm trait.
 pub trait NormL1 {
@@ -40,7 +41,13 @@ pub trait Outer<V> {
     fn outer(self, other: V) -> Self::Output;
 }
 
-macro_rules! derive_primitive_base {
+/// Conversion into complex type of `Self`.
+pub trait IntoComplex {
+    /// If `Self` is already `Complex<T>` then it should be `Self`, otherwise `Complex<Self>`.
+    type Output;
+}
+
+macro_rules! derive_primitive_scalar {
     ($T:ident) => {
         impl Dot for $T {
             type Output = Self;
@@ -48,12 +55,15 @@ macro_rules! derive_primitive_base {
                 self * other
             }
         }
+        impl IntoComplex for $T {
+            type Output = Complex<Self>;
+        }
     };
 }
 
 macro_rules! derive_primitive_unsigned {
     ($T:ident) => {
-        derive_primitive_base!($T);
+        derive_primitive_scalar!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -78,7 +88,7 @@ macro_rules! derive_primitive_unsigned {
 
 macro_rules! derive_primitive_signed {
     ($T:ident) => {
-        derive_primitive_base!($T);
+        derive_primitive_scalar!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -103,7 +113,7 @@ macro_rules! derive_primitive_signed {
 
 macro_rules! derive_primitive_float {
     ($T:ident) => {
-        derive_primitive_base!($T);
+        derive_primitive_scalar!($T);
 
         impl NormL1 for $T {
             type Output = Self;
@@ -140,3 +150,7 @@ derive_primitive_signed!(isize);
 
 derive_primitive_float!(f32);
 derive_primitive_float!(f64);
+
+impl<T> IntoComplex for Complex<T> {
+    type Output = Self;
+}
