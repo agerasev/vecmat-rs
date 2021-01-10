@@ -13,6 +13,9 @@ pub struct IntoIter<T, const N: usize> {
     range: Range<usize>,
 }
 
+pub type Iter<'a, T> = slice::Iter<'a, T>;
+pub type IterMut<'a, T> = slice::IterMut<'a, T>;
+
 impl<T, const N: usize> IntoIter<T, N> {
     pub fn new(a: Vector<T, N>) -> Self {
         Self {
@@ -79,11 +82,11 @@ impl<T, const N: usize> Drop for IntoIter<T, N> {
 
 impl<T, const N: usize> Vector<T, N> {
     /// Returns iterator over vector element refrences.
-    pub fn iter(&self) -> slice::Iter<'_, T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         self.as_ref().iter()
     }
     /// Returns iterator over vector element mutable refrences.
-    pub fn iter_mut(&mut self) -> slice::IterMut<'_, T> {
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
         self.as_mut().iter_mut()
     }
 }
@@ -98,7 +101,7 @@ impl<T, const N: usize> IntoIterator for Vector<T, N> {
 
 impl<'a, T, const N: usize> IntoIterator for &'a Vector<T, N> {
     type Item = &'a T;
-    type IntoIter = slice::Iter<'a, T>;
+    type IntoIter = Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.as_ref().iter()
     }
@@ -106,7 +109,7 @@ impl<'a, T, const N: usize> IntoIterator for &'a Vector<T, N> {
 
 impl<'a, T, const N: usize> IntoIterator for &'a mut Vector<T, N> {
     type Item = &'a mut T;
-    type IntoIter = slice::IterMut<'a, T>;
+    type IntoIter = IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
         self.as_mut().iter_mut()
     }
