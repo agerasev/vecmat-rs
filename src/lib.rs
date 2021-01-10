@@ -68,7 +68,7 @@ pub mod matrix;
 pub mod traits;
 pub mod transform;
 pub mod vector;
-pub mod polynomial;
+//pub mod polynomial;
 
 pub use complex::{Complex, Quaternion};
 pub use matrix::Matrix;

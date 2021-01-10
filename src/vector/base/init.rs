@@ -9,12 +9,12 @@ use core::{
 
 impl<T, const N: usize> Vector<MaybeUninit<T>, N> {
     /// Transpose `MaybeUninit<Vector<T, N>>` into `Vector<MaybeUninit<T>, N>`.
-    fn from_uninit(uninit: MaybeUninit<Vector<T, N>>) -> Self {
+    pub fn from_uninit(uninit: MaybeUninit<Vector<T, N>>) -> Self {
         // TODO: Use `mem::transmute` when it will be possible.
         unsafe { ptr::read(&uninit as *const _ as *const Vector<MaybeUninit<T>, N>) }
     }
     /// Transpose `Vector<MaybeUninit<T>, N>` into `MaybeUninit<Vector<T, N>>`.
-    fn into_uninit(self) -> MaybeUninit<Vector<T, N>> {
+    pub fn into_uninit(self) -> MaybeUninit<Vector<T, N>> {
         // TODO: Use `mem::transmute` when it will be possible.
         unsafe { ptr::read(&self as *const _ as *const MaybeUninit<Vector<T, N>>) }
     }

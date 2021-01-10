@@ -96,6 +96,74 @@ mod mem {
             assert_eq!(Rc::strong_count(x), 1);
         }
     }
+
+    #[test]
+    fn into_iter_rev() {
+        let a = <Vector16<_>>::init(|| Rc::new(()));
+        let b = a.clone();
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 2);
+        }
+
+        let mut c = b.into_iter().rev().skip(7);
+        c.next().unwrap();
+
+        for (i, x) in a.iter().enumerate() {
+            if i >= 8 {
+                assert_eq!(Rc::strong_count(x), 1);
+            } else {
+                assert_eq!(Rc::strong_count(x), 2);
+            }
+        }
+
+        mem::drop(c);
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 1);
+        }
+    }
+
+    #[test]
+    fn into_iter_both() {
+        let a = <Vector16<_>>::init(|| Rc::new(()));
+        let b = a.clone();
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 2);
+        }
+
+        let mut c = b.into_iter().skip(3);
+        c.next().unwrap();
+        let mut c = c.rev().skip(3);
+        c.next().unwrap();
+
+        for (i, x) in a.iter().enumerate() {
+            if !(4..12).contains(&i) {
+                assert_eq!(Rc::strong_count(x), 1);
+            } else {
+                assert_eq!(Rc::strong_count(x), 2);
+            }
+        }
+
+        mem::drop(c);
+        for x in a.iter() {
+            assert_eq!(Rc::strong_count(x), 1);
+        }
+    }
+
+    #[test]
+    fn into_iter_len() {
+        let mut a = Vector16::indices().into_iter();
+        
+        for i in 0..8 {
+            assert_eq!(a.len(), 16 - i);
+            assert_eq!(a.next().unwrap(), i);
+        }
+        for i in 0..8 {
+            assert_eq!(a.len(), 8 - i);
+            assert_eq!(a.next_back().unwrap(), 16 - i - 1);
+        }
+        assert_eq!(a.len(), 0);
+        assert!(a.next().is_none());
+    }
 }
 
 mod iter {

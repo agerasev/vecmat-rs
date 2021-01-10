@@ -1,40 +1,59 @@
 use super::Vector;
 use core::{
+    ops::Range,
     convert::{TryFrom, TryInto},
-    iter::IntoIterator,
+    iter::{IntoIterator, ExactSizeIterator, DoubleEndedIterator},
     mem::{self, MaybeUninit},
-    ptr, slice,
+    slice,
 };
 
 /// Iterator by values for vector.
 pub struct IntoIter<T, const N: usize> {
     data: Vector<MaybeUninit<T>, N>,
-    pos: usize,
+    range: Range<usize>,
 }
 
 impl<T, const N: usize> IntoIter<T, N> {
     pub fn new(a: Vector<T, N>) -> Self {
-        let it = Self {
-            data: unsafe {
-                // unsafe { mem::transmute::<_, [MaybeUninit<T>; N]>(a) }
-                ptr::read(&a as *const _ as *const Vector<MaybeUninit<T>, N>)
-            },
-            pos: 0,
-        };
-        mem::forget(a);
-        it
+        Self {
+            data: Vector::from_uninit(MaybeUninit::new(a)),
+            range: 0..N,
+        }
     }
 }
 
 impl<T, const N: usize> Iterator for IntoIter<T, N> {
     type Item = T;
     fn next(&mut self) -> Option<T> {
-        if self.pos < N {
+        if !self.range.is_empty() {
             let o = unsafe {
-                mem::replace(self.data.get_unchecked_mut(self.pos), MaybeUninit::uninit())
-                    .assume_init()
+                mem::replace(
+                    self.data.get_unchecked_mut(self.range.start),
+                    MaybeUninit::uninit(),
+                ).assume_init()
             };
-            self.pos += 1;
+            self.range.start += 1;
+            Some(o)
+        } else {
+            None
+        }
+    }
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let len = self.range.len();
+        (len, Some(len))
+    }
+}
+
+impl<T, const N: usize> DoubleEndedIterator for IntoIter<T, N> {
+    fn next_back(&mut self) -> Option<T> {
+        if !self.range.is_empty() {
+            let o = unsafe {
+                mem::replace(
+                    self.data.get_unchecked_mut(self.range.end - 1),
+                    MaybeUninit::uninit(),
+                ).assume_init()
+            };
+            self.range.end -= 1;
             Some(o)
         } else {
             None
@@ -42,11 +61,17 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
     }
 }
 
+impl<T, const N: usize> ExactSizeIterator for IntoIter<T, N> {
+    fn len(&self) -> usize {
+        self.range.len()
+    }
+}
+
 impl<T, const N: usize> Drop for IntoIter<T, N> {
     fn drop(&mut self) {
         unsafe {
-            for x in self.data.as_mut().get_unchecked_mut(self.pos..N) {
-                mem::replace(x, MaybeUninit::uninit()).assume_init();
+            for x in self.data.as_mut().get_unchecked_mut(self.range.clone()) {
+                drop(mem::replace(x, MaybeUninit::uninit()).assume_init());
             }
         }
     }
@@ -123,7 +148,7 @@ impl<T, const N: usize> Vector<T, N> {
             // Drop loaded items
             unsafe {
                 for x in a.as_mut().get_unchecked_mut(0..pos) {
-                    mem::replace(x, MaybeUninit::uninit()).assume_init();
+                    drop(mem::replace(x, MaybeUninit::uninit()).assume_init());
                 }
             }
             None
