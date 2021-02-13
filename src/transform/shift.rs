@@ -32,9 +32,9 @@ impl<T, const N: usize> From<Vector<T, N>> for Shift<T, N> {
         Self::from_vector(pos)
     }
 }
-impl<T, const N: usize> Into<Vector<T, N>> for Shift<T, N> {
-    fn into(self) -> Vector<T, N> {
-        self.into_vector()
+impl<T, const N: usize> From<Shift<T, N>> for Vector<T, N> {
+    fn from(shift: Shift<T, N>) -> Self {
+        shift.into_vector()
     }
 }
 

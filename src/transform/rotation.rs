@@ -34,9 +34,9 @@ impl<T> From<Complex<T>> for Rotation2<T> {
         Self::from_complex(comp)
     }
 }
-impl<T> Into<Complex<T>> for Rotation2<T> {
-    fn into(self) -> Complex<T> {
-        self.into_complex()
+impl<T> From<Rotation2<T>> for Complex<T> {
+    fn from(rot: Rotation2<T>) -> Self {
+        rot.into_complex()
     }
 }
 
@@ -141,9 +141,9 @@ impl<T> From<Quaternion<T>> for Rotation3<T> {
         Self::from_quaternion(quat)
     }
 }
-impl<T> Into<Quaternion<T>> for Rotation3<T> {
-    fn into(self) -> Quaternion<T> {
-        self.into_quaternion()
+impl<T> From<Rotation3<T>> for Quaternion<T> {
+    fn from(rot: Rotation3<T>) -> Self {
+        rot.into_quaternion()
     }
 }
 

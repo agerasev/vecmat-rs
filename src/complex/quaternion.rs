@@ -53,9 +53,9 @@ impl<T> From<Vector4<T>> for Quaternion<T> {
         Self::from_vector(vec)
     }
 }
-impl<T> Into<Vector4<T>> for Quaternion<T> {
-    fn into(self) -> Vector4<T> {
-        self.into_vector()
+impl<T> From<Quaternion<T>> for Vector4<T> {
+    fn from(quat: Quaternion<T>) -> Self {
+        quat.into_vector()
     }
 }
 impl<T> From<(T, Vector3<T>)> for Quaternion<T> {
@@ -63,9 +63,9 @@ impl<T> From<(T, Vector3<T>)> for Quaternion<T> {
         Self::from_scalar_and_vector3(w, vec)
     }
 }
-impl<T> Into<(T, Vector3<T>)> for Quaternion<T> {
-    fn into(self) -> (T, Vector3<T>) {
-        self.into_scalar_and_vector3()
+impl<T> From<Quaternion<T>> for (T, Vector3<T>) {
+    fn from(quat: Quaternion<T>) -> Self {
+        quat.into_scalar_and_vector3()
     }
 }
 impl<T> From<[T; 4]> for Quaternion<T> {
@@ -73,9 +73,9 @@ impl<T> From<[T; 4]> for Quaternion<T> {
         Self::from_array(arr)
     }
 }
-impl<T> Into<[T; 4]> for Quaternion<T> {
-    fn into(self) -> [T; 4] {
-        self.into_array()
+impl<T> From<Quaternion<T>> for [T; 4] {
+    fn from(quat: Quaternion<T>) -> Self {
+        quat.into_array()
     }
 }
 impl<T> From<(T, T, T, T)> for Quaternion<T> {
@@ -83,9 +83,9 @@ impl<T> From<(T, T, T, T)> for Quaternion<T> {
         Self::from_tuple(tup)
     }
 }
-impl<T> Into<(T, T, T, T)> for Quaternion<T> {
-    fn into(self) -> (T, T, T, T) {
-        self.into_tuple()
+impl<T> From<Quaternion<T>> for (T, T, T, T) {
+    fn from(quat: Quaternion<T>) -> Self {
+        quat.into_tuple()
     }
 }
 

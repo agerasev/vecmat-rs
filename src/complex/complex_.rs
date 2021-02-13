@@ -10,9 +10,9 @@ impl<T> From<Vector2<T>> for Complex<T> {
         Self::new(x, y)
     }
 }
-impl<T> Into<Vector2<T>> for Complex<T> {
-    fn into(self) -> Vector2<T> {
-        Vector2::from([self.re, self.im])
+impl<T> From<Complex<T>> for Vector2<T> {
+    fn from(c: Complex<T>) -> Self {
+        Vector2::from([c.re, c.im])
     }
 }
 

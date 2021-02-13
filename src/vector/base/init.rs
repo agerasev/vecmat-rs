@@ -107,19 +107,19 @@ where
         Self::from_array(*ar)
     }
 }
-impl<T, const N: usize> Into<[T; N]> for Vector<T, N> {
-    fn into(self) -> [T; N] {
-        self.into_array()
+impl<T, const N: usize> From<Vector<T, N>> for [T; N] {
+    fn from(vec: Vector<T, N>) -> Self {
+        vec.into_array()
     }
 }
-impl<'a, T, const N: usize> Into<&'a [T; N]> for &'a Vector<T, N> {
-    fn into(self) -> &'a [T; N] {
-        self.as_array()
+impl<'a, T, const N: usize> From<&'a Vector<T, N>> for &'a [T; N] {
+    fn from(vr: &'a Vector<T, N>) -> Self {
+        vr.as_array()
     }
 }
-impl<'a, T, const N: usize> Into<&'a mut [T; N]> for &'a mut Vector<T, N> {
-    fn into(self) -> &'a mut [T; N] {
-        self.as_mut_array()
+impl<'a, T, const N: usize> From<&'a mut Vector<T, N>> for &'a mut [T; N] {
+    fn from(vr: &'a mut Vector<T, N>) -> Self {
+        vr.as_mut_array()
     }
 }
 

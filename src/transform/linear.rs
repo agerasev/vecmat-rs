@@ -32,9 +32,9 @@ impl<T, const N: usize> From<Matrix<T, N, N>> for Linear<T, N> {
         Self::from_matrix(lin)
     }
 }
-impl<T, const N: usize> Into<Matrix<T, N, N>> for Linear<T, N> {
-    fn into(self) -> Matrix<T, N, N> {
-        self.into_matrix()
+impl<T, const N: usize> From<Linear<T, N>> for Matrix<T, N, N> {
+    fn from(lin: Linear<T, N>) -> Matrix<T, N, N> {
+        lin.into_matrix()
     }
 }
 

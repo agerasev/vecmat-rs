@@ -39,19 +39,19 @@ impl<T, const M: usize, const N: usize> From<[[T; N]; M]> for Matrix<T, M, N> {
         Self::from_array_of_arrays(a)
     }
 }
-impl<T, const M: usize, const N: usize> Into<Vector<Vector<T, N>, M>> for Matrix<T, M, N> {
-    fn into(self) -> Vector<Vector<T, N>, M> {
-        self.into_vector_of_vectors()
+impl<T, const M: usize, const N: usize> From<Matrix<T, M, N>> for Vector<Vector<T, N>, M> {
+    fn from(mat: Matrix<T, M, N>) -> Self {
+        mat.into_vector_of_vectors()
     }
 }
-impl<T, const M: usize, const N: usize> Into<[Vector<T, N>; M]> for Matrix<T, M, N> {
-    fn into(self) -> [Vector<T, N>; M] {
-        self.into_array_of_vectors()
+impl<T, const M: usize, const N: usize> From<Matrix<T, M, N>> for [Vector<T, N>; M] {
+    fn from(mat: Matrix<T, M, N>) -> Self {
+        mat.into_array_of_vectors()
     }
 }
-impl<T, const M: usize, const N: usize> Into<[[T; N]; M]> for Matrix<T, M, N> {
-    fn into(self) -> [[T; N]; M] {
-        self.into_array_of_arrays()
+impl<T, const M: usize, const N: usize> From<Matrix<T, M, N>> for [[T; N]; M] {
+    fn from(mat: Matrix<T, M, N>) -> Self {
+        mat.into_array_of_arrays()
     }
 }
 
@@ -132,28 +132,28 @@ impl<T, const M: usize, const N: usize> AsMut<[[T; N]; M]> for Matrix<T, M, N> {
 }
 */
 
-impl<'a, T, const M: usize, const N: usize> Into<&'a Vector<Vector<T, N>, M>>
-    for &'a Matrix<T, M, N>
+impl<'a, T, const M: usize, const N: usize> From<&'a Matrix<T, M, N>>
+    for &'a Vector<Vector<T, N>, M>
 {
-    fn into(self) -> &'a Vector<Vector<T, N>, M> {
-        self.as_vector_of_vectors()
+    fn from(mr: &'a Matrix<T, M, N>) -> Self {
+        mr.as_vector_of_vectors()
     }
 }
-impl<'a, T, const M: usize, const N: usize> Into<&'a mut Vector<Vector<T, N>, M>>
-    for &'a mut Matrix<T, M, N>
+impl<'a, T, const M: usize, const N: usize> From<&'a mut Matrix<T, M, N>>
+    for &'a mut Vector<Vector<T, N>, M>
 {
-    fn into(self) -> &'a mut Vector<Vector<T, N>, M> {
-        self.as_mut_vector_of_vectors()
+    fn from(mr: &'a mut Matrix<T, M, N>) -> Self {
+        mr.as_mut_vector_of_vectors()
     }
 }
-impl<'a, T, const M: usize, const N: usize> Into<&'a [[T; N]; M]> for &'a Matrix<T, M, N> {
-    fn into(self) -> &'a [[T; N]; M] {
-        self.as_array_of_arrays()
+impl<'a, T, const M: usize, const N: usize> From<&'a Matrix<T, M, N>> for &'a [[T; N]; M] {
+    fn from(mr: &'a Matrix<T, M, N>) -> Self {
+        mr.as_array_of_arrays()
     }
 }
-impl<'a, T, const M: usize, const N: usize> Into<&'a mut [[T; N]; M]> for &'a mut Matrix<T, M, N> {
-    fn into(self) -> &'a mut [[T; N]; M] {
-        self.as_mut_array_of_arrays()
+impl<'a, T, const M: usize, const N: usize> From<&'a mut Matrix<T, M, N>> for &'a mut [[T; N]; M] {
+    fn from(mr: &'a mut Matrix<T, M, N>) -> Self {
+        mr.as_mut_array_of_arrays()
     }
 }
 

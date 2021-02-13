@@ -183,9 +183,9 @@ impl<T> From<(T, T)> for Vector<T, 2> {
         Self::from_tuple(tuple)
     }
 }
-impl<T> Into<(T, T)> for Vector<T, 2> {
-    fn into(self) -> (T, T) {
-        self.into_tuple()
+impl<T> From<Vector<T, 2>> for (T, T) {
+    fn from(vec: Vector<T, 2>) -> Self {
+        vec.into_tuple()
     }
 }
 impl<T> From<(T, T, T)> for Vector<T, 3> {
@@ -193,9 +193,9 @@ impl<T> From<(T, T, T)> for Vector<T, 3> {
         Self::from_tuple(tuple)
     }
 }
-impl<T> Into<(T, T, T)> for Vector<T, 3> {
-    fn into(self) -> (T, T, T) {
-        self.into_tuple()
+impl<T> From<Vector<T, 3>> for (T, T, T) {
+    fn from(vec: Vector<T, 3>) -> Self {
+        vec.into_tuple()
     }
 }
 impl<T> From<(T, T, T, T)> for Vector<T, 4> {
@@ -203,8 +203,8 @@ impl<T> From<(T, T, T, T)> for Vector<T, 4> {
         Self::from_tuple(tuple)
     }
 }
-impl<T> Into<(T, T, T, T)> for Vector<T, 4> {
-    fn into(self) -> (T, T, T, T) {
-        self.into_tuple()
+impl<T> From<Vector<T, 4>> for (T, T, T, T) {
+    fn from(vec: Vector<T, 4>) -> Self {
+        vec.into_tuple()
     }
 }
