@@ -5,6 +5,7 @@ mod complex_;
 mod distr;
 mod format;
 mod quaternion;
+mod moebius;
 #[cfg(all(test, feature = "approx"))]
 mod tests;
 
@@ -14,3 +15,4 @@ pub use distr::*;
 #[cfg(feature = "rand")]
 pub use num_complex::ComplexDistribution;
 pub use quaternion::*;
+pub use moebius::*;

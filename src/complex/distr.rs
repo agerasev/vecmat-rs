@@ -1,9 +1,11 @@
 use crate::{
     distr::*,
     vector::{Vector},
-    complex::{Complex, Quaternion},
+    matrix::{Matrix},
+    complex::{Complex, Quaternion, Moebius},
 };
-use num_traits::Float;
+use core::ops::{Neg};
+use num_traits::{Float, Num};
 use rand_::{distributions::Distribution, Rng};
 
 impl<T> Distribution<Complex<T>> for Normal
@@ -57,5 +59,15 @@ where
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
         rng.sample(Self).into()
+    }
+}
+
+impl<T: Neg<Output=T> + Num + Copy> Distribution<Moebius<T>> for SomeDistr
+where
+    Invertible: Distribution<Matrix<T, 2, 2>>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Moebius<T> {
+        let mat = rng.sample(Invertible);
+        (mat / mat.det()).into()
     }
 }
