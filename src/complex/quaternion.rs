@@ -4,7 +4,7 @@ use crate::{
     vector::{Vector3, Vector4},
     complex::{Complex},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem};
 use num_traits::{Float, Num, One, Zero};
 
 /// Quaternion.
@@ -528,6 +528,20 @@ where
 {
     fn div_assign(&mut self, other: T) {
         *self = *self / other;
+    }
+}
+
+impl<T: Neg<Output=T> + Num + Copy> Rem for Quaternion<T> {
+    type Output = Self;
+    fn rem(self, _other: Self) -> Self {
+        unimplemented!();
+    }
+}
+
+impl<T: Neg<Output=T> + Num + Copy> Num for Quaternion<T> {
+    type FromStrRadixErr = T::FromStrRadixErr;
+    fn from_str_radix(_s: &str, _radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        unimplemented!();
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{
     traits::{NormL1, Epsilon},
-    distr::{Invertible, Normal, StatefulNormal},
+    distr::{Invertible, Normal},
     Matrix,
 };
 use core::{ops::Neg, marker::PhantomData};
@@ -32,10 +32,10 @@ impl<D: Distribution<T>, T, const M: usize, const N: usize> Distribution<Matrix<
 
 impl<T, const M: usize, const N: usize> Distribution<Matrix<T, M, N>> for Normal
 where
-    StatefulNormal<T>: Distribution<T>,
+    Normal: Distribution<T>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, M, N> {
-        rng.sample(&MatrixDistribution::new(StatefulNormal::new()))
+        rng.sample(&MatrixDistribution::new(self))
     }
 }
 

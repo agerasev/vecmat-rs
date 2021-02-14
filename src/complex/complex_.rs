@@ -3,8 +3,8 @@ use crate::{
     traits::{Dot, Conj, NormL1, NormL2},
     vector::{Vector2},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use num_complex::Complex as NumComplex;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem};
+use num_complex::{Complex as NumComplex, ParseComplexError};
 use num_traits::{Float, Num, One, Zero};
 
 /// Complex number.
@@ -29,6 +29,9 @@ impl<T> Complex<T> {
     pub fn from_tuple(tup: (T, T)) -> Self {
         Self { vec: tup.into() }
     }
+    pub fn from_num(nc: NumComplex<T>) -> Self {
+        Self::new(nc.re, nc.im)
+    }
     pub fn into_vector(self) -> Vector2<T> {
         self.vec
     }
@@ -37,6 +40,10 @@ impl<T> Complex<T> {
     }
     pub fn into_tuple(self) -> (T, T) {
         self.vec.into()
+    }
+    pub fn into_num(self) -> NumComplex<T> {
+        let (re, im) = self.into();
+        NumComplex { re, im }
     }
 }
 
@@ -68,6 +75,16 @@ impl<T> From<(T, T)> for Complex<T> {
 impl<T> From<Complex<T>> for (T, T) {
     fn from(comp: Complex<T>) -> Self {
         comp.into_tuple()
+    }
+}
+impl<T> From<NumComplex<T>> for Complex<T> {
+    fn from(nc: NumComplex<T>) -> Self {
+        Self::from_num(nc)
+    }
+}
+impl<T> From<Complex<T>> for NumComplex<T> {
+    fn from(comp: Complex<T>) -> Self {
+        comp.into_num()
     }
 }
 
@@ -387,6 +404,20 @@ where
     }
 }
 
+impl<T: Neg<Output=T> + Num + Copy> Rem for Complex<T> {
+    type Output = Self;
+    fn rem(self, other: Self) -> Self {
+        (self.into_num() % other.into_num()).into()
+    }
+}
+
+impl<T: Neg<Output=T> + Num + Copy> Num for Complex<T> {
+    type FromStrRadixErr = ParseComplexError<T::FromStrRadixErr>;
+    fn from_str_radix(s: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        NumComplex::from_str_radix(s, radix).map(Self::from_num)
+    }
+}
+
 macro_rules! reverse_mul_div {
     ($T:ident) => {
         /// Workaround for reverse multiplication.
@@ -417,26 +448,6 @@ where
     type Output = T;
     fn dot(self, other: Self) -> T {
         self.vec.dot(other.vec)
-    }
-}
-
-impl<T> Complex<T> {
-    pub fn from_num(nc: NumComplex<T>) -> Self {
-        Self::new(nc.re, nc.im)
-    }
-    pub fn into_num(self) -> NumComplex<T> {
-        let (re, im) = self.into();
-        NumComplex { re, im }
-    }
-}
-impl<T> From<NumComplex<T>> for Complex<T> {
-    fn from(nc: NumComplex<T>) -> Self {
-        Self::from_num(nc)
-    }
-}
-impl<T> From<Complex<T>> for NumComplex<T> {
-    fn from(comp: Complex<T>) -> Self {
-        comp.into_num()
     }
 }
 
