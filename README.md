@@ -27,9 +27,11 @@ Low-dimensional vector algebra with `min_const_generics` support.
 
 ## Cargo features
 
-+ `std` - use std (enabled by default). Crate could be used with `no_std`.
++ `std` - use std. Crate could be used with `no_std`.
 + `rand` - distributions for generating random entities.
 + `approx` - approximate comparison.
+
+All these features are enabled by default.
 
 ## [Documentation](https://docs.rs/vecmat)
 
