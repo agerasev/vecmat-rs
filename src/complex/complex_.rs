@@ -1,9 +1,9 @@
 use crate::{
     matrix::Matrix2x2,
-    traits::{Dot, Conj, NormL1, NormL2},
-    vector::{Vector2},
+    traits::{Conj, Dot, NormL1, NormL2},
+    vector::Vector2,
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use num_complex::{Complex as NumComplex, ParseComplexError};
 use num_traits::{Float, Num, One, Zero};
 
@@ -16,9 +16,7 @@ pub struct Complex<T> {
 
 impl<T> Complex<T> {
     pub fn new(w: T, x: T) -> Self {
-        Self {
-            vec: [w, x].into(),
-        }
+        Self { vec: [w, x].into() }
     }
     pub fn from_vector(vec: Vector2<T>) -> Self {
         Self { vec }
@@ -142,7 +140,10 @@ where
     }
 }
 
-impl<T> Conj for Complex<T> where T: Neg<Output=T> {
+impl<T> Conj for Complex<T>
+where
+    T: Neg<Output = T>,
+{
     fn conj(self) -> Self {
         Complex::conj(self)
     }
@@ -333,7 +334,10 @@ impl<T: Float> Complex<T> {
         Self::new(r * theta.cos(), r * theta.sin())
     }
 }
-impl<T> NormL1 for Complex<T> where Vector2<T>: NormL1<Output=T> {
+impl<T> NormL1 for Complex<T>
+where
+    Vector2<T>: NormL1<Output = T>,
+{
     type Output = T;
     fn norm_l1(self) -> T {
         self.vec.norm_l1()
@@ -404,14 +408,14 @@ where
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Rem for Complex<T> {
+impl<T: Neg<Output = T> + Num + Copy> Rem for Complex<T> {
     type Output = Self;
     fn rem(self, other: Self) -> Self {
         (self.into_num() % other.into_num()).into()
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Num for Complex<T> {
+impl<T: Neg<Output = T> + Num + Copy> Num for Complex<T> {
     type FromStrRadixErr = ParseComplexError<T::FromStrRadixErr>;
     fn from_str_radix(s: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
         NumComplex::from_str_radix(s, radix).map(Self::from_num)
@@ -456,7 +460,7 @@ impl<T: Num + Copy> Complex<T> {
         self.into_num().powu(exp).into()
     }
 }
-impl<T: Neg<Output=T> + Num + Copy> Complex<T> {
+impl<T: Neg<Output = T> + Num + Copy> Complex<T> {
     pub fn powi(&self, exp: i32) -> Self {
         self.into_num().powi(exp).into()
     }

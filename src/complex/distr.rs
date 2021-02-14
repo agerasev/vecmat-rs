@@ -1,10 +1,10 @@
 use crate::{
+    complex::{Complex, Moebius, Quaternion},
     distr::*,
-    vector::{Vector},
-    matrix::{Matrix},
-    complex::{Complex, Quaternion, Moebius},
+    matrix::Matrix,
+    vector::Vector,
 };
-use core::ops::{Neg};
+use core::ops::Neg;
 use num_traits::{Float, Num};
 use rand_::{distributions::Distribution, Rng};
 
@@ -62,7 +62,7 @@ where
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Distribution<Moebius<T>> for SomeDistr
+impl<T: Neg<Output = T> + Num + Copy> Distribution<Moebius<T>> for SomeDistr
 where
     Invertible: Distribution<Matrix<T, 2, 2>>,
 {

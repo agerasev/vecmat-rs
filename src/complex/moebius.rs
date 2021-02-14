@@ -1,10 +1,10 @@
-use core::ops::{Neg, Add, Mul, Div};
-use num_traits::{Zero, One, Num, NumCast};
 use crate::{
-    traits::Dot,
-    matrix::Matrix2x2,
     complex::{Complex, Quaternion},
+    matrix::Matrix2x2,
+    traits::Dot,
 };
+use core::ops::{Add, Div, Mul, Neg};
+use num_traits::{Num, NumCast, One, Zero};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Moebius<T> {
@@ -44,22 +44,46 @@ impl<T> Moebius<T> {
 }
 
 impl<T: Copy> Moebius<T> {
-    pub fn a(&self) -> T { self.mat[(0, 0)] }
-    pub fn b(&self) -> T { self.mat[(0, 1)] }
-    pub fn c(&self) -> T { self.mat[(1, 0)] }
-    pub fn d(&self) -> T { self.mat[(1, 1)] }
+    pub fn a(&self) -> T {
+        self.mat[(0, 0)]
+    }
+    pub fn b(&self) -> T {
+        self.mat[(0, 1)]
+    }
+    pub fn c(&self) -> T {
+        self.mat[(1, 0)]
+    }
+    pub fn d(&self) -> T {
+        self.mat[(1, 1)]
+    }
 }
 
 impl<T> Moebius<T> {
-    pub fn a_ref(&self) -> &T { &self.mat[(0, 0)] }
-    pub fn b_ref(&self) -> &T { &self.mat[(0, 1)] }
-    pub fn c_ref(&self) -> &T { &self.mat[(1, 0)] }
-    pub fn d_ref(&self) -> &T { &self.mat[(1, 1)] }
+    pub fn a_ref(&self) -> &T {
+        &self.mat[(0, 0)]
+    }
+    pub fn b_ref(&self) -> &T {
+        &self.mat[(0, 1)]
+    }
+    pub fn c_ref(&self) -> &T {
+        &self.mat[(1, 0)]
+    }
+    pub fn d_ref(&self) -> &T {
+        &self.mat[(1, 1)]
+    }
 
-    pub fn a_mut(&mut self) -> &mut T { &mut self.mat[(0, 0)] }
-    pub fn b_mut(&mut self) -> &mut T { &mut self.mat[(0, 1)] }
-    pub fn c_mut(&mut self) -> &mut T { &mut self.mat[(1, 0)] }
-    pub fn d_mut(&mut self) -> &mut T { &mut self.mat[(1, 1)] }
+    pub fn a_mut(&mut self) -> &mut T {
+        &mut self.mat[(0, 0)]
+    }
+    pub fn b_mut(&mut self) -> &mut T {
+        &mut self.mat[(0, 1)]
+    }
+    pub fn c_mut(&mut self) -> &mut T {
+        &mut self.mat[(1, 0)]
+    }
+    pub fn d_mut(&mut self) -> &mut T {
+        &mut self.mat[(1, 1)]
+    }
 }
 
 impl<T: Zero + One> Moebius<T> {
@@ -68,7 +92,10 @@ impl<T: Zero + One> Moebius<T> {
     }
 }
 
-impl<T> Moebius<T> where T: Add<Output=T> + Mul<Output=T> + Div<Output=T> + Copy {
+impl<T> Moebius<T>
+where
+    T: Add<Output = T> + Mul<Output = T> + Div<Output = T> + Copy,
+{
     pub fn chain(self, other: Self) -> Self {
         Self::from(Dot::dot(self.mat, other.mat))
     }
@@ -77,14 +104,14 @@ impl<T> Moebius<T> where T: Add<Output=T> + Mul<Output=T> + Div<Output=T> + Copy
 impl<T> Moebius<T> {
     pub fn apply<U>(&self, x: U) -> U
     where
-        T: Mul<U, Output=U> + Copy,
-        U: Add<T, Output=U> + Div<Output=U> + Copy,
+        T: Mul<U, Output = U> + Copy,
+        U: Add<T, Output = U> + Div<Output = U> + Copy,
     {
         (self.a() * x + self.b()) / (self.c() * x + self.d())
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Moebius<T> {
+impl<T: Neg<Output = T> + Num + Copy> Moebius<T> {
     pub fn det(&self) -> T {
         self.mat.det()
     }
@@ -94,7 +121,10 @@ impl<T: Neg<Output=T> + Num + Copy> Moebius<T> {
     }
 }
 
-impl<T: Copy> Moebius<Complex<T>> where Complex<T>: Num {
+impl<T: Copy> Moebius<Complex<T>>
+where
+    Complex<T>: Num,
+{
     pub fn deriv(&self, p: Complex<T>) -> Complex<T> {
         let u = self.a() * p + self.b();
         let d = self.c() * p + self.d();
@@ -104,9 +134,9 @@ impl<T: Copy> Moebius<Complex<T>> where Complex<T>: Num {
 
 impl<T> Moebius<Complex<T>>
 where
-    T: Neg<Output=T> + Num + NumCast + Copy,
-    Complex<T>: Mul<Quaternion<T>, Output=Quaternion<T>> + Copy,
-    Quaternion<T>: Dot<Output=T> + Copy,
+    T: Neg<Output = T> + Num + NumCast + Copy,
+    Complex<T>: Mul<Quaternion<T>, Output = Quaternion<T>> + Copy,
+    Quaternion<T>: Dot<Output = T> + Copy,
 {
     pub fn deriv_dir(&self, p: Quaternion<T>, v: Quaternion<T>) -> Quaternion<T> {
         let u = self.a() * p + self.b();

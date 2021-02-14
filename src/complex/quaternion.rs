@@ -1,10 +1,10 @@
 use crate::{
+    complex::Complex,
     matrix::Matrix4x4,
-    traits::{Dot, Conj, NormL1, NormL2},
+    traits::{Conj, Dot, NormL1, NormL2},
     vector::{Vector3, Vector4},
-    complex::{Complex},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Rem};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use num_traits::{Float, Num, One, Zero};
 
 /// Quaternion.
@@ -167,7 +167,10 @@ where
     }
 }
 
-impl<T> Conj for Quaternion<T> where T: Neg<Output=T> {
+impl<T> Conj for Quaternion<T>
+where
+    T: Neg<Output = T>,
+{
     fn conj(self) -> Self {
         Quaternion::conj(self)
     }
@@ -442,7 +445,10 @@ impl<T: Float> Quaternion<T> {
         self.vec.length()
     }
 }
-impl<T> NormL1 for Quaternion<T> where Vector4<T>: NormL1<Output=T> {
+impl<T> NormL1 for Quaternion<T>
+where
+    Vector4<T>: NormL1<Output = T>,
+{
     type Output = T;
     fn norm_l1(self) -> T {
         self.vec.norm_l1()
@@ -531,14 +537,14 @@ where
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Rem for Quaternion<T> {
+impl<T: Neg<Output = T> + Num + Copy> Rem for Quaternion<T> {
     type Output = Self;
     fn rem(self, _other: Self) -> Self {
         unimplemented!();
     }
 }
 
-impl<T: Neg<Output=T> + Num + Copy> Num for Quaternion<T> {
+impl<T: Neg<Output = T> + Num + Copy> Num for Quaternion<T> {
     type FromStrRadixErr = T::FromStrRadixErr;
     fn from_str_radix(_s: &str, _radix: u32) -> Result<Self, Self::FromStrRadixErr> {
         unimplemented!();

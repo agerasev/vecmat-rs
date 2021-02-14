@@ -12,8 +12,7 @@ macro_rules! impl_normal_float {
     ($T:ident) => {
         impl Distribution<$T> for Normal {
             fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $T {
-                let r = ((1.0 - RangedUniform::new(0.0, 1.0).sample(rng)).ln() * -2.0)
-                .sqrt();
+                let r = ((1.0 - RangedUniform::new(0.0, 1.0).sample(rng)).ln() * -2.0).sqrt();
                 let phi = RangedUniform::new(0.0, $T::PI()).sample(rng);
                 r * phi.cos()
                 //r * phi.sin()

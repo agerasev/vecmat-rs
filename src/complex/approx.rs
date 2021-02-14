@@ -1,4 +1,4 @@
-use crate::complex::{Complex, Quaternion, Moebius};
+use crate::complex::{Complex, Moebius, Quaternion};
 use approx::{abs_diff_eq, AbsDiffEq};
 
 impl<T> AbsDiffEq for Complex<T>

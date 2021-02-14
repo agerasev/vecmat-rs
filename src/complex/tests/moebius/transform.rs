@@ -1,10 +1,10 @@
-use rand_::{prelude::*};
-use rand_xorshift::XorShiftRng;
-use approx::*;
 use crate::{
-    complex::{Complex, Quaternion, Moebius},
-    distr::{Unit, Normal, SomeDistr},
+    complex::{Complex, Moebius, Quaternion},
+    distr::{Normal, SomeDistr, Unit},
 };
+use approx::*;
+use rand_::prelude::*;
+use rand_xorshift::XorShiftRng;
 
 const SAMPLE_ATTEMPTS: usize = 256;
 
@@ -15,11 +15,7 @@ fn chaining() {
         let a: Moebius<Complex<f64>> = rng.sample(SomeDistr);
         let b: Moebius<Complex<f64>> = rng.sample(SomeDistr);
         let c: Quaternion<f64> = rng.sample(Normal);
-        assert_abs_diff_eq!(
-            a.chain(b).apply(c),
-            a.apply(b.apply(c)),
-            epsilon=1e-12,
-        );
+        assert_abs_diff_eq!(a.chain(b).apply(c), a.apply(b.apply(c)), epsilon = 1e-12,);
     }
 }
 
@@ -38,7 +34,7 @@ fn complex_derivation() {
         assert_abs_diff_eq!(
             (a.apply(p + EPS * v) - a.apply(p)) / (EPS * v),
             deriv,
-            epsilon=1e-4*dabs
+            epsilon = 1e-4 * dabs
         );
     }
 }
@@ -58,7 +54,7 @@ fn quaternion_directional_derivation() {
         assert_abs_diff_eq!(
             (a.apply(p + EPS * v) - a.apply(p)) / EPS,
             deriv,
-            epsilon=1e-4*dabs
+            epsilon = 1e-4 * dabs
         );
     }
 }
