@@ -1,5 +1,5 @@
 use crate::{
-    distr::{NonZero, Normal, StatefulNormal, Unit},
+    distr::{NonZero, Normal, Unit},
     Vector,
 };
 use core::marker::PhantomData;
@@ -31,10 +31,10 @@ impl<D: Distribution<T>, T, const N: usize> Distribution<Vector<T, N>>
 
 impl<T, const N: usize> Distribution<Vector<T, N>> for Normal
 where
-    StatefulNormal<T>: Distribution<T>,
+    Normal: Distribution<T>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vector<T, N> {
-        rng.sample(&VectorDistribution::new(StatefulNormal::new()))
+        rng.sample(&VectorDistribution::new(self))
     }
 }
 

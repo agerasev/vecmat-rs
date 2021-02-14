@@ -1,5 +1,16 @@
-use crate::Quaternion;
+use crate::complex::{Complex, Quaternion};
 use core::fmt::{Debug, Display, Formatter, Result as FmtResult};
+
+impl<T: Debug> Debug for Complex<T> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "Complex({:?}, {:?})", self.re_ref(), self.im_ref(),)
+    }
+}
+impl<T: Display> Display for Complex<T> {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+        write!(f, "Complex({}, {})", self.re_ref(), self.im_ref(),)
+    }
+}
 
 impl<T: Debug> Debug for Quaternion<T> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {

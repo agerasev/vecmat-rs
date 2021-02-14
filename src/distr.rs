@@ -1,65 +1,27 @@
-use core::cell::Cell;
-use num_traits::{Float, FloatConst, FromPrimitive};
+use num_traits::{Float, FloatConst};
 use rand_::{
-    distributions::{uniform::SampleUniform, Distribution, Uniform as RangedUniform},
+    distributions::{Distribution, Uniform as RangedUniform},
     Rng,
 };
-
-pub struct NormalPair;
-
-impl<T> Distribution<(T, T)> for NormalPair
-where
-    T: SampleUniform + Float + FloatConst + FromPrimitive,
-{
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> (T, T) {
-        let r = ((T::one() - RangedUniform::new(T::zero(), T::one()).sample(rng)).ln()
-            * T::from_f32(-2.0).unwrap())
-        .sqrt();
-        let phi = RangedUniform::new(T::zero(), T::PI()).sample(rng);
-        (r * phi.cos(), r * phi.sin())
-    }
-}
-
-#[derive(Default)]
-pub struct StatefulNormal<T> {
-    other: Cell<Option<T>>,
-}
-
-impl<T> StatefulNormal<T> {
-    pub fn new() -> Self {
-        Self {
-            other: Cell::new(None),
-        }
-    }
-}
-
-impl<T> Distribution<T> for StatefulNormal<T>
-where
-    NormalPair: Distribution<(T, T)>,
-{
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> T {
-        match self.other.take() {
-            Some(x) => x,
-            None => {
-                let (x, y) = rng.sample(NormalPair);
-                self.other.set(Some(y));
-                x
-            }
-        }
-    }
-}
 
 /// Standard normal distribution.
 pub struct Normal;
 
-impl<T> Distribution<T> for Normal
-where
-    NormalPair: Distribution<(T, T)>,
-{
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> T {
-        rng.sample(&NormalPair).0
-    }
+// FIXME: Use another normal generator without 2x overhead
+macro_rules! impl_normal_float {
+    ($T:ident) => {
+        impl Distribution<$T> for Normal {
+            fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> $T {
+                let r = ((1.0 - RangedUniform::new(0.0, 1.0).sample(rng)).ln() * -2.0).sqrt();
+                let phi = RangedUniform::new(0.0, $T::PI()).sample(rng);
+                r * phi.cos()
+                //r * phi.sin()
+            }
+        }
+    };
 }
+impl_normal_float!(f32);
+impl_normal_float!(f64);
 
 /// Uniform distribution over all possible values.
 pub struct Uniform;
@@ -73,3 +35,6 @@ pub struct Unit;
 
 /// Distribution that guarantees to produce an element which could be inverted.
 pub struct Invertible;
+
+/// Distribution that produces *some* elements with no further guarantees (but with reasonable variation).
+pub struct SomeDistr;

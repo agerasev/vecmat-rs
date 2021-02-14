@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
@@ -25,7 +25,7 @@ approx = { version = "0.4", optional = true }
 rand_xorshift = "0.2"
 
 [features]
-default = ["std"]
+default = ["std", "rand", "approx"]
 std = ["num-traits/std", "num-integer/std", "num-complex/std", "rand_/std", "approx/std"]
 rand = ["rand_", "num-complex/rand"]
 

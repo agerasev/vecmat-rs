@@ -1,10 +1,10 @@
 use crate::{
+    complex::Complex,
     matrix::Matrix4x4,
-    traits::Dot,
+    traits::{Conj, Dot, NormL1, NormL2},
     vector::{Vector3, Vector4},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use num_complex::Complex;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use num_traits::{Float, Num, One, Zero};
 
 /// Quaternion.
@@ -167,6 +167,15 @@ where
     }
 }
 
+impl<T> Conj for Quaternion<T>
+where
+    T: Neg<Output = T>,
+{
+    fn conj(self) -> Self {
+        Quaternion::conj(self)
+    }
+}
+
 impl<T> Add for Quaternion<T>
 where
     T: Add<Output = T>,
@@ -183,7 +192,8 @@ where
     type Output = Self;
     fn add(self, other: Complex<T>) -> Self {
         let (w, x, y, z) = self.into();
-        Self::new(w + other.re, x + other.im, y, z)
+        let (re, im) = other.into();
+        Self::new(w + re, x + im, y, z)
     }
 }
 impl<T> Add<T> for Quaternion<T>
@@ -212,7 +222,8 @@ where
     type Output = Self;
     fn sub(self, other: Complex<T>) -> Self {
         let (w, x, y, z) = self.into();
-        Self::new(w - other.re, x - other.im, y, z)
+        let (re, im) = other.into();
+        Self::new(w - re, x - im, y, z)
     }
 }
 impl<T> Sub<T> for Quaternion<T>
@@ -275,8 +286,9 @@ where
     T: AddAssign,
 {
     fn add_assign(&mut self, other: Complex<T>) {
-        *self.w_mut() += other.re;
-        *self.x_mut() += other.im;
+        let (re, im) = other.into();
+        *self.w_mut() += re;
+        *self.x_mut() += im;
     }
 }
 impl<T> AddAssign<T> for Quaternion<T>
@@ -300,8 +312,9 @@ where
     T: SubAssign,
 {
     fn sub_assign(&mut self, other: Complex<T>) {
-        *self.w_mut() -= other.re;
-        *self.x_mut() -= other.im;
+        let (re, im) = other.into();
+        *self.w_mut() -= re;
+        *self.x_mut() -= im;
     }
 }
 impl<T> SubAssign<T> for Quaternion<T>
@@ -353,10 +366,10 @@ where
     type Output = Self;
     fn mul(self, other: Complex<T>) -> Self {
         Self::new(
-            self.w() * other.re - self.x() * other.im,
-            self.w() * other.im + self.x() * other.re,
-            self.z() * other.im + self.y() * other.re,
-            self.z() * other.re - self.y() * other.im,
+            self.w() * other.re() - self.x() * other.im(),
+            self.w() * other.im() + self.x() * other.re(),
+            self.z() * other.im() + self.y() * other.re(),
+            self.z() * other.re() - self.y() * other.im(),
         )
     }
 }
@@ -427,12 +440,27 @@ where
         self.vec.square_length()
     }
 }
-impl<T> Quaternion<T>
-where
-    T: Float,
-{
+impl<T: Float> Quaternion<T> {
     pub fn norm(self) -> T {
         self.vec.length()
+    }
+}
+impl<T> NormL1 for Quaternion<T>
+where
+    Vector4<T>: NormL1<Output = T>,
+{
+    type Output = T;
+    fn norm_l1(self) -> T {
+        self.vec.norm_l1()
+    }
+}
+impl<T: Float> NormL2 for Quaternion<T> {
+    type Output = T;
+    fn norm_l2(self) -> T {
+        self.norm()
+    }
+    fn norm_l2_sqr(self) -> T {
+        self.norm_sqr()
     }
 }
 
@@ -509,6 +537,20 @@ where
     }
 }
 
+impl<T: Neg<Output = T> + Num + Copy> Rem for Quaternion<T> {
+    type Output = Self;
+    fn rem(self, _other: Self) -> Self {
+        unimplemented!();
+    }
+}
+
+impl<T: Neg<Output = T> + Num + Copy> Num for Quaternion<T> {
+    type FromStrRadixErr = T::FromStrRadixErr;
+    fn from_str_radix(_s: &str, _radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        unimplemented!();
+    }
+}
+
 macro_rules! reverse_mul_div {
     ($T:ident) => {
         /// Workaround for reverse multiplication.
@@ -523,10 +565,10 @@ macro_rules! reverse_mul_div {
             type Output = Quaternion<$T>;
             fn mul(self, other: Quaternion<$T>) -> Self::Output {
                 Quaternion::new(
-                    self.re * other.w() - self.im * other.x(),
-                    self.re * other.x() + self.im * other.w(),
-                    self.re * other.y() - self.im * other.z(),
-                    self.re * other.z() + self.im * other.y(),
+                    self.re() * other.w() - self.im() * other.x(),
+                    self.re() * other.x() + self.im() * other.w(),
+                    self.re() * other.y() - self.im() * other.z(),
+                    self.re() * other.z() + self.im() * other.y(),
                 )
             }
         }

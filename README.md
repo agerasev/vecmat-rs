@@ -27,9 +27,11 @@ Low-dimensional vector algebra with `min_const_generics` support.
 
 ## Cargo features
 
-+ `std` - use std (enabled by default). Crate could be used with `no_std`.
++ `std` - use std. Crate could be used with `no_std`.
 + `rand` - distributions for generating random entities.
 + `approx` - approximate comparison.
+
+All these features are enabled by default.
 
 ## [Documentation](https://docs.rs/vecmat)
 
@@ -39,7 +41,7 @@ Low-dimensional vector algebra with `min_const_generics` support.
 
 + `Vector`.
 + `Matrix`.
-+ `Quaternion` (and `Complex` reexported from `num_complex`).
++ `Complex` and `Quaternion`.
 
 ### Transformations
 
@@ -47,6 +49,7 @@ Low-dimensional vector algebra with `min_const_generics` support.
 + `Linear`.
 + `Affine`.
 + `Rotation2` and `Rotation3`.
++ `Moebius` (over `Complex` and `Quaternion`).
 
 ## Functionality
 
@@ -65,7 +68,6 @@ Low-dimensional vector algebra with `min_const_generics` support.
 ### Planning
 
 + Eigen- and singular decomposition for matrices.
-+ Moebuis transformation.
 + `Rotation4`.
 
 ## License

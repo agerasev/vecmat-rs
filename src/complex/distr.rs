@@ -1,26 +1,37 @@
 use crate::{
+    complex::{Complex, Moebius, Quaternion},
     distr::*,
-    vector::{Vector, VectorDistribution},
-    Quaternion,
+    matrix::Matrix,
+    vector::Vector,
 };
-use num_traits::Float;
+use core::ops::Neg;
+use num_traits::{Float, Num};
 use rand_::{distributions::Distribution, Rng};
 
-pub struct QuaternionDistribution<D: Distribution<T>, T> {
-    pub inner: VectorDistribution<D, T, 4>,
-}
-
-impl<D: Distribution<T>, T> QuaternionDistribution<D, T> {
-    pub fn new(inner: D) -> Self {
-        Self {
-            inner: VectorDistribution::new(inner),
-        }
+impl<T> Distribution<Complex<T>> for Normal
+where
+    Normal: Distribution<Vector<T, 2>>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complex<T> {
+        rng.sample(self).into()
     }
 }
 
-impl<D: Distribution<T>, T> Distribution<Quaternion<T>> for QuaternionDistribution<D, T> {
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        rng.sample(&self.inner).into()
+impl<T: Float> Distribution<Complex<T>> for NonZero
+where
+    NonZero: Distribution<Vector<T, 2>>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complex<T> {
+        rng.sample(Self).into()
+    }
+}
+
+impl<T: Float> Distribution<Complex<T>> for Unit
+where
+    Unit: Distribution<Vector<T, 2>>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Complex<T> {
+        rng.sample(Self).into()
     }
 }
 
@@ -29,7 +40,7 @@ where
     Normal: Distribution<Vector<T, 4>>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
-        rng.sample(Self).into()
+        rng.sample(self).into()
     }
 }
 
@@ -48,5 +59,15 @@ where
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Quaternion<T> {
         rng.sample(Self).into()
+    }
+}
+
+impl<T: Neg<Output = T> + Num + Copy> Distribution<Moebius<T>> for SomeDistr
+where
+    Invertible: Distribution<Matrix<T, 2, 2>>,
+{
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Moebius<T> {
+        let mat = rng.sample(Invertible);
+        (mat / mat.det()).into()
     }
 }

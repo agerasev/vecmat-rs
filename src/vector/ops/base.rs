@@ -245,8 +245,11 @@ where
     T: Float,
 {
     type Output = T;
+    fn norm_l2_sqr(self) -> T {
+        self.map(|x| x * x).sum()
+    }
     fn norm_l2(self) -> T {
-        self.map(|x| x * x).sum().sqrt()
+        self.norm_l2_sqr().sqrt()
     }
 }
 impl<T, const N: usize> NormLInf for Vector<T, N>

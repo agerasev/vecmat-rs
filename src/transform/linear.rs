@@ -122,7 +122,7 @@ where
 #[cfg(all(test, feature = "rand", feature = "approx"))]
 mod tests {
     use super::*;
-    use crate::distr::Unit;
+    use crate::distr::{Normal, Unit};
     use approx::assert_abs_diff_eq;
     use rand_::prelude::*;
     use rand_xorshift::XorShiftRng;
