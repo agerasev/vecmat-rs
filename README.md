@@ -41,7 +41,7 @@ All these features are enabled by default.
 
 + `Vector`.
 + `Matrix`.
-+ `Quaternion` (and `Complex` reexported from `num_complex`).
++ `Complex` and `Quaternion`.
 
 ### Transformations
 
@@ -49,6 +49,7 @@ All these features are enabled by default.
 + `Linear`.
 + `Affine`.
 + `Rotation2` and `Rotation3`.
++ `Moebius` (over `Complex` and `Quaternion`).
 
 ## Functionality
 
@@ -67,7 +68,6 @@ All these features are enabled by default.
 ### Planning
 
 + Eigen- and singular decomposition for matrices.
-+ Moebuis transformation.
 + `Rotation4`.
 
 ## License
