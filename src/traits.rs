@@ -12,6 +12,8 @@ pub trait NormL1 {
 pub trait NormL2 {
     /// Type of the norm.
     type Output;
+    /// Square norm of the element.
+    fn norm_l2_sqr(self) -> Self::Output;
     /// Norm of the element.
     fn norm_l2(self) -> Self::Output;
 }
@@ -40,6 +42,18 @@ pub trait Outer<V> {
     fn outer(self, other: V) -> Self::Output;
 }
 
+/// Complex conjugate trait.
+pub trait Conj {
+    /// Perform complex conjugation.
+    fn conj(self) -> Self;
+}
+
+/// Type that has epsilon value.
+pub trait Epsilon {
+    /// Check that value is inside epsilon area.
+    fn is_epsilon(&self) -> bool;
+}
+
 macro_rules! derive_primitive_base {
     ($T:ident) => {
         impl Dot for $T {
@@ -66,6 +80,9 @@ macro_rules! derive_primitive_unsigned {
             fn norm_l2(self) -> Self {
                 self
             }
+            fn norm_l2_sqr(self) -> Self {
+                self * self
+            }
         }
         impl NormLInf for $T {
             type Output = Self;
@@ -90,6 +107,9 @@ macro_rules! derive_primitive_signed {
             type Output = Self;
             fn norm_l2(self) -> Self {
                 self.abs()
+            }
+            fn norm_l2_sqr(self) -> Self {
+                self * self
             }
         }
         impl NormLInf for $T {
@@ -116,11 +136,24 @@ macro_rules! derive_primitive_float {
             fn norm_l2(self) -> Self {
                 <$T as FloatCore>::abs(self)
             }
+            fn norm_l2_sqr(self) -> Self {
+                self * self
+            }
         }
         impl NormLInf for $T {
             type Output = Self;
             fn norm_l_inf(self) -> Self {
                 <$T as FloatCore>::abs(self)
+            }
+        }
+        impl Conj for $T {
+            fn conj(self) -> Self {
+                self
+            }
+        }
+        impl Epsilon for $T {
+            fn is_epsilon(&self) -> bool {
+                self.abs() <= Self::EPSILON
             }
         }
     };

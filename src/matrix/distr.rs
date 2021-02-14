@@ -1,9 +1,10 @@
 use crate::{
+    traits::{NormL1, Epsilon},
     distr::{Invertible, Normal, StatefulNormal},
     Matrix,
 };
-use core::marker::PhantomData;
-use num_traits::Float;
+use core::{ops::Neg, marker::PhantomData};
+use num_traits::{Num};
 use rand_::{distributions::Distribution, Rng};
 
 /// Per-component matrix distribution.
@@ -41,12 +42,13 @@ where
 impl<T, const N: usize> Distribution<Matrix<T, N, N>> for Invertible
 where
     Normal: Distribution<Matrix<T, N, N>>,
-    T: Float,
+    T: Neg<Output=T> + Num + NormL1 + Copy,
+    <T as NormL1>::Output: Epsilon,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Matrix<T, N, N> {
         loop {
             let x = rng.sample(&Normal);
-            if x.det().abs() > T::epsilon() {
+            if !x.det().norm_l1().is_epsilon() {
                 break x;
             }
         }

@@ -50,7 +50,7 @@ where
         }
     }
     pub fn angle(&self) -> T {
-        self.comp.im.atan2(self.comp.re)
+        self.comp.im().atan2(self.comp.re())
     }
 }
 
@@ -87,8 +87,8 @@ where
 {
     pub fn to_linear(self) -> Linear<T, 2> {
         Linear::from(Matrix::from([
-            [self.comp.re, -self.comp.im],
-            [self.comp.im, self.comp.re],
+            [self.comp.re(), -self.comp.im()],
+            [self.comp.im(), self.comp.re()],
         ]))
     }
 }
@@ -116,8 +116,8 @@ where
         T::default_epsilon()
     }
     fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        abs_diff_eq!(self.comp.re, other.comp.re, epsilon = epsilon)
-            && abs_diff_eq!(self.comp.im, other.comp.im, epsilon = epsilon)
+        abs_diff_eq!(self.comp.re(), other.comp.re(), epsilon = epsilon)
+            && abs_diff_eq!(self.comp.im(), other.comp.im(), epsilon = epsilon)
     }
 }
 

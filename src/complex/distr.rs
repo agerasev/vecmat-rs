@@ -1,7 +1,7 @@
 use crate::{
     distr::*,
     vector::{Vector, VectorDistribution},
-    Quaternion,
+    complex::{Quaternion},
 };
 use num_traits::Float;
 use rand_::{distributions::Distribution, Rng};

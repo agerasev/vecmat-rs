@@ -74,7 +74,7 @@ fn mul_comp() {
     let c = Complex::<f32>::new(1.0, 2.0);
     right_test_func(q * c);
     left_test_func(c * q);
-    let cq = Quaternion::<f32>::new(c.re, c.im, 0.0, 0.0);
+    let cq = Quaternion::<f32>::new(c.re(), c.im(), 0.0, 0.0);
     right_test_func(q * cq);
     left_test_func(cq * q);
 }
