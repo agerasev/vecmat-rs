@@ -373,6 +373,20 @@ where
         )
     }
 }
+impl<T> Mul<Quaternion<T>> for Complex<T>
+where
+    T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Copy,
+{
+    type Output = Quaternion<T>;
+    fn mul(self, other: Quaternion<T>) -> Self::Output {
+        Quaternion::new(
+            self.re() * other.w() - self.im() * other.x(),
+            self.re() * other.x() + self.im() * other.w(),
+            self.re() * other.y() - self.im() * other.z(),
+            self.re() * other.z() + self.im() * other.y(),
+        )
+    }
+}
 impl<T> Mul<T> for Quaternion<T>
 where
     T: Mul<Output = T> + Copy,
@@ -511,6 +525,16 @@ where
         self * other.inv()
     }
 }
+#[allow(clippy::suspicious_arithmetic_impl)]
+impl<T> Div<Quaternion<T>> for Complex<T>
+where
+    T: Neg<Output = T> + Num + Copy,
+{
+    type Output = Quaternion<T>;
+    fn div(self, other: Quaternion<T>) -> Self::Output {
+        self * other.inv()
+    }
+}
 
 impl<T> DivAssign for Quaternion<T>
 where
@@ -560,29 +584,9 @@ macro_rules! reverse_mul_div {
                 other * self
             }
         }
-        /// Workaround for reverse multiplication.
-        impl Mul<Quaternion<$T>> for Complex<$T> {
-            type Output = Quaternion<$T>;
-            fn mul(self, other: Quaternion<$T>) -> Self::Output {
-                Quaternion::new(
-                    self.re() * other.w() - self.im() * other.x(),
-                    self.re() * other.x() + self.im() * other.w(),
-                    self.re() * other.y() - self.im() * other.z(),
-                    self.re() * other.z() + self.im() * other.y(),
-                )
-            }
-        }
         /// Workaround for reverse division.
         #[allow(clippy::suspicious_arithmetic_impl)]
         impl Div<Quaternion<$T>> for $T {
-            type Output = Quaternion<$T>;
-            fn div(self, other: Quaternion<$T>) -> Self::Output {
-                self * other.inv()
-            }
-        }
-        /// Workaround for reverse division.
-        #[allow(clippy::suspicious_arithmetic_impl)]
-        impl Div<Quaternion<$T>> for Complex<$T> {
             type Output = Quaternion<$T>;
             fn div(self, other: Quaternion<$T>) -> Self::Output {
                 self * other.inv()

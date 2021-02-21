@@ -35,6 +35,3 @@ pub struct Unit;
 
 /// Distribution that guarantees to produce an element which could be inverted.
 pub struct Invertible;
-
-/// Distribution that produces *some* elements with no further guarantees (but with reasonable variation).
-pub struct SomeDistr;

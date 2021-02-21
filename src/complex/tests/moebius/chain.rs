@@ -1,6 +1,6 @@
 use crate::{
     complex::{Complex, Moebius, Quaternion},
-    distr::{Normal, SomeDistr},
+    distr::{Normal, Invertible},
 };
 use approx::*;
 use rand_::prelude::*;
@@ -14,8 +14,8 @@ const POINT_ATTEMPTS: usize = 16;
 fn moebius2() {
     let mut rng = XorShiftRng::seed_from_u64(0xDEAD0);
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a: Moebius<Complex<f64>> = rng.sample(SomeDistr);
-        let b: Moebius<Complex<f64>> = rng.sample(SomeDistr);
+        let a: Moebius<Complex<f64>> = rng.sample(Invertible);
+        let b: Moebius<Complex<f64>> = rng.sample(Invertible);
         let c = a.chain(b);
         for _ in 0..POINT_ATTEMPTS {
             let x: Complex<f64> = rng.sample(Normal);
@@ -31,8 +31,8 @@ fn moebius2() {
 fn moebius4() {
     let mut rng = XorShiftRng::seed_from_u64(0xDEAD1);
     for _ in 0..TRANSFORM_ATTEMPTS {
-        let a: Moebius<Quaternion<f64>> = rng.sample(SomeDistr);
-        let b: Moebius<Quaternion<f64>> = rng.sample(SomeDistr);
+        let a: Moebius<Quaternion<f64>> = rng.sample(Invertible);
+        let b: Moebius<Quaternion<f64>> = rng.sample(Invertible);
         let c = a.chain(b);
         for _ in 0..POINT_ATTEMPTS {
             let x: Quaternion<f64> = rng.sample(Normal);

@@ -41,6 +41,16 @@ impl<T> Moebius<T> {
     pub fn as_mut_array_of_arrays(&mut self) -> &mut [[T; 2]; 2] {
         self.as_mut_matrix().as_mut_array_of_arrays()
     }
+
+    pub fn from_tuple(tup: (T, T, T, T)) -> Self {
+        let (a, b, c, d) = tup;
+        Self::new(a, b, c, d)
+    }
+    pub fn into_tuple(self) -> (T, T, T, T) {
+        let (ab, cd) = self.into_matrix().into_vector_of_vectors().into();
+        let ((a, b), (c, d)) = (ab.into(), cd.into());
+        (a, b, c, d)
+    }
 }
 
 impl<T: Copy> Moebius<T> {
@@ -121,9 +131,9 @@ impl<T: Neg<Output = T> + Num + Copy> Moebius<T> {
     }
 }
 
-impl<T: Copy> Moebius<Complex<T>>
+impl<T> Moebius<Complex<T>>
 where
-    Complex<T>: Num,
+    T: Neg<Output = T> + Num + Copy,
 {
     pub fn deriv(&self, p: Complex<T>) -> Complex<T> {
         let u = self.a() * p + self.b();
@@ -135,8 +145,6 @@ where
 impl<T> Moebius<Complex<T>>
 where
     T: Neg<Output = T> + Num + NumCast + Copy,
-    Complex<T>: Mul<Quaternion<T>, Output = Quaternion<T>> + Copy,
-    Quaternion<T>: Dot<Output = T> + Copy,
 {
     pub fn deriv_dir(&self, p: Quaternion<T>, v: Quaternion<T>) -> Quaternion<T> {
         let u = self.a() * p + self.b();
@@ -144,9 +152,18 @@ where
         let d2 = d.norm_sqr();
         let g1 = (self.a() * v) / d;
         let g21 = (self.c() * v).conj();
-        let g22 = d.conj() * (d.dot(self.c() * v) * T::from(2).unwrap() / d2);
+        let g22 = d.conj() * (d.dot(self.c() * v) * T::from(2.0).unwrap() / d2);
         let g2 = u * ((g21 - g22) / d2);
         g1 + g2
+    }
+}
+
+impl<T> Moebius<T>
+where
+    T: Neg<Output = T> + Num + Copy,
+{
+    pub fn inv(self) -> Self {
+        self.into_matrix().inv().into()
     }
 }
 

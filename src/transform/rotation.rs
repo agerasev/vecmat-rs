@@ -6,7 +6,7 @@ use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
 #[cfg(feature = "rand")]
 use num_traits::FloatConst;
-use num_traits::{Float, FromPrimitive, Num, One};
+use num_traits::{Float, NumCast, Num, One};
 #[cfg(feature = "rand")]
 use rand_::{
     distributions::{uniform::SampleUniform, Distribution, Uniform as RangedUniform},
@@ -68,10 +68,10 @@ where
             comp: self.comp.conj(),
         }
     }
-    fn apply(self, pos: Vector<T, 2>) -> Vector<T, 2> {
+    fn apply(&self, pos: Vector<T, 2>) -> Vector<T, 2> {
         (<Vector<T, 2> as Into<Complex<T>>>::into(pos) * self.into_complex()).into()
     }
-    fn deriv(self, _pos: Vector<T, 2>, dir: Vector<T, 2>) -> Vector<T, 2> {
+    fn deriv(&self, _pos: Vector<T, 2>, dir: Vector<T, 2>) -> Vector<T, 2> {
         self.apply(dir)
     }
     fn chain(self, other: Self) -> Self {
@@ -97,12 +97,12 @@ where
 impl<T> Distribution<Rotation2<T>> for Uniform
 where
     RangedUniform<T>: Distribution<T>,
-    T: SampleUniform + Float + FloatConst + FromPrimitive,
+    T: SampleUniform + Float + FloatConst + NumCast,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Rotation2<T> {
         Rotation2::new(rng.sample(&RangedUniform::new(
             T::zero(),
-            T::from_f32(2.0).unwrap() * T::PI(),
+            T::from(2.0).unwrap() * T::PI(),
         )))
     }
 }
@@ -149,10 +149,10 @@ impl<T> From<Rotation3<T>> for Quaternion<T> {
 
 impl<T> Rotation3<T>
 where
-    T: Float + FromPrimitive,
+    T: Float + NumCast,
 {
     pub fn new(axis: Vector<T, 3>, angle: T) -> Self {
-        let half = angle / T::from_f32(2.0).unwrap();
+        let half = angle / T::from(2.0).unwrap();
         Self {
             quat: Quaternion::from_scalar_and_vector3(half.cos(), axis * half.sin()),
         }
@@ -163,7 +163,7 @@ where
     }
     pub fn angle(&self) -> T {
         let (w, ax) = self.quat.into();
-        T::from_f32(2.0).unwrap() * ax.length().atan2(w)
+        T::from(2.0).unwrap() * ax.length().atan2(w)
     }
 }
 
@@ -181,13 +181,13 @@ where
             quat: self.quat.conj(),
         }
     }
-    fn apply(self, pos: Vector<T, 3>) -> Vector<T, 3> {
+    fn apply(&self, pos: Vector<T, 3>) -> Vector<T, 3> {
         let qpos = Quaternion::from_scalar_and_vector3(T::zero(), pos);
         let qres = self.quat * qpos * self.quat.conj();
         let (_, res) = qres.into();
         res
     }
-    fn deriv(self, _pos: Vector<T, 3>, dir: Vector<T, 3>) -> Vector<T, 3> {
+    fn deriv(&self, _pos: Vector<T, 3>, dir: Vector<T, 3>) -> Vector<T, 3> {
         self.apply(dir)
     }
     fn chain(self, other: Self) -> Self {
@@ -199,11 +199,11 @@ where
 
 impl<T> Rotation3<T>
 where
-    T: Float + FromPrimitive,
+    T: Float + NumCast,
 {
     pub fn to_linear(self) -> Linear<T, 3> {
         let t1 = T::one();
-        let t2 = T::from_f32(2.0).unwrap();
+        let t2 = T::from(2.0).unwrap();
         let q = self.quat;
         Linear::from(Matrix::from([
             [
@@ -230,14 +230,14 @@ impl<T> Distribution<Rotation3<T>> for Uniform
 where
     Unit: Distribution<Vector<T, 3>>,
     RangedUniform<T>: Distribution<T>,
-    T: SampleUniform + Float + FloatConst + FromPrimitive,
+    T: SampleUniform + Float + FloatConst + NumCast,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Rotation3<T> {
         Rotation3::new(
             rng.sample(&Unit),
             rng.sample(&RangedUniform::new(
                 T::zero(),
-                T::from_f32(2.0).unwrap() * T::PI(),
+                T::from(2.0).unwrap() * T::PI(),
             )),
         )
     }

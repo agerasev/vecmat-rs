@@ -62,12 +62,11 @@ where
     }
 }
 
-impl<T: Neg<Output = T> + Num + Copy> Distribution<Moebius<T>> for SomeDistr
+impl<T: Neg<Output = T> + Num + Copy> Distribution<Moebius<T>> for Invertible
 where
     Invertible: Distribution<Matrix<T, 2, 2>>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Moebius<T> {
-        let mat = rng.sample(Invertible);
-        (mat / mat.det()).into()
+        rng.sample(Invertible).into()
     }
 }

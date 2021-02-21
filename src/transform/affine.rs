@@ -67,10 +67,10 @@ where
             pos: ilin.dot(-self.pos),
         }
     }
-    fn apply(self, pos: Vector<T, N>) -> Vector<T, N> {
+    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N> {
         self.lin.dot(pos) + self.pos
     }
-    fn deriv(self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
+    fn deriv(&self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
         self.lin.dot(dir)
     }
     fn chain(self, other: Self) -> Self {

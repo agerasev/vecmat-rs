@@ -20,9 +20,9 @@ pub trait Transform<T, const N: usize> {
     fn inv(self) -> Self;
 
     /// Perform the transformation itself.
-    fn apply(self, pos: Vector<T, N>) -> Vector<T, N>;
+    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N>;
     /// Find transformation directional derivative at specified point.
-    fn deriv(self, pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N>;
+    fn deriv(&self, pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N>;
 
     /// Chain two transformations into a new one.
     fn chain(self, other: Self) -> Self;

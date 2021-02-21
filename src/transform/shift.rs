@@ -40,7 +40,7 @@ impl<T, const N: usize> From<Shift<T, N>> for Vector<T, N> {
 
 impl<T, const N: usize> Transform<T, N> for Shift<T, N>
 where
-    T: Neg<Output = T> + Num,
+    T: Neg<Output = T> + Num + Copy,
 {
     fn identity() -> Self {
         Self {
@@ -50,10 +50,10 @@ where
     fn inv(self) -> Self {
         Self { pos: -self.pos }
     }
-    fn apply(self, pos: Vector<T, N>) -> Vector<T, N> {
+    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N> {
         pos - self.pos
     }
-    fn deriv(self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
+    fn deriv(&self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
         dir
     }
     fn chain(self, other: Self) -> Self {

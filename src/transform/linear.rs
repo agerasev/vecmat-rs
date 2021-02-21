@@ -4,7 +4,7 @@ use crate::{traits::Dot, Matrix, Transform, Vector};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
-use num_traits::{Float, FromPrimitive, Num, One};
+use num_traits::{Float, NumCast, Num, One};
 #[cfg(feature = "rand")]
 use rand_::{distributions::Distribution, Rng};
 
@@ -50,10 +50,10 @@ where
             lin: self.lin.inv(),
         }
     }
-    fn apply(self, pos: Vector<T, N>) -> Vector<T, N> {
+    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N> {
         self.lin.dot(pos)
     }
-    fn deriv(self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
+    fn deriv(&self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
         self.apply(dir)
     }
     fn chain(self, other: Self) -> Self {
@@ -108,10 +108,10 @@ where
 }
 impl<T> Linear<T, 3>
 where
-    T: Float + FromPrimitive,
+    T: Float + NumCast,
 {
     pub fn look_at_any(dir: Vector<T, 3>) -> Self {
-        if dir.z().abs() < T::from_f32(0.5).unwrap() {
+        if dir.z().abs() < T::from(0.5).unwrap() {
             Self::look_at(dir, Vector::from([T::zero(), T::zero(), T::one()]))
         } else {
             Self::look_at(dir, Vector::from([T::zero(), T::one(), T::zero()]))
