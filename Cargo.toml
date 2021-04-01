@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
@@ -15,7 +15,7 @@ license = "MIT/Apache-2.0"
 
 [dependencies]
 num-traits = { version = "0.2", default-features = false, features = ["libm"] }
-num-complex = { version = "0.3", default-features = false, features = ["libm"] }
+num-complex = { version = "0.4", default-features = false, features = ["libm"] }
 num-integer = { version = "0.1", default-features = false }
 
 rand_ = { package = "rand", version = "0.8", optional = true }

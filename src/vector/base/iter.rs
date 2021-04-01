@@ -1,56 +1,11 @@
+pub use std::array::IntoIter;
 use super::Vector;
 use core::{
     convert::{TryFrom, TryInto},
     iter::IntoIterator,
     mem::{self, MaybeUninit},
-    ptr, slice,
+    slice,
 };
-
-/// Iterator by values for vector.
-pub struct IntoIter<T, const N: usize> {
-    data: Vector<MaybeUninit<T>, N>,
-    pos: usize,
-}
-
-impl<T, const N: usize> IntoIter<T, N> {
-    pub fn new(a: Vector<T, N>) -> Self {
-        let it = Self {
-            data: unsafe {
-                // unsafe { mem::transmute::<_, [MaybeUninit<T>; N]>(a) }
-                ptr::read(&a as *const _ as *const Vector<MaybeUninit<T>, N>)
-            },
-            pos: 0,
-        };
-        mem::forget(a);
-        it
-    }
-}
-
-impl<T, const N: usize> Iterator for IntoIter<T, N> {
-    type Item = T;
-    fn next(&mut self) -> Option<T> {
-        if self.pos < N {
-            let o = unsafe {
-                mem::replace(self.data.get_unchecked_mut(self.pos), MaybeUninit::uninit())
-                    .assume_init()
-            };
-            self.pos += 1;
-            Some(o)
-        } else {
-            None
-        }
-    }
-}
-
-impl<T, const N: usize> Drop for IntoIter<T, N> {
-    fn drop(&mut self) {
-        unsafe {
-            for x in self.data.as_mut().get_unchecked_mut(self.pos..N) {
-                mem::replace(x, MaybeUninit::uninit()).assume_init();
-            }
-        }
-    }
-}
 
 impl<T, const N: usize> Vector<T, N> {
     /// Returns iterator over vector element refrences.
@@ -67,7 +22,7 @@ impl<T, const N: usize> IntoIterator for Vector<T, N> {
     type Item = T;
     type IntoIter = IntoIter<T, N>;
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter::new(self)
+        IntoIter::new(self.into())
     }
 }
 
@@ -100,7 +55,7 @@ where
 impl<T, const N: usize> Vector<T, N> {
     // TODO: Implement `TryFrom` without conflict.
     /// Try to conctruct a vector from iterator.
-    /// If iterator conatins less items than vector, then `Err` is returned.
+    /// If iterator conatains less items than vector, then `Err` is returned.
     pub fn try_from_iter<I>(iter: I) -> Option<Self>
     where
         I: Iterator<Item = T>,
