@@ -2,39 +2,39 @@ os: Visual Studio 2015
 
 environment:
   matrix:
-    #- channel: stable
-    #  target: x86_64-pc-windows-msvc
-    #- channel: stable
-    #  target: i686-pc-windows-msvc
-    #- channel: beta
-    #  target: x86_64-pc-windows-msvc
-    #- channel: beta
-    #  target: i686-pc-windows-msvc
+    - channel: stable
+      target: x86_64-pc-windows-msvc
+    - channel: stable
+      target: i686-pc-windows-msvc
+    - channel: beta
+      target: x86_64-pc-windows-msvc
+    - channel: beta
+      target: i686-pc-windows-msvc
     - channel: nightly
       target: x86_64-pc-windows-msvc
-      #cargoflags: --features "unstable"
+      cargoflags: --features "unstable"
     - channel: nightly
       target: i686-pc-windows-msvc
-      #cargoflags: --features "unstable"
+      cargoflags: --features "unstable"
 
-    #- channel: stable
-    #  target: x86_64-pc-windows-gnu
-    #- channel: stable
-    #  target: i686-pc-windows-gnu
-    #- channel: beta
-    #  target: x86_64-pc-windows-gnu
-    #- channel: beta
-    #  target: i686-pc-windows-gnu
+    - channel: stable
+      target: x86_64-pc-windows-gnu
+    - channel: stable
+      target: i686-pc-windows-gnu
+    - channel: beta
+      target: x86_64-pc-windows-gnu
+    - channel: beta
+      target: i686-pc-windows-gnu
     - channel: nightly
       target: x86_64-pc-windows-gnu
-      #cargoflags: --features "unstable"
+      cargoflags: --features "unstable"
     - channel: nightly
       target: i686-pc-windows-gnu
-      #cargoflags: --features "unstable"
+      cargoflags: --features "unstable"
 
-#matrix:
-#  allow_failures:
-#    - channel: nightly
+matrix:
+  allow_failures:
+    - channel: nightly
 
 install:
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
@@ -46,5 +46,5 @@ install:
 build: false
 
 test_script:
-- cargo test --verbose --features=rand,approx %cargoflags%
+- cargo test --verbose %cargoflags%
 - cargo test --verbose --no-default-features %cargoflags%
