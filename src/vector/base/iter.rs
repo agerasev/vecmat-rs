@@ -1,6 +1,6 @@
-pub use std::array::IntoIter;
 use super::Vector;
 use core::{
+    array::IntoIter,
     convert::{TryFrom, TryInto},
     iter::IntoIterator,
     mem::{self, MaybeUninit},
