@@ -1,6 +1,6 @@
 use crate::{
     complex::{Complex, Moebius, Quaternion},
-    distr::{Normal, Invertible},
+    distr::{Invertible, Normal},
 };
 use approx::*;
 use rand_::prelude::*;

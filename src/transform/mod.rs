@@ -1,9 +1,11 @@
 mod affine;
+mod chain;
 mod linear;
 mod rotation;
 mod shift;
 
 pub use affine::*;
+pub use chain::*;
 pub use linear::*;
 pub use rotation::*;
 pub use shift::*;
@@ -25,6 +27,8 @@ pub trait Transform<T, const N: usize> {
     fn deriv(&self, pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N>;
 
     /// Chain two transformations into a new one.
+    ///
+    /// `C = A.chain(B)` means that `C(x) = A(B(x))`.
     fn chain(self, other: Self) -> Self;
 }
 

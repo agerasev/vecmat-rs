@@ -1,12 +1,15 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Uniform, Unit};
-use crate::{transform::Linear, Complex, Matrix, Quaternion, Transform, Vector};
+use crate::{
+    transform::{Linear, Reorder, Shift},
+    Complex, Matrix, Quaternion, Transform, Vector,
+};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
 #[cfg(feature = "rand")]
 use num_traits::FloatConst;
-use num_traits::{Float, NumCast, Num, One};
+use num_traits::{Float, Num, NumCast, One};
 #[cfg(feature = "rand")]
 use rand_::{
     distributions::{uniform::SampleUniform, Distribution, Uniform as RangedUniform},
@@ -222,6 +225,44 @@ where
                 t1 - t2 * q.x() * q.x() - t2 * q.y() * q.y(),
             ],
         ]))
+    }
+}
+
+impl<T> Reorder<Rotation2<T>, T, 2> for Shift<T, 2>
+where
+    Rotation2<T>: Transform<T, 2> + Copy,
+    Self: Transform<T, 2>,
+{
+    fn reorder(self, other: Rotation2<T>) -> (Rotation2<T>, Shift<T, 2>) {
+        (other, other.inv().apply(self.into_vector()).into())
+    }
+}
+impl<T> Reorder<Shift<T, 2>, T, 2> for Rotation2<T>
+where
+    Self: Transform<T, 2>,
+    Shift<T, 2>: Transform<T, 2>,
+{
+    fn reorder(self, other: Shift<T, 2>) -> (Shift<T, 2>, Rotation2<T>) {
+        (self.apply(other.into_vector()).into(), self)
+    }
+}
+
+impl<T> Reorder<Rotation3<T>, T, 3> for Shift<T, 3>
+where
+    Rotation3<T>: Transform<T, 3> + Copy,
+    Self: Transform<T, 3>,
+{
+    fn reorder(self, other: Rotation3<T>) -> (Rotation3<T>, Shift<T, 3>) {
+        (other, other.inv().apply(self.into_vector()).into())
+    }
+}
+impl<T> Reorder<Shift<T, 3>, T, 3> for Rotation3<T>
+where
+    Self: Transform<T, 3>,
+    Shift<T, 3>: Transform<T, 3>,
+{
+    fn reorder(self, other: Shift<T, 3>) -> (Shift<T, 3>, Rotation3<T>) {
+        (self.apply(other.into_vector()).into(), self)
     }
 }
 

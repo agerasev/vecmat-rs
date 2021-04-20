@@ -1,83 +1,28 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Invertible, Normal};
-use crate::{
-    traits::Dot,
-    transform::{Linear, Shift},
-    Matrix, Transform, Vector,
-};
-#[cfg(feature = "approx")]
-use approx::{abs_diff_eq, AbsDiffEq};
-use core::ops::Neg;
-use num_traits::{Num, One, Zero};
+use crate::transform::{Chain, Linear, Shift};
 #[cfg(feature = "rand")]
 use rand_::{distributions::Distribution, Rng};
 
 /// Affine transformation.
-#[derive(Clone, Copy, PartialEq, Debug)]
-pub struct Affine<T, const N: usize> {
-    lin: Matrix<T, N, N>,
-    pos: Vector<T, N>,
-}
+pub type Affine<T, const N: usize> = Chain<Shift<T, N>, Linear<T, N>, T, N>;
 
 pub type Affine2<T> = Affine<T, 2>;
 pub type Affine3<T> = Affine<T, 3>;
 pub type Affine4<T> = Affine<T, 4>;
 
-impl<T, const N: usize> Affine<T, N> {
-    /// Construct affine transformation from linear one and shift.
-    pub fn new(linear: Linear<T, N>, shift: Shift<T, N>) -> Self {
-        Self {
-            lin: linear.into(),
-            pos: shift.into(),
-        }
-    }
-    /// Split into linear and shift components.
-    pub fn split(self) -> (Linear<T, N>, Shift<T, N>) {
-        (self.lin.into(), self.pos.into())
-    }
-}
 impl<T, const N: usize> Affine<T, N>
 where
     T: Copy,
 {
     /// Linear component of the transformation.
     pub fn linear(&self) -> Linear<T, N> {
-        self.lin.into()
+        *self.inner()
     }
+
     /// Shift component of the transformation.
     pub fn shift(&self) -> Shift<T, N> {
-        self.pos.into()
-    }
-}
-
-impl<T, const N: usize> Transform<T, N> for Affine<T, N>
-where
-    T: Neg<Output = T> + Num + Copy,
-{
-    fn identity() -> Self {
-        Self {
-            lin: Matrix::one(),
-            pos: Vector::zero(),
-        }
-    }
-    fn inv(self) -> Self {
-        let ilin = self.lin.inv();
-        Self {
-            lin: ilin,
-            pos: ilin.dot(-self.pos),
-        }
-    }
-    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N> {
-        self.lin.dot(pos) + self.pos
-    }
-    fn deriv(&self, _pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
-        self.lin.dot(dir)
-    }
-    fn chain(self, other: Self) -> Self {
-        Self {
-            lin: self.lin.dot(other.lin),
-            pos: self.lin.dot(other.pos) + self.pos,
-        }
+        *self.outer()
     }
 }
 
@@ -97,22 +42,7 @@ where
     Normal: Distribution<Shift<T, N>>,
 {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Affine<T, N> {
-        Affine::new(rng.sample(&Self), rng.sample(&Normal))
-    }
-}
-
-#[cfg(feature = "approx")]
-impl<T, const N: usize> AbsDiffEq for Affine<T, N>
-where
-    T: AbsDiffEq<Epsilon = T> + Copy,
-{
-    type Epsilon = T;
-    fn default_epsilon() -> Self::Epsilon {
-        T::default_epsilon()
-    }
-    fn abs_diff_eq(&self, other: &Self, epsilon: Self::Epsilon) -> bool {
-        abs_diff_eq!(self.lin, other.lin, epsilon = epsilon)
-            && abs_diff_eq!(self.pos, other.pos, epsilon = epsilon)
+        Affine::new(rng.sample(&Normal), rng.sample(&Self))
     }
 }
 
@@ -120,7 +50,7 @@ where
 mod tests {
     mod base {
         use super::super::*;
-        use crate::{matrix::*, vector::*};
+        use crate::{matrix::*, vector::*, Transform};
         use approx::*;
         use num_traits::{One, Zero};
 
@@ -142,10 +72,11 @@ mod tests {
 
         macro_rules! inverse_test {
             ($X:ident, $M:ident, $V:ident) => {
-                let m = $X::new(($M::fill(1.0) + $M::one()).into(), $V::fill(1.0).into());
+                let m = $X::new($V::fill(1.0).into(), ($M::fill(1.0) + $M::one()).into());
                 let v = $V::fill(1.0);
-                assert_abs_diff_eq!(v, m.inv().apply(m.apply(v)));
-                assert_abs_diff_eq!(v, m.apply(m.inv().apply(v)));
+                let eps = 1e-12;
+                assert_abs_diff_eq!(v, m.inv().apply(m.apply(v)), epsilon = eps);
+                assert_abs_diff_eq!(v, m.apply(m.inv().apply(v)), epsilon = eps);
             };
         }
         #[test]
@@ -157,10 +88,10 @@ mod tests {
 
         macro_rules! chain_test {
             ($X:ident, $M:ident, $V:ident) => {
-                let m0 = $X::new(($M::fill(1.0) + $M::one()).into(), $V::fill(1.0).into());
+                let m0 = $X::new($V::fill(1.0).into(), ($M::fill(1.0) + $M::one()).into());
                 let m1 = $X::new(
-                    ($M::fill(1.0) - $M::one()).into(),
                     $V::indices().map(|i| i as f64).into(),
+                    ($M::fill(1.0) - $M::one()).into(),
                 );
                 let v = $V::fill(1.0);
                 assert_abs_diff_eq!(m0.apply(m1.apply(v)), m0.chain(m1).apply(v));
@@ -178,7 +109,7 @@ mod tests {
     #[cfg(feature = "rand")]
     mod random {
         use super::super::*;
-        use crate::vector::*;
+        use crate::{vector::*, Transform};
         use approx::assert_abs_diff_eq;
         use num_traits::Zero;
         use rand_::prelude::*;

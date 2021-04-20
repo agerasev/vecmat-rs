@@ -1,10 +1,14 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Invertible, Normal};
-use crate::{traits::Dot, Matrix, Transform, Vector};
+use crate::{
+    traits::Dot,
+    transform::{Reorder, Shift},
+    Matrix, Transform, Vector,
+};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
-use num_traits::{Float, NumCast, Num, One};
+use num_traits::{Float, Num, NumCast, One};
 #[cfg(feature = "rand")]
 use rand_::{distributions::Distribution, Rng};
 
@@ -116,6 +120,25 @@ where
         } else {
             Self::look_at(dir, Vector::from([T::zero(), T::one(), T::zero()]))
         }
+    }
+}
+
+impl<T, const N: usize> Reorder<Linear<T, N>, T, N> for Shift<T, N>
+where
+    Linear<T, N>: Transform<T, N> + Copy,
+    Self: Transform<T, N>,
+{
+    fn reorder(self, other: Linear<T, N>) -> (Linear<T, N>, Shift<T, N>) {
+        (other, other.inv().apply(self.into_vector()).into())
+    }
+}
+impl<T, const N: usize> Reorder<Shift<T, N>, T, N> for Linear<T, N>
+where
+    Self: Transform<T, N>,
+    Shift<T, N>: Transform<T, N>,
+{
+    fn reorder(self, other: Shift<T, N>) -> (Shift<T, N>, Linear<T, N>) {
+        (self.apply(other.into_vector()).into(), self)
     }
 }
 
