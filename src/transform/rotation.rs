@@ -3,6 +3,7 @@ use crate::distr::{Uniform, Unit};
 use crate::{
     transform::{Linear, Reorder, Shift},
     Complex, Matrix, Quaternion, Transform, Vector,
+    traits::Dot,
 };
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
@@ -228,6 +229,25 @@ where
     }
 }
 
+impl<T> Rotation3<T>
+where
+    T: Float + FloatConst,
+{
+    /// Returns any of transformations that rotate `dir` to `-z`-axis.
+    pub fn look_at_any(dir: Vector<T, 3>) -> Self {
+        let z = Vector::from((T::zero(), T::zero(), -T::one()));
+        let cross = dir.cross(z);
+        let cross_len = cross.length();
+        if cross_len > T::epsilon() {
+            let dot = dir.dot(z);
+            Self::new(cross / cross_len, cross_len.atan2(dot))
+        } else {
+            let y = Vector::from((T::zero(), T::one(), T::zero()));
+            Self::new(y, T::from(T::PI()).unwrap())
+        }
+    }
+}
+
 impl<T> Reorder<Rotation2<T>, T, 2> for Shift<T, 2>
 where
     Rotation2<T>: Transform<T, 2> + Copy,
@@ -413,6 +433,20 @@ mod tests {
                     a.chain(b).to_linear(),
                     epsilon = EPS,
                 );
+            }
+        }
+
+
+        #[test]
+        fn look_to_the_direction() {
+            const EPS: f64 = 1e-14;
+            let mut rng = XorShiftRng::seed_from_u64(0xBEC);
+
+            for _ in 0..SAMPLE_ATTEMPTS {
+                let d: Vector<f64, 3> = rng.sample(&Unit);
+                let m = Rotation3::look_at_any(d);
+
+                assert_abs_diff_eq!(m.apply(d), Vector::from([0.0, 0.0, -1.0]), epsilon = EPS);
             }
         }
     }

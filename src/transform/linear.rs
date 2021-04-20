@@ -104,16 +104,19 @@ impl<T> Linear<T, 3>
 where
     T: Float,
 {
+    /// Returns the transformation that rotates `dir` to `-z`-axis
+    /// and `up` to `y`-axis.
     pub fn look_at(dir: Vector<T, 3>, up: Vector<T, 3>) -> Self {
         let right = dir.cross(up).normalize();
-        let down = dir.cross(right);
-        Self::from(Matrix::from([right, down, dir]))
+        let strict_up = right.cross(dir);
+        Self::from(Matrix::from([right, strict_up, -dir]))
     }
 }
 impl<T> Linear<T, 3>
 where
     T: Float + NumCast,
 {
+    /// Returns any of transformations that rotate `dir` to `-z`-axis.
     pub fn look_at_any(dir: Vector<T, 3>) -> Self {
         if dir.z().abs() < T::from(0.5).unwrap() {
             Self::look_at(dir, Vector::from([T::zero(), T::zero(), T::one()]))
@@ -216,7 +219,7 @@ mod tests {
             let d: Vector<f64, 3> = rng.sample(&Unit);
             let m = Linear::look_at_any(d);
 
-            assert_abs_diff_eq!(m.apply(d), Vector::from([0.0, 0.0, 1.0]), epsilon = EPS);
+            assert_abs_diff_eq!(m.apply(d), Vector::from([0.0, 0.0, -1.0]), epsilon = EPS);
         }
     }
 }
