@@ -1,11 +1,11 @@
 use crate::{
     complex::Complex,
     matrix::Matrix4x4,
-    traits::{Conj, Dot, NormL1, NormL2},
+    traits::{Conj, Dot, NormL1, NormL2, Normalize},
     vector::{Vector3, Vector4},
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
-use num_traits::{Float, Num, One, Zero};
+use num_traits::{Float, Num, One, Zero, Inv};
 
 /// Quaternion.
 #[repr(transparent)]
@@ -496,12 +496,32 @@ where
         self / self.norm()
     }
 }
+
+impl<T> Normalize for Quaternion<T>
+where
+    T: Float
+{
+    fn normalize(self) -> Self {
+        Quaternion::normalize(self)
+    }
+}
+
 impl<T> Quaternion<T>
 where
     T: Neg<Output = T> + Num + Copy,
 {
     pub fn inv(self) -> Self {
         self.conj() / self.norm_sqr()
+    }
+}
+
+impl<T> Inv for Quaternion<T>
+where
+    T: Float
+{
+    type Output = Self;
+    fn inv(self) -> Self {
+        Quaternion::inv(self)
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::{
     complex::{Complex, Quaternion},
     matrix::Matrix2x2,
-    traits::Dot,
+    traits::{Dot, Normalize},
 };
 use core::ops::{Add, Div, Mul, Neg};
 use num_traits::{Num, NumCast, One, Zero};
@@ -125,7 +125,9 @@ impl<T: Neg<Output = T> + Num + Copy> Moebius<T> {
     pub fn det(&self) -> T {
         self.mat.det()
     }
-    pub fn normalize(self) -> Self {
+}
+impl<T: Neg<Output = T> + Num + Copy> Normalize for Moebius<T> {
+    fn normalize(self) -> Self {
         let det = self.det();
         (self.mat / det).into()
     }

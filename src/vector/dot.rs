@@ -1,4 +1,4 @@
-use crate::{traits::Dot, Vector};
+use crate::{traits::{Dot, Normalize}, Vector};
 use core::ops::{Add, Mul};
 use num_traits::Float;
 
@@ -30,5 +30,14 @@ where
     }
     pub fn normalize(self) -> Vector<T, N> {
         self / self.length()
+    }
+}
+
+impl<T, const N: usize> Normalize for Vector<T, N>
+where
+    T: Float
+{
+    fn normalize(self) -> Self {
+        Vector::normalize(self)
     }
 }

@@ -1,11 +1,11 @@
 use crate::{
     matrix::Matrix2x2,
-    traits::{Conj, Dot, NormL1, NormL2},
+    traits::{Conj, Dot, NormL1, NormL2, Normalize},
     vector::Vector2,
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
 use num_complex::{Complex as NumComplex, ParseComplexError};
-use num_traits::{Float, Num, One, Zero};
+use num_traits::{Float, Num, One, Zero, Inv};
 
 /// Complex number.
 #[repr(transparent)]
@@ -371,12 +371,30 @@ where
         self / self.norm()
     }
 }
+impl<T> Normalize for Complex<T>
+where
+    T: Float
+{
+    fn normalize(self) -> Self {
+        Complex::normalize(self)
+    }
+}
+
 impl<T> Complex<T>
 where
     T: Neg<Output = T> + Num + Copy,
 {
     pub fn inv(self) -> Self {
         self.conj() / self.norm_sqr()
+    }
+}
+impl<T> Inv for Complex<T>
+where
+    T: Float
+{
+    type Output = Self;
+    fn inv(self) -> Self {
+        Complex::inv(self)
     }
 }
 

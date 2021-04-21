@@ -26,6 +26,12 @@ pub trait NormLInf {
     fn norm_l_inf(self) -> Self::Output;
 }
 
+/// Something that could be normalized using most suitable norm.
+pub trait Normalize {
+    /// Normalize object.
+    fn normalize(self) -> Self;
+}
+
 /// Dot product trait.
 pub trait Dot<V = Self> {
     /// Dot product output type.
