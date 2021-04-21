@@ -38,7 +38,7 @@ impl<T, const N: usize> From<Shift<T, N>> for Vector<T, N> {
     }
 }
 
-impl<T, const N: usize> Transform<T, N> for Shift<T, N>
+impl<T, const N: usize> Transform<Vector<T, N>> for Shift<T, N>
 where
     T: Neg<Output = T> + Num + Copy,
 {

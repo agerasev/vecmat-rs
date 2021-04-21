@@ -1,20 +1,19 @@
-use crate::{Transform, Vector};
+use crate::{Transform};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
-use core::{marker::PhantomData, ops::Neg};
-use num_traits::Num;
+use core::marker::PhantomData;
 
 /// Transformation obtained by combining two other ones.
 ///
 /// Transformations are applied in the following order: `A(B(x))`.
 #[derive(Clone, Copy, PartialEq, Debug)]
-pub struct Chain<A, B, T, const N: usize> {
+pub struct Chain<A, B, T> {
     outer: A,
     inner: B,
     phantom: PhantomData<T>,
 }
 
-impl<A, B, T, const N: usize> Chain<A, B, T, N> {
+impl<A, B, T> Chain<A, B, T> {
     /// Construct chained transformation from outer and inner ones.
     pub fn new(outer: A, inner: B) -> Self {
         Self {
@@ -48,30 +47,29 @@ impl<A, B, T, const N: usize> Chain<A, B, T, N> {
     }
 }
 
-impl<A, B, T, const N: usize> From<(A, B)> for Chain<A, B, T, N> {
+impl<A, B, T> From<(A, B)> for Chain<A, B, T> {
     fn from((a, b): (A, B)) -> Self {
         Self::new(a, b)
     }
 }
-impl<A, B, T, const N: usize> From<Chain<A, B, T, N>> for (A, B) {
-    fn from(c: Chain<A, B, T, N>) -> Self {
+impl<A, B, T> From<Chain<A, B, T>> for (A, B) {
+    fn from(c: Chain<A, B, T>) -> Self {
         c.split()
     }
 }
 
 /// Transformations that can be reordered, e.g. for some `A` and `B` find such `A'` and `B'`
 /// that satisfies `A(B(x)) = B'(A'(x))` for any `x`.
-pub trait Reorder<B: Transform<T, N>, T, const N: usize>: Transform<T, N> {
+pub trait Reorder<B: Transform<T>, T>: Transform<T> {
     /// For given `A` and `B` returns `B'` and `A'`.
     fn reorder(self, other: B) -> (B, Self);
 }
 
-impl<A: Transform<T, N>, B: Transform<T, N>, T, const N: usize> Transform<T, N>
-    for Chain<A, B, T, N>
+impl<A, B, T> Transform<T> for Chain<A, B, T>
 where
-    A: Reorder<B, T, N>,
-    B: Reorder<A, T, N>,
-    T: Neg<Output = T> + Num + Copy,
+    A: Transform<T> + Reorder<B, T>,
+    B: Transform<T> + Reorder<A, T>,
+    T: Copy,
 {
     fn identity() -> Self {
         Self::new(A::identity(), B::identity())
@@ -79,10 +77,10 @@ where
     fn inv(self) -> Self {
         self.inner.inv().reorder(self.outer.inv()).into()
     }
-    fn apply(&self, pos: Vector<T, N>) -> Vector<T, N> {
+    fn apply(&self, pos: T) -> T {
         self.outer.apply(self.inner.apply(pos))
     }
-    fn deriv(&self, pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
+    fn deriv(&self, pos: T, dir: T) -> T {
         self.outer
             .deriv(self.inner.apply(pos), self.inner.deriv(pos, dir))
     }
@@ -93,7 +91,7 @@ where
 }
 
 #[cfg(feature = "approx")]
-impl<A, B, T, const N: usize> AbsDiffEq for Chain<A, B, T, N>
+impl<A, B, T> AbsDiffEq for Chain<A, B, T>
 where
     A: AbsDiffEq<Epsilon = T>,
     B: AbsDiffEq<Epsilon = T>,

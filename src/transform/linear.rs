@@ -42,7 +42,7 @@ impl<T, const N: usize> From<Linear<T, N>> for Matrix<T, N, N> {
     }
 }
 
-impl<T, const N: usize> Transform<T, N> for Linear<T, N>
+impl<T, const N: usize> Transform<Vector<T, N>> for Linear<T, N>
 where
     T: Neg<Output = T> + Num + Copy,
 {
@@ -126,19 +126,19 @@ where
     }
 }
 
-impl<T, const N: usize> Reorder<Linear<T, N>, T, N> for Shift<T, N>
+impl<T, const N: usize> Reorder<Linear<T, N>, Vector<T, N>> for Shift<T, N>
 where
-    Linear<T, N>: Transform<T, N> + Copy,
-    Self: Transform<T, N>,
+    Linear<T, N>: Transform<Vector<T, N>> + Copy,
+    Self: Transform<Vector<T, N>>,
 {
     fn reorder(self, other: Linear<T, N>) -> (Linear<T, N>, Shift<T, N>) {
         (other, other.inv().apply(self.into_vector()).into())
     }
 }
-impl<T, const N: usize> Reorder<Shift<T, N>, T, N> for Linear<T, N>
+impl<T, const N: usize> Reorder<Shift<T, N>, Vector<T, N>> for Linear<T, N>
 where
-    Self: Transform<T, N>,
-    Shift<T, N>: Transform<T, N>,
+    Self: Transform<Vector<T, N>>,
+    Shift<T, N>: Transform<Vector<T, N>>,
 {
     fn reorder(self, other: Shift<T, N>) -> (Shift<T, N>, Linear<T, N>) {
         (self.apply(other.into_vector()).into(), self)

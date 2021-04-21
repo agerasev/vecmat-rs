@@ -58,7 +58,7 @@ where
     }
 }
 
-impl<T> Transform<T, 2> for Rotation2<T>
+impl<T> Transform<Vector<T, 2>> for Rotation2<T>
 where
     T: Neg<Output = T> + Num + Copy,
 {
@@ -171,7 +171,7 @@ where
     }
 }
 
-impl<T> Transform<T, 3> for Rotation3<T>
+impl<T> Transform<Vector<T, 3>> for Rotation3<T>
 where
     T: Neg<Output = T> + Num + Copy,
 {
@@ -248,38 +248,38 @@ where
     }
 }
 
-impl<T> Reorder<Rotation2<T>, T, 2> for Shift<T, 2>
+impl<T> Reorder<Rotation2<T>, Vector<T, 2>> for Shift<T, 2>
 where
-    Rotation2<T>: Transform<T, 2> + Copy,
-    Self: Transform<T, 2>,
+    Rotation2<T>: Transform<Vector<T, 2>> + Copy,
+    Self: Transform<Vector<T, 2>>,
 {
     fn reorder(self, other: Rotation2<T>) -> (Rotation2<T>, Shift<T, 2>) {
         (other, other.inv().apply(self.into_vector()).into())
     }
 }
-impl<T> Reorder<Shift<T, 2>, T, 2> for Rotation2<T>
+impl<T> Reorder<Shift<T, 2>, Vector<T, 2>> for Rotation2<T>
 where
-    Self: Transform<T, 2>,
-    Shift<T, 2>: Transform<T, 2>,
+    Self: Transform<Vector<T, 2>>,
+    Shift<T, 2>: Transform<Vector<T, 2>>,
 {
     fn reorder(self, other: Shift<T, 2>) -> (Shift<T, 2>, Rotation2<T>) {
         (self.apply(other.into_vector()).into(), self)
     }
 }
 
-impl<T> Reorder<Rotation3<T>, T, 3> for Shift<T, 3>
+impl<T> Reorder<Rotation3<T>, Vector<T, 3>> for Shift<T, 3>
 where
-    Rotation3<T>: Transform<T, 3> + Copy,
-    Self: Transform<T, 3>,
+    Rotation3<T>: Transform<Vector<T, 3>> + Copy,
+    Self: Transform<Vector<T, 3>>,
 {
     fn reorder(self, other: Rotation3<T>) -> (Rotation3<T>, Shift<T, 3>) {
         (other, other.inv().apply(self.into_vector()).into())
     }
 }
-impl<T> Reorder<Shift<T, 3>, T, 3> for Rotation3<T>
+impl<T> Reorder<Shift<T, 3>, Vector<T, 3>> for Rotation3<T>
 where
-    Self: Transform<T, 3>,
-    Shift<T, 3>: Transform<T, 3>,
+    Self: Transform<Vector<T, 3>>,
+    Shift<T, 3>: Transform<Vector<T, 3>>,
 {
     fn reorder(self, other: Shift<T, 3>) -> (Shift<T, 3>, Rotation3<T>) {
         (self.apply(other.into_vector()).into(), self)

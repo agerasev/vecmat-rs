@@ -1,11 +1,11 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Invertible, Normal};
-use crate::transform::{Chain, Linear, Shift};
+use crate::{Vector, transform::{Chain, Linear, Shift}};
 #[cfg(feature = "rand")]
 use rand_::{distributions::Distribution, Rng};
 
 /// Affine transformation.
-pub type Affine<T, const N: usize> = Chain<Shift<T, N>, Linear<T, N>, T, N>;
+pub type Affine<T, const N: usize> = Chain<Shift<T, N>, Linear<T, N>, Vector<T, N>>;
 
 pub type Affine2<T> = Affine<T, 2>;
 pub type Affine3<T> = Affine<T, 3>;
