@@ -9,7 +9,7 @@ use num_traits::{Float, Num, One, Zero, Inv};
 
 /// Quaternion.
 #[repr(transparent)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct Quaternion<T> {
     vec: Vector4<T>,
 }

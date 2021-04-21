@@ -9,7 +9,7 @@ use num_traits::{Float, Num, One, Zero, Inv};
 
 /// Complex number.
 #[repr(transparent)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct Complex<T> {
     vec: Vector2<T>,
 }
