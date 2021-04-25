@@ -8,9 +8,7 @@ use crate::{
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
-#[cfg(feature = "rand")]
-use num_traits::FloatConst;
-use num_traits::{Float, Num, NumCast, One};
+use num_traits::{Float, Num, NumCast, One, FloatConst};
 #[cfg(feature = "rand")]
 use rand_::{
     distributions::{uniform::SampleUniform, Distribution, Uniform as RangedUniform},
