@@ -1,4 +1,4 @@
-use crate::{Transform};
+use crate::{Transform, transform::Directional, traits::Normalize};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::marker::PhantomData;
@@ -87,6 +87,21 @@ where
     fn chain(self, other: Self) -> Self {
         let (roa, rsb) = self.inner.reorder(other.outer);
         Self::new(self.outer.chain(roa), rsb.chain(other.inner))
+    }
+}
+
+impl<A, B, T> Directional<T> for Chain<A, B, T>
+where
+    A: Directional<T>,
+    B: Directional<T>,
+    Self: Transform<T>,
+    T: Normalize + Copy
+{
+    fn apply_dir(&self, pos: T, dir: T) -> T {
+        self.outer.apply_dir(self.inner.apply(pos), self.inner.apply_dir(pos, dir))
+    }
+    fn apply_normal(&self, pos: T, normal: T) -> T {
+        self.outer.apply_normal(self.inner.apply(pos), self.inner.apply_normal(pos, normal))
     }
 }
 

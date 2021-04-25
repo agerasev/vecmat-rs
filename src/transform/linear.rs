@@ -1,14 +1,14 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Invertible, Normal};
 use crate::{
-    traits::Dot,
-    transform::{Reorder, Shift},
+    traits::{Dot, Normalize},
+    transform::{Reorder, Shift, Directional},
     Matrix, Transform, Vector,
 };
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
-use num_traits::{Float, Num, NumCast, One};
+use num_traits::{Float, Num, NumCast, One, Inv};
 #[cfg(feature = "rand")]
 use rand_::{distributions::Distribution, Rng};
 
@@ -64,6 +64,28 @@ where
         Self {
             lin: self.lin.dot(other.lin),
         }
+    }
+}
+
+impl<T, const N: usize> Linear<T, N>
+where
+    T: Neg<Output = T> + Num + Copy,
+    Matrix<T, N, N>: Inv<Output=Matrix<T, N, N>>,
+{
+    pub fn normal_transform(self) -> Self {
+        Self { lin: self.lin.inv().transpose() }
+    }
+}
+
+impl<T, const N: usize> Directional<Vector<T, N>> for Linear<T, N>
+where
+    Self: Transform<Vector<T, N>>,
+    T: Neg<Output = T> + Num + Copy,
+    Vector<T, N>: Normalize,
+    Matrix<T, N, N>: Inv<Output=Matrix<T, N, N>>,
+{
+    fn apply_normal(&self, _: Vector<T, N>, normal: Vector<T, N>) -> Vector<T, N> {
+        self.normal_transform().apply(normal).normalize()
     }
 }
 

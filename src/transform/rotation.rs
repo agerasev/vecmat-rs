@@ -1,9 +1,9 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Uniform, Unit};
 use crate::{
-    transform::{Linear, Reorder, Shift},
+    transform::{Linear, Reorder, Shift, Directional},
     Complex, Matrix, Quaternion, Transform, Vector,
-    traits::Dot,
+    traits::{Dot, Normalize},
 };
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
@@ -84,6 +84,12 @@ where
         }
     }
 }
+
+impl<T> Directional<Vector<T, 2>> for Rotation2<T>
+where
+    Self: Transform<Vector<T, 2>>,
+    Vector<T, 2>: Normalize,
+{}
 
 impl<T> Rotation2<T>
 where
@@ -200,6 +206,12 @@ where
         }
     }
 }
+
+impl<T> Directional<Vector<T, 3>> for Rotation3<T>
+where
+    Self: Transform<Vector<T, 3>>,
+    Vector<T, 3>: Normalize,
+{}
 
 impl<T> Rotation3<T>
 where

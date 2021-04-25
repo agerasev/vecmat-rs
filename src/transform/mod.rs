@@ -12,7 +12,9 @@ pub use rotation::*;
 pub use shift::*;
 pub use moebius::*;
 
-/// General N-dimensional tansformation trait.
+use crate::traits::Normalize;
+
+/// General tansformation trait.
 ///
 /// It's assumed that transfomation is a group.
 pub trait Transform<T> {
@@ -30,4 +32,13 @@ pub trait Transform<T> {
     ///
     /// `C = A.chain(B)` means that `C(x) = A(B(x))`.
     fn chain(self, other: Self) -> Self;
+}
+
+pub trait Directional<T: Normalize>: Transform<T> {
+    fn apply_dir(&self, pos: T, dir: T) -> T {
+        self.deriv(pos, dir).normalize()
+    }
+    fn apply_normal(&self, pos: T, normal: T) -> T {
+        self.apply_dir(pos, normal)
+    }
 }

@@ -1,5 +1,5 @@
 pub use crate::complex::Moebius;
-use crate::{complex::{Complex, Quaternion}, Transform};
+use crate::{complex::{Complex, Quaternion}, Transform, transform::Directional, traits::Normalize};
 use core::ops::Neg;
 use num_traits::{Num, NumCast};
 
@@ -49,3 +49,15 @@ where
         Moebius::chain(self, other)
     }
 }
+
+impl<T> Directional<Complex<T>> for Moebius<Complex<T>>
+where
+    Self: Transform<Complex<T>>,
+    Complex<T>: Normalize,
+{}
+
+impl<T> Directional<Quaternion<T>> for Moebius<Complex<T>>
+where
+    Self: Transform<Quaternion<T>>,
+    Quaternion<T>: Normalize,
+{}

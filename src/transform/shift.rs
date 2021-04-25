@@ -1,6 +1,6 @@
 #[cfg(feature = "rand")]
 use crate::distr::Normal;
-use crate::{Transform, Vector};
+use crate::{Transform, Vector, transform::Directional, traits::Normalize};
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
@@ -62,6 +62,12 @@ where
         }
     }
 }
+
+impl<T, const N: usize> Directional<Vector<T, N>> for Shift<T, N>
+where
+    Self: Transform<Vector<T, N>>,
+    Vector<T, N>: Normalize,
+{}
 
 #[cfg(feature = "rand")]
 impl<T, const N: usize> Distribution<Shift<T, N>> for Normal
