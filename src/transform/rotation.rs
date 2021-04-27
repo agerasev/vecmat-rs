@@ -3,7 +3,7 @@ use crate::distr::{Uniform, Unit};
 use crate::{
     transform::{Linear, Reorder, Shift, Directional},
     Complex, Matrix, Quaternion, Transform, Vector,
-    traits::{Dot, Normalize},
+    traits::Dot,
 };
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
@@ -86,8 +86,14 @@ where
 impl<T> Directional<Vector<T, 2>> for Rotation2<T>
 where
     Self: Transform<Vector<T, 2>>,
-    Vector<T, 2>: Normalize,
-{}
+{
+    fn apply_dir(&self, pos: Vector<T, 2>, dir: Vector<T, 2>) -> Vector<T, 2> {
+        self.deriv(pos, dir)
+    }
+    fn apply_normal(&self, pos: Vector<T, 2>, normal: Vector<T, 2>) -> Vector<T, 2> {
+        self.apply_dir(pos, normal)
+    }
+}
 
 impl<T> Rotation2<T>
 where
@@ -208,8 +214,14 @@ where
 impl<T> Directional<Vector<T, 3>> for Rotation3<T>
 where
     Self: Transform<Vector<T, 3>>,
-    Vector<T, 3>: Normalize,
-{}
+{
+    fn apply_dir(&self, pos: Vector<T, 3>, dir: Vector<T, 3>) -> Vector<T, 3> {
+        self.deriv(pos, dir)
+    }
+    fn apply_normal(&self, pos: Vector<T, 3>, normal: Vector<T, 3>) -> Vector<T, 3> {
+        self.apply_dir(pos, normal)
+    }
+}
 
 impl<T> Rotation3<T>
 where

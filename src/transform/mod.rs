@@ -3,6 +3,7 @@ mod chain;
 mod linear;
 mod rotation;
 mod shift;
+mod scale;
 mod moebius;
 
 pub use affine::*;
@@ -10,9 +11,8 @@ pub use chain::*;
 pub use linear::*;
 pub use rotation::*;
 pub use shift::*;
+pub use scale::*;
 pub use moebius::*;
-
-use crate::traits::Normalize;
 
 /// General tansformation trait.
 ///
@@ -34,11 +34,12 @@ pub trait Transform<T> {
     fn chain(self, other: Self) -> Self;
 }
 
-pub trait Directional<T: Normalize>: Transform<T> {
-    fn apply_dir(&self, pos: T, dir: T) -> T {
-        self.deriv(pos, dir).normalize()
-    }
-    fn apply_normal(&self, pos: T, normal: T) -> T {
-        self.apply_dir(pos, normal)
-    }
+pub trait Directional<T>: Transform<T> {
+    /// Returns the result of the direction transformation at the specified position.
+    fn apply_dir(&self, pos: T, dir: T) -> T;
+
+    /// Returns the result of the normal transformation at the specified position.
+    /// 
+    /// If the transformation is conformal then the result is equal to `apply_dir`.
+    fn apply_normal(&self, pos: T, normal: T) -> T;
 }

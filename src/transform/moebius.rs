@@ -54,10 +54,24 @@ impl<T> Directional<Complex<T>> for Moebius<Complex<T>>
 where
     Self: Transform<Complex<T>>,
     Complex<T>: Normalize,
-{}
+{
+    fn apply_dir(&self, pos: Complex<T>, dir: Complex<T>) -> Complex<T> {
+        self.deriv(pos, dir).normalize()
+    }
+    fn apply_normal(&self, pos: Complex<T>, normal: Complex<T>) -> Complex<T> {
+        self.apply_dir(pos, normal)
+    }
+}
 
 impl<T> Directional<Quaternion<T>> for Moebius<Complex<T>>
 where
     Self: Transform<Quaternion<T>>,
     Quaternion<T>: Normalize,
-{}
+{
+    fn apply_dir(&self, pos: Quaternion<T>, dir: Quaternion<T>) -> Quaternion<T> {
+        self.deriv(pos, dir).normalize()
+    }
+    fn apply_normal(&self, pos: Quaternion<T>, normal: Quaternion<T>) -> Quaternion<T> {
+        self.apply_dir(pos, normal)
+    }
+}

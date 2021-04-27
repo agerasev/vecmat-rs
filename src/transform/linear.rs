@@ -84,6 +84,9 @@ where
     Vector<T, N>: Normalize,
     Matrix<T, N, N>: Inv<Output=Matrix<T, N, N>>,
 {
+    fn apply_dir(&self, pos: Vector<T, N>, dir: Vector<T, N>) -> Vector<T, N> {
+        self.deriv(pos, dir).normalize()
+    }
     fn apply_normal(&self, _: Vector<T, N>, normal: Vector<T, N>) -> Vector<T, N> {
         self.normal_transform().apply(normal).normalize()
     }
@@ -126,12 +129,12 @@ impl<T> Linear<T, 3>
 where
     T: Float,
 {
-    /// Returns the transformation that rotates `dir` to `-z`-axis
-    /// and `up` to `y`-axis.
+    /// Returns the transformation that rotates `-z`-axis to `dir`
+    /// and `y`-axis to `up`.
     pub fn look_at(dir: Vector<T, 3>, up: Vector<T, 3>) -> Self {
         let right = dir.cross(up).normalize();
         let strict_up = right.cross(dir);
-        Self::from(Matrix::from([right, strict_up, -dir]))
+        Self::from(Matrix::from([right, strict_up, -dir]).transpose())
     }
 }
 impl<T> Linear<T, 3>
@@ -241,7 +244,7 @@ mod tests {
             let d: Vector<f64, 3> = rng.sample(&Unit);
             let m = Linear::look_at_any(d);
 
-            assert_abs_diff_eq!(m.apply(d), Vector::from([0.0, 0.0, -1.0]), epsilon = EPS);
+            assert_abs_diff_eq!(m.apply(Vector::from([0.0, 0.0, -1.0])), d, epsilon = EPS);
         }
     }
 }
