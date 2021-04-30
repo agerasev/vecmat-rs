@@ -255,10 +255,10 @@ impl<T> Rotation3<T>
 where
     T: Float + FloatConst,
 {
-    /// Returns any of transformations that rotate `dir` to `-z`-axis.
+    /// Returns any of transformations that rotate `-z`-axis to `dir`.
     pub fn look_at_any(dir: Vector<T, 3>) -> Self {
         let z = Vector::from((T::zero(), T::zero(), -T::one()));
-        let cross = dir.cross(z);
+        let cross = z.cross(dir);
         let cross_len = cross.length();
         if cross_len > T::epsilon() {
             let dot = dir.dot(z);
@@ -468,7 +468,7 @@ mod tests {
                 let d: Vector<f64, 3> = rng.sample(&Unit);
                 let m = Rotation3::look_at_any(d);
 
-                assert_abs_diff_eq!(m.apply(d), Vector::from([0.0, 0.0, -1.0]), epsilon = EPS);
+                assert_abs_diff_eq!(m.apply(Vector::from([0.0, 0.0, -1.0])), d, epsilon = EPS);
             }
         }
     }
