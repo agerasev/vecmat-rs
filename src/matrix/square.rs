@@ -1,6 +1,6 @@
 use crate::{Matrix, Vector};
 use core::ops::{Index, IndexMut, Neg};
-use num_traits::{Num, One, Zero};
+use num_traits::{Num, One, Zero, Inv};
 
 impl<T, const N: usize> Matrix<T, N, N>
 where
@@ -163,6 +163,17 @@ where
 
     /// Inverse matrix.
     pub fn inv(&self) -> Self {
+        self.adj() / self.det()
+    }
+}
+
+impl<T, const N: usize> Inv for Matrix<T, N, N>
+where
+    T: Neg<Output = T> + Num + Copy,
+{
+    type Output = Self;
+
+    fn inv(self) -> Self::Output {
         self.adj() / self.det()
     }
 }
