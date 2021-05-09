@@ -253,19 +253,22 @@ where
 
 impl<T> Rotation3<T>
 where
-    T: Float + FloatConst,
+    T: Float + NumCast + FloatConst,
 {
     /// Returns any of transformations that rotate `-z`-axis to `dir`.
     pub fn look_at_any(dir: Vector<T, 3>) -> Self {
         let z = Vector::from((T::zero(), T::zero(), -T::one()));
-        let cross = z.cross(dir);
-        let cross_len = cross.length();
-        if cross_len > T::epsilon() {
-            let dot = dir.dot(z);
-            Self::new(cross / cross_len, cross_len.atan2(dot))
+        let dot = z.dot(dir);
+        if T::one() + dot < T::epsilon() {
+            Self::new(
+                Vector::from((T::zero(), T::one(), T::zero())),
+                T::from(T::PI()).unwrap(),
+            )
         } else {
-            let y = Vector::from((T::zero(), T::one(), T::zero()));
-            Self::new(y, T::from(T::PI()).unwrap())
+            let cross = z.cross(dir);
+            let cos = ((T::one() + dot) / T::from(2).unwrap()).sqrt();
+            let sin_mult = T::one() / (T::from(2).unwrap() * cos);
+            Self::from_quaternion((cos, cross * sin_mult).into())
         }
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "vecmat"
-version = "0.7.4"
+version = "0.7.5"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
 edition = "2018"
 
