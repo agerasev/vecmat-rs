@@ -12,10 +12,8 @@ environment:
       target: i686-pc-windows-msvc
     - channel: nightly
       target: x86_64-pc-windows-msvc
-      cargoflags: --features "unstable"
     - channel: nightly
       target: i686-pc-windows-msvc
-      cargoflags: --features "unstable"
 
     - channel: stable
       target: x86_64-pc-windows-gnu
@@ -27,10 +25,8 @@ environment:
       target: i686-pc-windows-gnu
     - channel: nightly
       target: x86_64-pc-windows-gnu
-      cargoflags: --features "unstable"
     - channel: nightly
       target: i686-pc-windows-gnu
-      cargoflags: --features "unstable"
 
 matrix:
   allow_failures:
