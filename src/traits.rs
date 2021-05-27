@@ -60,6 +60,12 @@ pub trait Epsilon {
     fn is_epsilon(&self) -> bool;
 }
 
+/// Make new dimensions by copying values along axes. 
+pub trait Broadcast<V> {
+    /// Copy values along axes to get `V`.
+    fn broadcast(self) -> V;
+}
+
 macro_rules! derive_primitive_base {
     ($T:ident) => {
         impl Dot for $T {

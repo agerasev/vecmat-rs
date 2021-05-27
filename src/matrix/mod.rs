@@ -10,6 +10,7 @@ mod square;
 #[cfg(test)]
 mod tests;
 mod transpose;
+mod math;
 
 pub use base::*;
 #[cfg(feature = "rand")]

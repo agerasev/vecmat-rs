@@ -8,6 +8,7 @@ mod ops;
 mod spec;
 #[cfg(test)]
 mod tests;
+mod math;
 
 pub use base::*;
 #[cfg(feature = "rand")]
