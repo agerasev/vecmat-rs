@@ -3,9 +3,12 @@ use crate::{
     traits::{Conj, Dot, NormL1, NormL2, Normalize},
     vector::Vector2,
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
+use core::{
+    iter::{Product, Sum},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
+};
 use num_complex::{Complex as NumComplex, ParseComplexError};
-use num_traits::{Float, Num, One, Zero, Inv};
+use num_traits::{Float, Inv, Num, One, Zero};
 
 /// Complex number.
 #[repr(transparent)]
@@ -373,7 +376,7 @@ where
 }
 impl<T> Normalize for Complex<T>
 where
-    T: Float
+    T: Float,
 {
     fn normalize(self) -> Self {
         Complex::normalize(self)
@@ -390,7 +393,7 @@ where
 }
 impl<T> Inv for Complex<T>
 where
-    T: Float
+    T: Float,
 {
     type Output = Self;
     fn inv(self) -> Self {
@@ -550,5 +553,23 @@ impl<T: Float> Complex<T> {
     }
     pub fn fdiv(self, other: Self) -> Self {
         self.into_num().fdiv(other.into_num()).into()
+    }
+}
+
+impl<T> Sum for Complex<T>
+where
+    Self: Zero + Add,
+{
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), |a, x| a + x)
+    }
+}
+
+impl<T> Product for Complex<T>
+where
+    Self: One + Mul,
+{
+    fn product<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::one(), |a, x| a * x)
     }
 }

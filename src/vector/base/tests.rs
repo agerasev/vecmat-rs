@@ -132,4 +132,11 @@ mod iter {
             assert_eq!(y, *b);
         }
     }
+
+    #[test]
+    fn sum() {
+        let a = <Vector16<usize>>::try_from_iter(&mut (0..16)).unwrap();
+
+        assert_eq!(a.into_iter().sum::<usize>(), (15 * 16) / 2);
+    }
 }

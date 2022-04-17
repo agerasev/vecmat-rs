@@ -4,8 +4,11 @@ use crate::{
     traits::{Conj, Dot, NormL1, NormL2, Normalize},
     vector::{Vector3, Vector4},
 };
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign};
-use num_traits::{Float, Num, One, Zero, Inv};
+use core::{
+    iter::{Product, Sum},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
+};
+use num_traits::{Float, Inv, Num, One, Zero};
 
 /// Quaternion.
 #[repr(transparent)]
@@ -499,7 +502,7 @@ where
 
 impl<T> Normalize for Quaternion<T>
 where
-    T: Float
+    T: Float,
 {
     fn normalize(self) -> Self {
         Quaternion::normalize(self)
@@ -517,7 +520,7 @@ where
 
 impl<T> Inv for Quaternion<T>
 where
-    T: Float
+    T: Float,
 {
     type Output = Self;
     fn inv(self) -> Self {
@@ -625,5 +628,23 @@ where
     type Output = T;
     fn dot(self, other: Self) -> T {
         self.vec.dot(other.vec)
+    }
+}
+
+impl<T> Sum for Quaternion<T>
+where
+    Self: Zero + Add,
+{
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::zero(), |a, x| a + x)
+    }
+}
+
+impl<T> Product for Quaternion<T>
+where
+    Self: One + Mul,
+{
+    fn product<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Self::one(), |a, x| a * x)
     }
 }
