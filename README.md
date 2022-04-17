@@ -3,19 +3,16 @@
 [![Crates.io][crates_badge]][crates]
 [![Docs.rs][docs_badge]][docs]
 [![Github Actions][github_badge]][github]
-[![Appveyor][appveyor_badge]][appveyor]
 [![License][license_badge]][license]
 
 [crates_badge]: https://img.shields.io/crates/v/vecmat.svg
 [docs_badge]: https://docs.rs/vecmat/badge.svg
 [github_badge]: https://github.com/agerasev/vecmat-rs/actions/workflows/test.yml/badge.svg
-[appveyor_badge]: https://ci.appveyor.com/api/projects/status/e43qp5a1alb9ilcp/branch/master?svg=true
 [license_badge]: https://img.shields.io/crates/l/vecmat.svg
 
 [crates]: https://crates.io/crates/vecmat
 [docs]: https://docs.rs/vecmat
 [github]: https://github.com/agerasev/vecmat-rs/actions/workflows/test.yml
-[appveyor]: https://ci.appveyor.com/project/agerasev/vecmat-rs
 [license]: #license
 
 Low-dimensional vector algebra with const generics support.
