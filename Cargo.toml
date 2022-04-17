@@ -2,7 +2,7 @@
 name = "vecmat"
 version = "0.7.7"
 authors = ["Alexey Gerasev <alexey.gerasev@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 description = "Low-dimensional vector algebra with min_const_generics support"
 documentation = "https://docs.rs/vecmat"
@@ -19,7 +19,7 @@ num-complex = { version = "0.4", default-features = false, features = ["libm"] }
 num-integer = { version = "0.1", default-features = false }
 
 rand_ = { package = "rand", version = "0.8", optional = true }
-approx = { version = "0.4", optional = true }
+approx = { version = "0.5", optional = true }
 
 [dev-dependencies]
 rand_xorshift = "0.3"

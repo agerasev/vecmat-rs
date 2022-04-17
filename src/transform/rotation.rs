@@ -1,14 +1,14 @@
 #[cfg(feature = "rand")]
 use crate::distr::{Uniform, Unit};
 use crate::{
-    transform::{Linear, Reorder, Shift, Directional},
-    Complex, Matrix, Quaternion, Transform, Vector,
     traits::Dot,
+    transform::{Directional, Linear, Reorder, Shift},
+    Complex, Matrix, Quaternion, Transform, Vector,
 };
 #[cfg(feature = "approx")]
 use approx::{abs_diff_eq, AbsDiffEq};
 use core::ops::Neg;
-use num_traits::{Float, Num, NumCast, One, FloatConst};
+use num_traits::{Float, FloatConst, Num, NumCast, One};
 #[cfg(feature = "rand")]
 use rand_::{
     distributions::{uniform::SampleUniform, Distribution, Uniform as RangedUniform},
@@ -48,7 +48,7 @@ where
 {
     pub fn new(angle: T) -> Self {
         Self {
-            comp: Complex::new(angle.clone().cos(), angle.sin()),
+            comp: Complex::new(angle.cos(), angle.sin()),
         }
     }
     pub fn angle(&self) -> T {
@@ -262,8 +262,7 @@ where
         let z = Vector::from((T::zero(), T::zero(), -T::one()));
         let dot = z.dot(dir);
         if dot < T::zero() {
-            Self::look_at_any(-dir)
-            .chain(Self::new(
+            Self::look_at_any(-dir).chain(Self::new(
                 Vector::from((T::one(), T::zero(), T::zero())),
                 T::PI(),
             ))
@@ -280,8 +279,7 @@ where
         if dir.z() < T::zero() {
             Self::look_at_any_cont(dir)
         } else {
-            Self::look_at_any_cont(-dir)
-            .chain(Self::new(
+            Self::look_at_any_cont(-dir).chain(Self::new(
                 Vector::from((T::one(), T::zero(), T::zero())),
                 T::PI(),
             ))
@@ -476,7 +474,6 @@ mod tests {
                 );
             }
         }
-
 
         #[test]
         fn look_to_the_direction() {

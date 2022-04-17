@@ -45,7 +45,7 @@ where
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vector<T, N> {
         loop {
             let x = rng.sample(&Normal);
-            if x.clone().length() > T::epsilon() {
+            if x.length() > T::epsilon() {
                 break x;
             }
         }

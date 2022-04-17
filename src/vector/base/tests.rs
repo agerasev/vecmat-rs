@@ -74,7 +74,7 @@ mod mem {
         }
         mem::drop(a);
 
-        assert!(<Vector16<_>>::try_from_iter(&mut v.iter().cloned().take(8)).is_none());
+        assert!(<Vector16<_>>::try_from_iter(&mut v.iter().take(8).cloned()).is_none());
         for x in v.iter() {
             assert_eq!(Rc::strong_count(x), 1);
         }
@@ -125,7 +125,7 @@ mod iter {
     #[test]
     fn unzip() {
         let c = <Vector16<_>>::try_from_iter(&mut (0i32..16).zip(-16..0i8)).unwrap();
-        let (a, b) = c.clone().unzip();
+        let (a, b) = c.unzip();
 
         for ((x, y), (a, b)) in c.into_iter().zip(a.iter().zip(b.iter())) {
             assert_eq!(x, *a);

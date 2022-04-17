@@ -36,7 +36,7 @@ impl<T> Moebius<T> {
         self.into_matrix().into_array_of_arrays()
     }
     pub fn as_array_of_arrays(&self) -> &[[T; 2]; 2] {
-        &self.as_matrix().as_array_of_arrays()
+        self.as_matrix().as_array_of_arrays()
     }
     pub fn as_mut_array_of_arrays(&mut self) -> &mut [[T; 2]; 2] {
         self.as_mut_matrix().as_mut_array_of_arrays()

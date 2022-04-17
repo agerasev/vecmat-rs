@@ -22,7 +22,7 @@ impl<T, const N: usize> IntoIterator for Vector<T, N> {
     type Item = T;
     type IntoIter = IntoIter<T, N>;
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter::new(self.into())
+        self.into_array().into_iter()
     }
 }
 
