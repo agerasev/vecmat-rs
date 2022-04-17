@@ -100,7 +100,7 @@ impl<T, const N: usize> Vector<T, N> {
     }
     /// Map vector elements.
     pub fn map<U, F: FnMut(T) -> U>(self, f: F) -> Vector<U, N> {
-        Vector::try_from_iter(&mut self.into_iter().map(f)).unwrap()
+        self.into_array().map(f).into()
     }
     /// Zip two vectors into one.
     pub fn zip<U>(self, other: Vector<U, N>) -> Vector<(T, U), N> {
